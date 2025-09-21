@@ -4,8 +4,7 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 
 # Copia apenas o package.json para aproveitar o cache do Docker
-COPY src/package*.json ./
-
+COPY package*.json ./
 # Instala as dependências
 RUN npm install
 

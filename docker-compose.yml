@@ -2,10 +2,13 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: angular_app
+      dockerfile: Dockerfile.dev
+    container_name: angular_app_dev
     ports:
-      - "4200:80"
+      - "4200:4200"
+    volumes:
+      - .:/app
+      - /app/node_modules
     networks:
       - app-network
     restart: unless-stopped
