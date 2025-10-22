@@ -1,14 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-
-interface PatientData {
-  full_name: string;
-  birth_date: string;
-  gender: string;
-  marital_status: string;
-  cpf: string;
-  rg: string;
-}
+import { PatientService, Patient } from '../services';
 
 @Component({
   selector: 'app-patient-register',
@@ -18,7 +10,7 @@ interface PatientData {
 })
 export class PatientRegister {
   
-  patientData: PatientData = {
+  patientData: Patient = {
     full_name: '',
     birth_date: '',
     gender: '',
@@ -31,7 +23,10 @@ export class PatientRegister {
   successMessage: string = '';
   errorMessage: string = '';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private patientService: PatientService
+  ) {}
 
   onSubmit(): void {
     if (this.validateForm()) {
@@ -112,21 +107,67 @@ export class PatientRegister {
   }
 
   private savePatient(): void {
-    // Simular delay de API
-    setTimeout(() => {
-      console.log('Dados do paciente:', this.patientData);
-      
-      // Simular sucesso
-      this.isLoading = false;
-      this.successMessage = 'Paciente cadastrado com sucesso!';
-      
-      // Resetar formulário após sucesso
-      setTimeout(() => {
-        this.resetForm();
-        this.successMessage = '';
-      }, 2000);
-      
-    }, 1500);
+    // Formatar a data para o formato esperado pelo backend (m-d-Y)
+    const formattedData = {
+      ...this.patientData,
+      birth_date: this.formatDateForAPI(this.patientData.birth_date)
+    };
+
+    this.patientService.createPatient(formattedData).subscribe({
+      next: (response) => {
+        console.log('Paciente cadastrado com sucesso:', response);
+        this.isLoading = false;
+        this.successMessage = 'Paciente cadastrado com sucesso!';
+        
+        // Resetar formulário após sucesso
+        setTimeout(() => {
+          this.resetForm();
+          this.successMessage = '';
+          // Opcionalmente redirecionar para lista de pacientes
+          // this.router.navigate(['/lista-pacientes']);
+        }, 2000);
+      },
+      error: (error) => {
+        console.error('Erro ao cadastrar paciente:', error);
+        this.isLoading = false;
+        
+        if (error.status === 422) {
+          // Erro de validação
+          this.handleValidationErrors(error.error.errors);
+        } else if (error.status === 409) {
+          this.errorMessage = 'CPF ou RG já cadastrado no sistema';
+        } else {
+          this.errorMessage = 'Erro no servidor. Tente novamente.';
+        }
+      }
+    });
+  }
+
+  private formatDateForAPI(date: string): string {
+    // Converter de YYYY-MM-DD para MM-DD-YYYY (formato esperado pelo backend)
+    if (!date) return '';
+    
+    const [year, month, day] = date.split('-');
+    return `${month}-${day}-${year}`;
+  }
+
+  private handleValidationErrors(errors: any): void {
+    // Tratar erros de validação específicos
+    if (errors.cpf) {
+      this.errorMessage = errors.cpf[0];
+    } else if (errors.full_name) {
+      this.errorMessage = errors.full_name[0];
+    } else if (errors.birth_date) {
+      this.errorMessage = 'Data de nascimento inválida';
+    } else if (errors.gender) {
+      this.errorMessage = 'Gênero inválido';
+    } else if (errors.marital_status) {
+      this.errorMessage = 'Estado civil inválido';
+    } else if (errors.rg) {
+      this.errorMessage = errors.rg[0];
+    } else {
+      this.errorMessage = 'Dados inválidos. Verifique os campos preenchidos.';
+    }
   }
 
   resetForm(): void {
