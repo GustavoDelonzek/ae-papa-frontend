@@ -1,0 +1,102 @@
+<app-sidebar></app-sidebar>
+
+<div class="patient-list-container">
+  <header class="patient-list-header">
+    <h1>Pacientes</h1>
+    <div class="search-container">
+      <input 
+        type="text" 
+        placeholder="Pesquisar" 
+        class="search-input"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()">
+      <button class="search-button">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="patient-list-content">
+    <div class="content-header">
+      <h2>Lista de pacientes</h2>
+      <button class="btn-add-patient" (click)="addPatient()">
+        <i class="fas fa-plus"></i> Adicionar Paciente
+      </button>
+    </div>
+
+    <!-- Exibir mensagem de erro -->
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+
+    <div class="patients-grid" *ngIf="filteredPatients && filteredPatients.length > 0; else noPatients">
+      <div 
+        class="patient-card" 
+        *ngFor="let patient of filteredPatients"
+        (click)="viewPatient(patient.id!)">
+        
+        <div class="patient-photo">
+          <img *ngIf="patient.photo" [src]="patient.photo" [alt]="patient.full_name">
+          <div *ngIf="!patient.photo" class="photo-placeholder">
+            <i class="fas fa-user"></i>
+          </div>
+        </div>
+
+        <div class="patient-info">
+          <h3>{{ patient.full_name }}</h3>
+          <p class="patient-age">{{ getPatientAge(patient.birth_date) }} anos</p>
+          <p class="patient-id">ID: {{ patient.id }}</p>
+          <p class="patient-cpf">CPF: {{ formatCPF(patient.cpf) }}</p>
+        </div>
+
+        <div class="patient-status">
+          <span class="status-badge" [ngClass]="getStatusClass('active')">
+            {{ patient.gender === 'M' ? 'Masculino' : 'Feminino' }}
+          </span>
+          <span class="marital-status">
+            {{ getMaritalStatusText(patient.marital_status) }}
+          </span>
+        </div>
+
+        <div class="patient-actions">
+          <button 
+            class="btn-view" 
+            (click)="viewPatient(patient.id!); $event.stopPropagation()"
+            title="Visualizar">
+            <i class="fas fa-eye"></i>
+          </button>
+          <button 
+            class="btn-edit" 
+            (click)="editPatient(patient.id!); $event.stopPropagation()"
+            title="Editar">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button 
+            class="btn-delete" 
+            (click)="deletePatient(patient.id!); $event.stopPropagation()"
+            title="Deletar">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noPatients>
+      <div class="no-patients">
+        <i class="fas fa-users"></i>
+        <h3>Nenhum paciente encontrado</h3>
+        <p *ngIf="searchTerm">Tente ajustar os termos de pesquisa</p>
+        <p *ngIf="!searchTerm">Comece adicionando seu primeiro paciente</p>
+        <button class="btn-add-first" (click)="addPatient()">
+          <i class="fas fa-plus"></i> Adicionar Primeiro Paciente
+        </button>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Loading state -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Carregando pacientes...</p>
+  </div>
+</div>

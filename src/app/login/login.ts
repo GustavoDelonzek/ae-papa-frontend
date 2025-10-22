@@ -1,41 +1,87 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '../services';
+
 interface LoginData {
-  usuario: string;
-  senha: string;
+  email: string;
+  password: string;
 }
 
 @Component({
   selector: 'app-login',
   standalone: false,
   templateUrl: './login.html',
-  styleUrl: './login.scss'
+  styleUrls: ['./login.scss']
 })
 export class Login {
+
   loginData: LoginData = {
-    usuario: '',
-    senha: ''
+    email: '',
+    password: ''
   };
 
-  onSubmit(): void {
-    if (this.loginData.usuario && this.loginData.senha) {
-      console.log('Dados de login:', this.loginData);
-      // Aqui você pode implementar a lógica de autenticação
-      // Por exemplo, chamar um serviço de autenticação
-      this.authenticateUser();
+  isLoading: boolean = false;
+  errorMessage: string = '';
+
+  constructor(
+    private router: Router,
+    @Inject(AuthService) private authService: AuthService
+  ) {
+    // Se já estiver logado, redirecionar para home
+    if (this.authService.isAuthenticated()) {
+      this.router.navigate(['/']);
     }
   }
 
-  private authenticateUser(): void {
-    // Implementar lógica de autenticação aqui
-    // Por enquanto, apenas um log
-    console.log('Tentando autenticar usuário:', this.loginData.usuario);
-    
-    // Exemplo de validação simples (remover em produção)
-    if (this.loginData.usuario === 'admin' && this.loginData.senha === 'admin') {
-      alert('Login realizado com sucesso!');
-      // Redirecionar para dashboard ou página principal
-    } else {
-      alert('Credenciais inválidas!');
+  onSubmit(): void {
+    if (this.validateForm()) {
+      this.isLoading = true;
+      this.errorMessage = '';
+
+      this.authService.login(this.loginData.email, this.loginData.password)
+        .subscribe({
+          next: (response) => {
+            console.log('Login realizado com sucesso:', response);
+            
+            // Salvar dados de autenticação
+            this.authService.setAuthData(response.user, response.token);
+            
+            this.isLoading = false;
+            
+            // Redirecionar para a página inicial
+            this.router.navigate(['/']);
+          },
+          error: (error) => {
+            console.error('Erro no login:', error);
+            this.isLoading = false;
+            
+            if (error.status === 401) {
+              this.errorMessage = 'Email ou senha incorretos';
+            } else {
+              this.errorMessage = 'Erro no servidor. Tente novamente.';
+            }
+          }
+        });
     }
+  }
+
+  private validateForm(): boolean {
+    if (!this.loginData.email.trim()) {
+      this.errorMessage = 'Email é obrigatório';
+      return false;
+    }
+
+    if (!this.loginData.password.trim()) {
+      this.errorMessage = 'Senha é obrigatória';
+      return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.loginData.email)) {
+      this.errorMessage = 'Email inválido';
+      return false;
+    }
+
+    return true;
   }
 }

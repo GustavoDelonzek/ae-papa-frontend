@@ -1,7 +1,8 @@
 <div class="login-container">
-  <!--vai entrar a imagem de fundo aqui -->
   <div class="login-left">
-    <img src="assets/images/imagem-fundo-login.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;" alt="img2">
+    <img src="assets/images/imagem-fundo-login.jpg" 
+         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;" 
+         alt="Background">
     <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(79, 209, 199, 0.7) 0%, rgba(59, 169, 156, 0.7) 100%); z-index: 2;"></div>
   </div>
   
@@ -12,43 +13,60 @@
           <img src="assets/images/logo.png" alt="Logo AEPAPA" class="logo-image">
         </div>
       </div>
-      
+
       <h2 class="login-title">Entrar</h2>
+
+      <!-- Exibir mensagem de erro -->
+      <div *ngIf="errorMessage" class="error-message" 
+           style="color: #dc3545; text-align: center; margin-bottom: 15px; padding: 10px; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px;">
+        {{ errorMessage }}
+      </div>
 
       <form class="login-form" (ngSubmit)="onSubmit()" #loginForm="ngForm">
         <div class="form-group">
-          <label for="usuario" class="form-label">Usuário</label>
+          <label for="email" class="form-label">Email</label>
           <input 
-            type="text" 
-            id="usuario"
-            name="usuario"
+            type="email" 
+            id="email"
+            name="email"
             class="form-control"
-            [(ngModel)]="loginData.usuario"
+            [(ngModel)]="loginData.email"
             required
-            #usuario="ngModel"
-            placeholder="Digite seu usuário">
+            email
+            #email="ngModel"
+            placeholder="Digite seu email">
+          
+          <div *ngIf="email.invalid && email.touched" 
+               style="color: #dc3545; font-size: 12px; margin-top: 5px;">
+            <small *ngIf="email.errors?.['required']">Email é obrigatório</small>
+            <small *ngIf="email.errors?.['email']">Email inválido</small>
+          </div>
         </div>
         
-        <!-- Campo Senha -->
         <div class="form-group">
-          <label for="senha" class="form-label">Senha</label>
+          <label for="password" class="form-label">Senha</label>
           <input 
             type="password" 
-            id="senha"
-            name="senha"
+            id="password"
+            name="password"
             class="form-control"
-            [(ngModel)]="loginData.senha"
+            [(ngModel)]="loginData.password"
             required
-            #senha="ngModel"
+            #password="ngModel"
             placeholder="Digite sua senha">
+          
+          <div *ngIf="password.invalid && password.touched" 
+               style="color: #dc3545; font-size: 12px; margin-top: 5px;">
+            <small *ngIf="password.errors?.['required']">Senha é obrigatória</small>
+          </div>
         </div>
         
-        <!-- Botão Entrar -->
         <button 
           type="submit" 
           class="btn btn-primary btn-entrar"
-          [disabled]="!loginForm.form.valid">
-          Entrar
+          [disabled]="!loginForm.form.valid || isLoading">
+          <span *ngIf="isLoading">Entrando...</span>
+          <span *ngIf="!isLoading">Entrar</span>
         </button>
       </form>
     </div>

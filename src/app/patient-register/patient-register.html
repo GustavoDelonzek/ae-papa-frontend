@@ -2,12 +2,12 @@
   <app-sidebar></app-sidebar>
   
   <div class="main-content">
-    <div class="content-header">
-      <h1 class="page-title">Cadastro de Pacientes</h1>
-      <p class="page-subtitle">Preencha os dados do paciente para realizar o cadastro</p>
-    </div>
     
     <div class="form-container">
+      <div class="content-header">
+        <h1 class="page-title">Cadastro de Pacientes</h1>
+        <p class="page-subtitle">Preencha os dados do paciente para realizar o cadastro</p>
+      </div>
       <form class="patient-form" (ngSubmit)="onSubmit()" #patientForm="ngForm" novalidate>
         
         <!-- Nome Completo -->
@@ -86,10 +86,10 @@
             required
             #maritalStatus="ngModel">
             <option value="">Selecione o estado civil</option>
-            <option value="solteiro">Solteiro(a)</option>
-            <option value="casado">Casado(a)</option>
-            <option value="divorciado">Divorciado(a)</option>
-            <option value="viuvo">Viúvo(a)</option>
+            <option value="single">Solteiro(a)</option>
+            <option value="married">Casado(a)</option>
+            <option value="divorced">Divorciado(a)</option>
+            <option value="widowed">Viúvo(a)</option>
           </select>
           
           <div *ngIf="maritalStatus.invalid && maritalStatus.touched" class="error-message">
