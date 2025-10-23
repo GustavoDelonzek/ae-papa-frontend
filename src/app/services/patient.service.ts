@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_URL } from '../../consts';
 
@@ -22,8 +22,21 @@ export interface PatientResponse {
 
 export interface PatientsListResponse {
   data: Patient[];
-  links?: any;
-  meta?: any;
+  links: {
+    first: string | null;
+    last: string | null;
+    prev: string | null;
+    next: string | null;
+  };
+  meta: {
+    current_page: number;
+    from: number;
+    last_page: number;
+    per_page: number;
+    to: number;
+    total: number;
+    path: string;
+  };
 }
 
 @Injectable({
@@ -41,10 +54,19 @@ export class PatientService {
   }
 
   /**
-   * Obter lista de pacientes
+   * Obter lista de pacientes com paginação e filtros
    */
-  getPatients(): Observable<PatientsListResponse> {
-    return this.http.get<PatientsListResponse>(`${API_URL}/patients`);
+  getPatients(page: number = 1, perPage: number = 15, searchTerm?: string): Observable<PatientsListResponse> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('per_page', perPage.toString());
+    
+    // Adicionar filtro de pesquisa se fornecido
+    if (searchTerm && searchTerm.trim()) {
+      params = params.set('full_name', searchTerm.trim());
+    }
+    
+    return this.http.get<PatientsListResponse>(`${API_URL}/patients`, { params });
   }
 
   /**
