@@ -6,10 +6,25 @@
     <div class="search-container">
       <input 
         type="text" 
-        placeholder="Pesquisar" 
+        placeholder="Pesquisar pacientes..." 
         class="search-input"
         [(ngModel)]="searchTerm"
         (input)="onSearch()">
+      
+      <!-- Indicador de loading da pesquisa -->
+      <div *ngIf="searching" class="search-loading">
+        <i class="fas fa-spinner fa-spin"></i>
+      </div>
+      
+      <!-- Botão para limpar pesquisa -->
+      <button 
+        *ngIf="searchTerm && !searching" 
+        class="clear-search-button"
+        (click)="clearSearch()"
+        title="Limpar pesquisa">
+        <i class="fas fa-times"></i>
+      </button>
+      
       <button class="search-button">
         <i class="fas fa-search"></i>
       </button>
@@ -92,6 +107,41 @@
         </button>
       </div>
     </ng-template>
+
+    <!-- Paginação -->
+    <div class="pagination-container" *ngIf="totalPages > 1 && !loading">
+      <div class="pagination-info">
+        <span>{{ getPaginationInfo() }}</span>
+      </div>
+      
+      <div class="pagination-controls">
+        <button 
+          class="btn-page" 
+          [disabled]="currentPage === 1"
+          (click)="previousPage()">
+          <i class="fas fa-chevron-left"></i>
+          Anterior
+        </button>
+        
+        <div class="page-numbers">
+          <button 
+            *ngFor="let page of getVisiblePages()"
+            class="btn-page-number"
+            [class.active]="page === currentPage"
+            (click)="goToPage(page)">
+            {{ page }}
+          </button>
+        </div>
+        
+        <button 
+          class="btn-page" 
+          [disabled]="currentPage === totalPages"
+          (click)="nextPage()">
+          Próxima
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Loading state -->
