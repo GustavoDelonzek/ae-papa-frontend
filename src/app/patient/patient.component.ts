@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, Params } from '@angular/router';
 import { PatientService, Patient } from '../services';
 
 @Component({
@@ -26,7 +26,7 @@ export class PatientComponent implements OnInit {
 
   ngOnInit(): void {
     // Pegar ID do paciente da rota
-    this.route.params.subscribe(params => {
+  this.route.params.subscribe((params: Params) => {
       if (params['id']) {
         this.patientId = parseInt(params['id'], 10);
         this.loadPatientData();
@@ -43,11 +43,12 @@ export class PatientComponent implements OnInit {
     this.errorMessage = '';
     
     this.patientService.getPatient(this.patientId).subscribe({
-      next: (response) => {
+      next: (response: any) => {
         this.patientData = response.data;
+        
         this.loading = false;
       },
-      error: (error) => {
+  error: (error: any) => {
         console.error('Erro ao carregar dados do paciente:', error);
         this.loading = false;
         
