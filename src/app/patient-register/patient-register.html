@@ -5,8 +5,8 @@
     
     <div class="form-container">
       <div class="content-header">
-        <h1 class="page-title">Cadastro de Pacientes</h1>
-        <p class="page-subtitle">Preencha os dados do paciente para realizar o cadastro</p>
+        <h1 class="page-title">{{ isEditing ? 'Editar Paciente' : 'Cadastro de Pacientes' }}</h1>
+        <p class="page-subtitle">{{ isEditing ? 'Atualize os dados do paciente e salve.' : 'Preencha os dados do paciente para realizar o cadastro' }}</p>
       </div>
       <form class="patient-form" (ngSubmit)="onSubmit()" #patientForm="ngForm" novalidate>
         
@@ -147,7 +147,7 @@
           <button 
             type="button" 
             class="btn btn-secondary"
-            (click)="resetForm()">
+            (click)="onCancel()">
             Cancelar
           </button>
           <button 
@@ -155,7 +155,7 @@
             class="btn btn-primary"
             [disabled]="!patientForm.form.valid || isLoading">
             <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-            {{ isLoading ? 'Salvando...' : 'Salvar Paciente' }}
+            {{ isLoading ? (isEditing ? 'Salvando...' : 'Salvando...') : (isEditing ? 'Atualizar Paciente' : 'Salvar Paciente') }}
           </button>
         </div>
 

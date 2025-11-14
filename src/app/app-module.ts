@@ -1,7 +1,8 @@
-import { NgModule } from '@angular/core';
+import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
@@ -16,6 +17,9 @@ import { PatientListComponent } from './patient-list/patient-list.component';
 import { AuthService } from './services';
 import { AuthGuard } from './guards/auth.guard';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { appInitializerFactory } from './core/app-initializer';
+import { CaretakerList } from './caretaker-list/caretaker-list';
+import { CaretakerRegister } from './caretaker-register/caretaker-register';
 
 @NgModule({
   declarations: [
@@ -26,6 +30,8 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     Sidebar,
     PatientComponent,
     PatientListComponent,
+    CaretakerList,
+    CaretakerRegister,
   ],
   imports: [
     BrowserModule,
@@ -39,6 +45,12 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: appInitializerFactory,
+      deps: [AuthService, Router],
       multi: true
     }
   ],

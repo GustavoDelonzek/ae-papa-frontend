@@ -1,1 +1,214 @@
 <app-sidebar></app-sidebar>
+
+<div class="dashboard-container">
+  <div class="dashboard-content">
+    <!-- Header -->
+    <div class="dashboard-header">
+      <div class="welcome-section">
+        <h1>Bem-vindo ao AEPAPA</h1>
+        <p class="subtitle">Visão geral do sistema de gerenciamento</p>
+      </div>
+      <div class="date-display">
+        <i class="fas fa-calendar-alt"></i>
+        {{ getCurrentDateFormatted() }}
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card primary">
+        <div class="stat-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ totalPatients }}</h3>
+          <p>Total de Pacientes</p>
+        </div>
+        <div class="stat-action" (click)="navigateToPatients()">
+          <i class="fas fa-arrow-right"></i>
+        </div>
+      </div>
+
+      <div class="stat-card success">
+        <div class="stat-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ appointmentsToday }}</h3>
+          <p>Consultas Hoje</p>
+        </div>
+        <div class="stat-action">
+          <i class="fas fa-arrow-right"></i>
+        </div>
+      </div>
+
+      <div class="stat-card warning">
+        <div class="stat-icon">
+          <i class="fas fa-tasks"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ pendingTasks }}</h3>
+          <p>Tarefas Pendentes</p>
+        </div>
+        <div class="stat-action">
+          <i class="fas fa-arrow-right"></i>
+        </div>
+      </div>
+
+      <div class="stat-card info">
+        <div class="stat-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ recentActivity }}</h3>
+          <p>Atividades Recentes</p>
+        </div>
+        <div class="stat-action">
+          <i class="fas fa-arrow-right"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+      <!-- Left Section: Quick Actions & Recent -->
+      <div class="left-section">
+        <!-- Quick Actions -->
+        <div class="card quick-actions">
+          <div class="card-header">
+            <h2>Ações Rápidas</h2>
+          </div>
+          <div class="card-body">
+            <button class="action-btn register" (click)="navigateToRegister()">
+              <i class="fas fa-user-plus"></i>
+              <span>Cadastrar Paciente</span>
+            </button>
+            <button class="action-btn appointments">
+              <i class="fas fa-calendar-plus"></i>
+              <span>Nova Consulta</span>
+            </button>
+            <button class="action-btn patients" (click)="navigateToPatients()">
+              <i class="fas fa-list"></i>
+              <span>Ver Pacientes</span>
+            </button>
+            <button class="action-btn reports">
+              <i class="fas fa-file-medical"></i>
+              <span>Relatórios</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card recent-activity">
+          <div class="card-header">
+            <h2>Atividades Recentes</h2>
+          </div>
+          <div class="card-body">
+            <div class="activity-list">
+              <div class="activity-item">
+                <div class="activity-icon success">
+                  <i class="fas fa-user-check"></i>
+                </div>
+                <div class="activity-content">
+                  <p class="activity-title">Novo paciente cadastrado</p>
+                  <p class="activity-time">Há 2 horas</p>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon info">
+                  <i class="fas fa-calendar"></i>
+                </div>
+                <div class="activity-content">
+                  <p class="activity-title">Consulta agendada</p>
+                  <p class="activity-time">Há 3 horas</p>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon warning">
+                  <i class="fas fa-edit"></i>
+                </div>
+                <div class="activity-content">
+                  <p class="activity-title">Prontuário atualizado</p>
+                  <p class="activity-time">Há 5 horas</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Section: Calendar -->
+      <div class="right-section">
+        <div class="card calendar-card">
+          <div class="card-header">
+            <h2>Calendário</h2>
+          </div>
+          <div class="card-body">
+            <div class="calendar">
+              <!-- Calendar Navigation -->
+              <div class="calendar-nav">
+                <button class="nav-btn" (click)="previousMonth()" title="Mês anterior">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="month-year">
+                  <span class="month">{{ currentMonth }}</span>
+                  <span class="year">{{ currentYear }}</span>
+                </div>
+                <button class="nav-btn" (click)="nextMonth()" title="Próximo mês">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+              
+              <!-- Today Button -->
+              <div class="calendar-actions" *ngIf="!isCurrentMonth()">
+                <button class="today-btn" (click)="goToToday()">
+                  <i class="fas fa-calendar-day"></i> Ir para hoje
+                </button>
+              </div>
+
+              <!-- Weekday Headers -->
+              <div class="calendar-weekdays">
+                <div class="weekday">Dom</div>
+                <div class="weekday">Seg</div>
+                <div class="weekday">Ter</div>
+                <div class="weekday">Qua</div>
+                <div class="weekday">Qui</div>
+                <div class="weekday">Sex</div>
+                <div class="weekday">Sáb</div>
+              </div>
+
+              <!-- Calendar Days -->
+              <div class="calendar-days">
+                <div *ngFor="let dayData of calendarDays" 
+                     class="calendar-day"
+                     [class.today]="dayData.isToday"
+                     [class.selected]="dayData.isSelected"
+                     [class.other-month]="!dayData.isCurrentMonth"
+                     (click)="selectDate(dayData)">
+                  {{ dayData.day }}
+                </div>
+              </div>
+
+              <!-- Selected Date Info -->
+              <div class="selected-date-info" *ngIf="selectedDate">
+                <p class="date-text">
+                  <i class="fas fa-calendar-day"></i>
+                  {{ getFormattedSelectedDate() }}
+                </p>
+                <p class="events-text">Nenhum evento agendado</p>
+              </div>
+              
+              <!-- No Selection Message -->
+              <div class="no-selection-info" *ngIf="!selectedDate">
+                <p class="hint-text">
+                  <i class="fas fa-hand-pointer"></i>
+                  Clique em um dia para ver os detalhes
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

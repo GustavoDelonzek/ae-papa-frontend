@@ -25,7 +25,73 @@ export class AuthService {
   isAuthenticated(): boolean {
     const token = localStorage.getItem('token');
     const user = localStorage.getItem('user');
-    return !!(token && user);
+    
+    if (!token || !user) {
+      return false;
+    }
+    
+    // Verificar se o token não está expirado
+    if (this.isTokenExpired(token)) {
+      this.logout();
+      return false;
+    }
+    
+    return true;
+  }
+
+  /**
+   * Verificar se o token JWT está expirado
+   */
+  private isTokenExpired(token: string): boolean {
+    try {
+      const payloadBase64 = token.split('.')[1];
+      const payload = JSON.parse(atob(payloadBase64));
+      
+      if (!payload.exp) {
+        return false;
+      }
+      
+      const expirationTime = payload.exp * 1000;
+      const currentTime = Date.now();
+      
+      // Adicionar margem de 5 minutos para evitar problemas de sincronização
+      return currentTime >= (expirationTime - 300000);
+    } catch (error) {
+      console.error('Erro ao verificar expiração do token:', error);
+      return true;
+    }
+  }
+
+  /**
+   * Verificar sessão com o backend
+   */
+  checkSession(): Observable<any> {
+    return this.http.get<any>(`${API_URL}/me`);
+  }
+
+  /**
+   * Validar token com o backend
+   */
+  validateToken(): Observable<boolean> {
+    return new Observable(observer => {
+      if (!this.isAuthenticated()) {
+        observer.next(false);
+        observer.complete();
+        return;
+      }
+
+      this.checkSession().subscribe({
+        next: () => {
+          observer.next(true);
+          observer.complete();
+        },
+        error: () => {
+          this.logout();
+          observer.next(false);
+          observer.complete();
+        }
+      });
+    });
   }
 
   /**
@@ -63,9 +129,22 @@ export class AuthService {
    * Realizar logout
    */
   logout(): void {
+    // Limpar localStorage
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    
+    // Limpar subject
     this.currentUserSubject.next(null);
+    
+    // Não redirecionar aqui, deixar o interceptor ou guard fazer isso
+    // para evitar redirecionamento duplo
+  }
+
+  /**
+   * Realizar logout e redirecionar
+   */
+  logoutAndRedirect(): void {
+    this.logout();
     this.router.navigate(['/login']);
   }
 }

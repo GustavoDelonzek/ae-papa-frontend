@@ -1,5 +1,5 @@
-import { Component, Inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, Inject, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../services';
 
 interface LoginData {
@@ -13,7 +13,7 @@ interface LoginData {
   templateUrl: './login.html',
   styleUrls: ['./login.scss']
 })
-export class Login {
+export class Login implements OnInit {
 
   loginData: LoginData = {
     email: '',
@@ -22,9 +22,12 @@ export class Login {
 
   isLoading: boolean = false;
   errorMessage: string = '';
+  sessionExpiredMessage: string = '';
+  returnUrl: string = '/';
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     @Inject(AuthService) private authService: AuthService
   ) {
     // Se já estiver logado, redirecionar para home
@@ -33,10 +36,23 @@ export class Login {
     }
   }
 
+  ngOnInit(): void {
+    // Capturar parâmetros da URL
+    this.route.queryParams.subscribe(params => {
+      this.returnUrl = params['returnUrl'] || '/';
+      
+      // Verificar se foi redirecionado por sessão expirada
+      if (params['expired'] === 'true') {
+        this.sessionExpiredMessage = 'Sua sessão expirou. Por favor, faça login novamente.';
+      }
+    });
+  }
+
   onSubmit(): void {
     if (this.validateForm()) {
       this.isLoading = true;
       this.errorMessage = '';
+      this.sessionExpiredMessage = '';
 
       this.authService.login(this.loginData.email, this.loginData.password)
         .subscribe({
@@ -48,8 +64,8 @@ export class Login {
             
             this.isLoading = false;
             
-            // Redirecionar para a página inicial
-            this.router.navigate(['/']);
+            // Redirecionar para a URL de retorno ou página inicial
+            this.router.navigate([this.returnUrl]);
           },
           error: (error) => {
             console.error('Erro no login:', error);

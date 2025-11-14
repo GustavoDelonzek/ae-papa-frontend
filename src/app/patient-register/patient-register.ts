@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 import { PatientService, Patient } from '../services';
 
 @Component({
@@ -8,8 +8,10 @@ import { PatientService, Patient } from '../services';
   templateUrl: './patient-register.html',
   styleUrl: './patient-register.scss'
 })
-export class PatientRegister {
-  
+export class PatientRegister implements OnInit {
+  isEditing: boolean = false;
+  patientId: number | null = null;
+
   patientData: Patient = {
     full_name: '',
     birth_date: '',
@@ -25,8 +27,43 @@ export class PatientRegister {
 
   constructor(
     private router: Router,
-    private patientService: PatientService
+    private patientService: PatientService,
+    private route: ActivatedRoute
   ) {}
+
+  ngOnInit(): void {
+    this.route.params.subscribe((params: Params) => {
+      if (params['id']) {
+        this.patientId = parseInt(params['id'], 10);
+        this.loadPatientForEdit(this.patientId);
+      }
+    });
+  }
+
+  private loadPatientForEdit(id: number): void {
+    this.isLoading = true;
+    this.patientService.getPatient(id).subscribe({
+      next: (response: any) => {
+        // Preencher o formulário com os dados retornados, incluindo o id
+        this.patientData = {
+          id: response.data.id,
+          full_name: response.data.full_name || '',
+          birth_date: response.data.birth_date || '',
+          gender: response.data.gender || '',
+          marital_status: response.data.marital_status || '',
+          cpf: response.data.cpf || '',
+          rg: response.data.rg || ''
+        };
+        this.isEditing = true;
+        this.isLoading = false;
+      },
+      error: (error: any) => {
+        console.error('Erro ao carregar paciente para edição:', error);
+        this.errorMessage = 'Erro ao carregar dados do paciente para edição.';
+        this.isLoading = false;
+      }
+    });
+  }
 
   onSubmit(): void {
     if (this.validateForm()) {
@@ -34,8 +71,12 @@ export class PatientRegister {
       this.errorMessage = '';
       this.successMessage = '';
 
-      // Simular chamada à API
-      this.savePatient();
+      // Chamar criação ou atualização conforme o modo
+      if (this.isEditing) {
+        this.updatePatient();
+      } else {
+        this.savePatient();
+      }
     }
   }
 
@@ -113,8 +154,14 @@ export class PatientRegister {
       birth_date: this.formatDateForAPI(this.patientData.birth_date)
     };
 
-    this.patientService.createPatient(formattedData).subscribe({
-      next: (response) => {
+    // Se o RG estiver vazio, não enviar o campo (evita validação do backend que espera string)
+    const payload: any = { ...formattedData };
+    if (payload.rg === '' || payload.rg === null || payload.rg === undefined) {
+      delete payload.rg;
+    }
+
+    this.patientService.createPatient(payload).subscribe({
+      next: (response: any) => {
         console.log('Paciente cadastrado com sucesso:', response);
         this.isLoading = false;
         this.successMessage = 'Paciente cadastrado com sucesso!';
@@ -127,7 +174,7 @@ export class PatientRegister {
           // this.router.navigate(['/lista-pacientes']);
         }, 2000);
       },
-      error: (error) => {
+  error: (error: any) => {
         console.error('Erro ao cadastrar paciente:', error);
         this.isLoading = false;
         
@@ -143,6 +190,53 @@ export class PatientRegister {
     });
   }
 
+  private updatePatient(): void {
+    // Usar o patientId armazenado quando carregamos os dados
+    if (!this.patientId) {
+      this.errorMessage = 'ID do paciente inválido para atualização.';
+      this.isLoading = false;
+      return;
+    }
+
+    const formattedData = {
+      ...this.patientData,
+      patient_id: this.patientId, // Enviar como patient_id conforme esperado pelo backend
+      birth_date: this.formatDateForAPI(this.patientData.birth_date)
+    };
+
+    const payload: any = { ...formattedData };
+    // Remover o campo 'id' se existir, pois usamos 'patient_id'
+    if (payload.id !== undefined) {
+      delete payload.id;
+    }
+    if (payload.rg === '' || payload.rg === null || payload.rg === undefined) {
+      delete payload.rg;
+    }
+
+    console.log('Payload de atualização:', payload); // Debug: ver o que está sendo enviado
+
+    this.patientService.updatePatient(this.patientId, payload).subscribe({
+      next: (response: any) => {
+        console.log('Paciente atualizado com sucesso:', response);
+        this.isLoading = false;
+        this.successMessage = 'Paciente atualizado com sucesso!';
+        setTimeout(() => {
+          // Após atualizar, redirecionar para a página do paciente
+          this.router.navigate(['/paciente', this.patientId]);
+        }, 1200);
+      },
+  error: (error: any) => {
+        console.error('Erro ao atualizar paciente:', error);
+        this.isLoading = false;
+        if (error.status === 422) {
+          this.handleValidationErrors(error.error.errors);
+        } else {
+          this.errorMessage = 'Erro ao atualizar paciente. Tente novamente.';
+        }
+      }
+    });
+  }
+
   private formatDateForAPI(date: string): string {
     // Converter de YYYY-MM-DD para MM-DD-YYYY (formato esperado pelo backend)
     if (!date) return '';
@@ -152,21 +246,31 @@ export class PatientRegister {
   }
 
   private handleValidationErrors(errors: any): void {
+    // Log completo dos erros para debug
+    console.log('Erros de validação do backend:', errors);
+    
     // Tratar erros de validação específicos
     if (errors.cpf) {
-      this.errorMessage = errors.cpf[0];
+      this.errorMessage = `CPF: ${errors.cpf[0]}`;
     } else if (errors.full_name) {
-      this.errorMessage = errors.full_name[0];
+      this.errorMessage = `Nome: ${errors.full_name[0]}`;
     } else if (errors.birth_date) {
-      this.errorMessage = 'Data de nascimento inválida';
+      this.errorMessage = `Data de nascimento: ${errors.birth_date[0] || 'Data de nascimento inválida'}`;
     } else if (errors.gender) {
-      this.errorMessage = 'Gênero inválido';
+      this.errorMessage = `Gênero: ${errors.gender[0] || 'Gênero inválido'}`;
     } else if (errors.marital_status) {
-      this.errorMessage = 'Estado civil inválido';
+      this.errorMessage = `Estado civil: ${errors.marital_status[0] || 'Estado civil inválido'}`;
     } else if (errors.rg) {
-      this.errorMessage = errors.rg[0];
+      this.errorMessage = `RG: ${errors.rg[0]}`;
     } else {
-      this.errorMessage = 'Dados inválidos. Verifique os campos preenchidos.';
+      // Mostrar todos os erros disponíveis
+      const errorMessages = Object.keys(errors).map(key => {
+        const messages = Array.isArray(errors[key]) ? errors[key] : [errors[key]];
+        return `${key}: ${messages.join(', ')}`;
+      });
+      this.errorMessage = errorMessages.length > 0 
+        ? `Erros: ${errorMessages.join('; ')}` 
+        : 'Dados inválidos. Verifique os campos preenchidos.';
     }
   }
 
@@ -182,5 +286,14 @@ export class PatientRegister {
     
     this.errorMessage = '';
     this.successMessage = '';
+  }
+
+  onCancel(): void {
+    if (this.isEditing && this.patientId) {
+      this.router.navigate(['/paciente', this.patientId]);
+      return;
+    }
+
+    this.resetForm();
   }
 }

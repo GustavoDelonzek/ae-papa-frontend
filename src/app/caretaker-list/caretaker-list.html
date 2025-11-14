@@ -1,0 +1,145 @@
+<app-sidebar></app-sidebar>
+
+<div class="caretaker-list-container">
+  <header class="caretaker-list-header">
+    <h1>Cuidadores</h1>
+    <div class="search-container">
+      <input 
+        type="text" 
+        placeholder="Pesquisar cuidadores..." 
+        class="search-input"
+        [(ngModel)]="searchTerm"
+        (keyup.enter)="performSearch()"
+        aria-label="Pesquisar cuidadores">
+      
+      <!-- Indicador de loading da pesquisa -->
+      <div *ngIf="searching" class="search-loading">
+        <i class="fas fa-spinner fa-spin"></i>
+      </div>
+      
+      <!-- Botão para limpar pesquisa -->
+      <button 
+        *ngIf="searchTerm && !searching" 
+        class="clear-search-button"
+        (click)="clearSearch()"
+        title="Limpar pesquisa">
+        <i class="fas fa-times"></i>
+      </button>
+      
+      <button class="search-button" (click)="performSearch()" title="Pesquisar" [disabled]="searching">
+        Pesquisar
+      </button>
+    </div>
+  </header>
+
+  <div class="caretaker-list-content">
+    <div class="content-header">
+      <h2>Lista de cuidadores</h2>
+      <button class="btn-add-caretaker" (click)="addCaretaker()">
+        <i class="fas fa-plus"></i> Adicionar Cuidador
+      </button>
+    </div>
+
+    <!-- Exibir mensagem de erro -->
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+
+    <div class="caretakers-grid" *ngIf="filteredCaretakers && filteredCaretakers.length > 0; else noCaretakers">
+      <div 
+        class="caretaker-card" 
+        *ngFor="let caretaker of filteredCaretakers"
+        (click)="viewCaretaker(caretaker.id!)">
+        
+        <div class="caretaker-icon">
+          <i class="fas fa-user-nurse"></i>
+        </div>
+
+        <div class="caretaker-info">
+          <h3>{{ caretaker.full_name }}</h3>
+          <p class="caretaker-age">{{ getCaretakerAge(caretaker.birth_date) }} anos</p>
+          <p class="caretaker-id">ID: {{ caretaker.id }}</p>
+          <p class="caretaker-cpf">CPF: {{ formatCPF(caretaker.cpf) }}</p>
+        </div>
+
+        <div class="caretaker-contact">
+          <p class="caretaker-phone">
+            <i class="fas fa-phone"></i> {{ formatPhone(caretaker.phone) }}
+          </p>
+          <p class="caretaker-email" *ngIf="caretaker.email">
+            <i class="fas fa-envelope"></i> {{ caretaker.email }}
+          </p>
+        </div>
+
+        <div class="caretaker-relationship" *ngIf="caretaker.relationship">
+          <span class="relationship-badge">{{ caretaker.relationship }}</span>
+        </div>
+
+        <div class="caretaker-actions">
+          <button 
+            class="btn-view" 
+            (click)="viewCaretaker(caretaker.id!); $event.stopPropagation()"
+            title="Visualizar">
+            <i class="fas fa-eye"></i>
+          </button>
+          <button 
+            class="btn-edit" 
+            (click)="editCaretaker(caretaker.id!); $event.stopPropagation()"
+            title="Editar">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button 
+            class="btn-delete" 
+            (click)="deleteCaretaker(caretaker.id!); $event.stopPropagation()"
+            title="Deletar">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noCaretakers>
+      <div class="no-data">
+        <div class="no-data-icon">
+          <i class="fas fa-user-nurse"></i>
+        </div>
+        <p *ngIf="!searchTerm">Nenhum cuidador cadastrado ainda.</p>
+        <p *ngIf="searchTerm">Nenhum cuidador encontrado com o termo "{{ searchTerm }}".</p>
+        <button class="btn-primary" (click)="addCaretaker()" *ngIf="!searchTerm">
+          <i class="fas fa-plus"></i> Adicionar primeiro cuidador
+        </button>
+      </div>
+    </ng-template>
+
+    <!-- Paginação -->
+    <div class="pagination-container" *ngIf="totalPages > 1">
+      <div class="pagination-info">
+        {{ getPaginationInfo() }}
+      </div>
+      
+      <div class="pagination-controls">
+        <button 
+          class="pagination-btn"
+          [disabled]="currentPage === 1"
+          (click)="previousPage()">
+          <i class="fas fa-chevron-left"></i> Anterior
+        </button>
+        
+        <button 
+          *ngFor="let page of getVisiblePages()"
+          class="pagination-number"
+          [class.active]="page === currentPage"
+          (click)="goToPage(page)">
+          {{ page }}
+        </button>
+        
+        <button 
+          class="pagination-btn"
+          [disabled]="currentPage === totalPages"
+          (click)="nextPage()">
+          Próximo <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
