@@ -85,16 +85,25 @@ export class CaretakerList implements OnInit, OnDestroy {
     return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
   }
 
-  formatPhone(phone: string): string {
-    if (!phone) return '';
-    const cleaned = phone.replace(/\D/g, '');
-    // (XX) XXXXX-XXXX ou (XX) XXXX-XXXX
-    if (cleaned.length === 11) {
-      return cleaned.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-    } else if (cleaned.length === 10) {
-      return cleaned.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
-    }
-    return phone;
+  getRelationshipLabel(relationship: string): string {
+    const labels: { [key: string]: string } = {
+      'son': 'Filho',
+      'daughter': 'Filha',
+      'spouse': 'Cônjuge',
+      'partner': 'Companheiro(a)',
+      'father': 'Pai',
+      'mother': 'Mãe',
+      'brother': 'Irmão',
+      'sister': 'Irmã',
+      'grand_son': 'Neto',
+      'grand_daughter': 'Neta',
+      'nephew': 'Sobrinho',
+      'niece': 'Sobrinha',
+      'friend': 'Amigo(a)',
+      'professional_caregiver': 'Cuidador Profissional',
+      'other': 'Outro'
+    };
+    return labels[relationship] || relationship;
   }
 
   getCaretakerAge(birthDate: string): number {

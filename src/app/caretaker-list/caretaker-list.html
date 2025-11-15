@@ -63,16 +63,16 @@
         </div>
 
         <div class="caretaker-contact">
-          <p class="caretaker-phone">
-            <i class="fas fa-phone"></i> {{ formatPhone(caretaker.phone) }}
+          <p class="caretaker-info">
+            <i class="fas fa-user"></i> Gênero: {{ caretaker.gender === 'M' ? 'Masculino' : 'Feminino' }}
           </p>
-          <p class="caretaker-email" *ngIf="caretaker.email">
-            <i class="fas fa-envelope"></i> {{ caretaker.email }}
+          <p class="caretaker-info">
+            <i class="fas fa-hospital-user"></i> Paciente ID: {{ caretaker.patient_id }}
           </p>
         </div>
 
         <div class="caretaker-relationship" *ngIf="caretaker.relationship">
-          <span class="relationship-badge">{{ caretaker.relationship }}</span>
+          <span class="relationship-badge">{{ getRelationshipLabel(caretaker.relationship) }}</span>
         </div>
 
         <div class="caretaker-actions">
