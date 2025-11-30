@@ -18,9 +18,8 @@ export class CaretakerRegister implements OnInit {
     rg: '',
     birth_date: '',
     gender: '',
-    marital_status: '',
-    relationship: '',
-    patient_id: 0
+    kinship: '',
+    patient_id: null
   };
 
   isLoading: boolean = false;
@@ -34,6 +33,14 @@ export class CaretakerRegister implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Capturar query params primeiro (para pegar patientId se vier da página do paciente)
+    this.route.queryParams.subscribe((queryParams: any) => {
+      if (queryParams['patientId']) {
+        this.caretakerData.patient_id = parseInt(queryParams['patientId'], 10);
+      }
+    });
+
+    // Depois verificar se é edição
     this.route.params.subscribe((params: Params) => {
       if (params['id']) {
         this.caretakerId = parseInt(params['id'], 10);
@@ -51,11 +58,10 @@ export class CaretakerRegister implements OnInit {
           full_name: response.data.full_name || '',
           cpf: response.data.cpf || '',
           rg: response.data.rg || '',
-          birth_date: response.data.birth_date || '',
+          birth_date: this.formatDateForAPI(response.data.birth_date) || '',
           gender: response.data.gender || '',
-          marital_status: response.data.marital_status || '',
-          relationship: response.data.relationship || '',
-          patient_id: response.data.patient_id || 0
+          kinship: response.data.kinship || '',
+          patient_id: response.data.patient_id || null
         };
         this.isEditing = true;
         this.isLoading = false;
@@ -108,8 +114,8 @@ export class CaretakerRegister implements OnInit {
       return false;
     }
 
-    if (!this.caretakerData.marital_status) {
-      this.errorMessage = 'Estado civil é obrigatório';
+    if (!this.caretakerData.kinship) {
+      this.errorMessage = 'Parentesco/Relação é obrigatório';
       return false;
     }
 
@@ -154,16 +160,14 @@ export class CaretakerRegister implements OnInit {
       birth_date: this.formatDateForAPI(this.caretakerData.birth_date)
     };
 
-    const payload: any = { ...formattedData };
+  const payload: any = { ...formattedData };
     if (payload.rg === '' || payload.rg === null || payload.rg === undefined) {
       delete payload.rg;
-    }
-    if (payload.relationship === '' || payload.relationship === null || payload.relationship === undefined) {
-      delete payload.relationship;
     }
     if (payload.patient_id === null || payload.patient_id === undefined) {
       delete payload.patient_id;
     }
+    console.log('Payload enviado:', payload);
 
     this.caretakerService.createCaretaker(payload).subscribe({
       next: (response: CaretakerResponse) => {
@@ -190,14 +194,11 @@ export class CaretakerRegister implements OnInit {
       caretaker_id: this.caretakerId
     };
 
-    const payload: any = { ...formattedData };
-    delete payload.id;
+  const payload: any = { ...formattedData };
+  delete payload.id;
     
     if (payload.rg === '' || payload.rg === null || payload.rg === undefined) {
       delete payload.rg;
-    }
-    if (payload.relationship === '' || payload.relationship === null || payload.relationship === undefined) {
-      delete payload.relationship;
     }
 
     this.caretakerService.updateCaretaker(this.caretakerId!, payload).subscribe({
@@ -221,9 +222,16 @@ export class CaretakerRegister implements OnInit {
   private formatDateForAPI(date: string): string {
     if (!date) return '';
     
+    // Se a data já está no formato yyyy-mm-dd
+    if (date.includes('-') && date.split('-')[0].length === 4) {
+      const [year, month, day] = date.split('-');
+      return `${month}-${day}-${year}`;
+    }
+    
+    // Se a data está em outro formato, tenta parsear
     const dateObj = new Date(date);
-    const month = dateObj.getMonth() + 1;
-    const day = dateObj.getDate();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, '0');
     const year = dateObj.getFullYear();
     
     return `${month}-${day}-${year}`;

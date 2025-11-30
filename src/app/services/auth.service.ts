@@ -26,47 +26,14 @@ export class AuthService {
     const token = localStorage.getItem('token');
     const user = localStorage.getItem('user');
     
-    if (!token || !user) {
-      return false;
-    }
-    
-    // Verificar se o token não está expirado
-    if (this.isTokenExpired(token)) {
-      this.logout();
-      return false;
-    }
-    
-    return true;
+    return !!(token && user);
   }
 
   /**
-   * Verificar se o token JWT está expirado
-   */
-  private isTokenExpired(token: string): boolean {
-    try {
-      const payloadBase64 = token.split('.')[1];
-      const payload = JSON.parse(atob(payloadBase64));
-      
-      if (!payload.exp) {
-        return false;
-      }
-      
-      const expirationTime = payload.exp * 1000;
-      const currentTime = Date.now();
-      
-      // Adicionar margem de 5 minutos para evitar problemas de sincronização
-      return currentTime >= (expirationTime - 300000);
-    } catch (error) {
-      console.error('Erro ao verificar expiração do token:', error);
-      return true;
-    }
-  }
-
-  /**
-   * Verificar sessão com o backend
+   * Verificar sessão com o backend (valida se o token está válido)
    */
   checkSession(): Observable<any> {
-    return this.http.get<any>(`${API_URL}/me`);
+    return this.http.get<any>(`${API_URL}/user`);
   }
 
   /**
@@ -85,9 +52,15 @@ export class AuthService {
           observer.next(true);
           observer.complete();
         },
-        error: () => {
-          this.logout();
-          observer.next(false);
+        error: (err) => {
+          // Só fazer logout se for erro 401 (token expirado/inválido)
+          if (err.status === 401) {
+            this.logout();
+            observer.next(false);
+          } else {
+            // Outros erros (rede, servidor) não devem deslogar
+            observer.next(true);
+          }
           observer.complete();
         }
       });

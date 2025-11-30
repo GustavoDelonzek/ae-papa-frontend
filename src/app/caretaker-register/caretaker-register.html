@@ -107,38 +107,18 @@
           </div>
         </div>
 
-        <!-- Estado Civil -->
-        <div class="form-group">
-          <label for="marital_status" class="form-label">Estado Civil *</label>
-          <select 
-            id="marital_status"
-            name="marital_status"
-            class="form-control"
-            [(ngModel)]="caretakerData.marital_status"
-            required
-            #maritalStatus="ngModel">
-            <option value="">Selecione o estado civil</option>
-            <option value="single">Solteiro(a)</option>
-            <option value="married">Casado(a)</option>
-            <option value="divorced">Divorciado(a)</option>
-            <option value="widowed">Viúvo(a)</option>
-          </select>
-          
-          <div *ngIf="maritalStatus.invalid && maritalStatus.touched" class="error-message">
-            <small *ngIf="maritalStatus.errors?.['required']" class="text-danger">
-              Estado civil é obrigatório
-            </small>
-          </div>
-        </div>
+        <!-- Estado Civil (removido para cuidador) -->
 
         <!-- Parentesco -->
         <div class="form-group">
-          <label for="relationship" class="form-label">Parentesco/Relação</label>
+          <label for="kinship" class="form-label">Parentesco/Relação *</label>
           <select 
-            id="relationship"
-            name="relationship"
+            id="kinship"
+            name="kinship"
             class="form-control"
-            [(ngModel)]="caretakerData.relationship">
+            [(ngModel)]="caretakerData.kinship"
+            required
+            #kinship="ngModel">
             <option value="">Selecione o parentesco</option>
             <option value="son">Filho</option>
             <option value="daughter">Filha</option>
@@ -156,6 +136,12 @@
             <option value="professional_caregiver">Cuidador Profissional</option>
             <option value="other">Outro</option>
           </select>
+          
+          <div *ngIf="kinship.invalid && kinship.touched" class="error-message">
+            <small *ngIf="kinship.errors?.['required']" class="text-danger">
+              Parentesco é obrigatório
+            </small>
+          </div>
         </div>
 
         <!-- ID do Paciente -->
@@ -167,9 +153,10 @@
             name="patient_id"
             class="form-control"
             [(ngModel)]="caretakerData.patient_id"
-            placeholder="Digite o ID do paciente"
+            placeholder="ID do paciente será preenchido automaticamente"
             required
             min="1"
+            readonly
             #patientId="ngModel">
           
           <div *ngIf="patientId.invalid && patientId.touched" class="error-message">

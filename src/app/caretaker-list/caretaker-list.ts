@@ -50,19 +50,27 @@ export class CaretakerList implements OnInit, OnDestroy {
     
     this.caretakerService.getCaretakers(page, this.perPage, search).subscribe({
       next: (response: CaretakersListResponse) => {
-        this.caretakers = response.data;
+        console.log('Resposta da API:', response);
+        this.caretakers = response.data || [];
         this.filteredCaretakers = [...this.caretakers];
         this.paginationMeta = response.meta;
-        this.totalPages = response.meta.last_page;
-        this.totalItems = response.meta.total;
+        this.totalPages = response.meta?.last_page || 1;
+        this.totalItems = response.meta?.total || 0;
         this.loading = false;
         this.searching = false;
       },
       error: (error: any) => {
         console.error('Erro ao carregar cuidadores:', error);
+        console.error('Detalhes do erro:', error.error);
         this.loading = false;
         this.searching = false;
-        this.errorMessage = 'Erro ao carregar lista de cuidadores. Tente novamente.';
+        if (error.status === 401) {
+          this.errorMessage = 'Sessão expirada. Faça login novamente.';
+        } else if (error.status === 0) {
+          this.errorMessage = 'Erro de conexão. Verifique se o backend está rodando.';
+        } else {
+          this.errorMessage = error.error?.message || 'Erro ao carregar lista de cuidadores. Tente novamente.';
+        }
       }
     });
   }
@@ -85,7 +93,7 @@ export class CaretakerList implements OnInit, OnDestroy {
     return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
   }
 
-  getRelationshipLabel(relationship: string): string {
+  getKinshipLabel(kinship: string): string {
     const labels: { [key: string]: string } = {
       'son': 'Filho',
       'daughter': 'Filha',
@@ -103,7 +111,7 @@ export class CaretakerList implements OnInit, OnDestroy {
       'professional_caregiver': 'Cuidador Profissional',
       'other': 'Outro'
     };
-    return labels[relationship] || relationship;
+    return labels[kinship] || kinship;
   }
 
   getCaretakerAge(birthDate: string): number {

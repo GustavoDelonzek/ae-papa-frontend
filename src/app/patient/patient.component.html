@@ -76,6 +76,12 @@
           (click)="selectTab('documentos')">
           Documentos
         </button>
+        <button 
+          class="tab-button" 
+          [class.active]="isTabActive('Cuidador')"
+          (click)="selectTab('Cuidador')">
+          Cuidador
+        </button>
       </div>
 
       <div class="tab-content">
@@ -139,6 +145,65 @@
             <i class="fas fa-folder-open"></i>
             <p>Funcionalidade de documentos em desenvolvimento</p>
             <p>Em breve você poderá gerenciar documentos do paciente</p>
+          </div>
+        </div>
+
+        <!-- Aba Cuidador -->
+        <div *ngIf="activeTab === 'Cuidador'" class="tab-panel">
+          <div class="caretaker-header">
+            <h2>Cuidadores do Paciente</h2>
+            <button class="btn-add" (click)="addCaretaker()">
+              <i class="fas fa-plus"></i> Cadastrar Cuidador
+            </button>
+          </div>
+          
+          <!-- Loading state -->
+          <div class="loading-container" *ngIf="loadingCaretakers">
+            <div class="loading-spinner"></div>
+            <p>Carregando cuidadores...</p>
+          </div>
+
+          <!-- Lista de cuidadores -->
+          <div class="caretakers-list" *ngIf="!loadingCaretakers && caretakers.length > 0">
+            <div class="caretaker-card" *ngFor="let caretaker of caretakers">
+              <div class="caretaker-info">
+                <div class="caretaker-name">
+                  <i class="fas fa-user-nurse"></i>
+                  {{ caretaker.full_name }}
+                </div>
+                <div class="caretaker-details">
+                  <span class="detail-item">
+                    <i class="fas fa-id-card"></i>
+                    CPF: {{ formatCPF(caretaker.cpf) }}
+                  </span>
+                         <span class="detail-item" *ngIf="caretaker.kinship">
+                           <i class="fas fa-heart"></i>
+                           {{ getKinshipText(caretaker.kinship) }}
+                  </span>
+                  <span class="detail-item">
+                    <i class="fas fa-calendar"></i>
+                    {{ formatDate(caretaker.birth_date) }}
+                  </span>
+                </div>
+              </div>
+              <div class="caretaker-actions">
+                <button class="btn-edit-small" (click)="caretaker.id && editCaretaker(caretaker.id)" title="Editar" [disabled]="!caretaker.id">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-delete-small" (click)="caretaker.id && deleteCaretaker(caretaker.id)" title="Excluir" [disabled]="!caretaker.id">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estado vazio -->
+          <div class="no-caretakers" *ngIf="!loadingCaretakers && caretakers.length === 0">
+            <i class="fas fa-user-friends"></i>
+            <p>Nenhum cuidador cadastrado para este paciente</p>
+            <button class="btn-add" (click)="addCaretaker()">
+              <i class="fas fa-plus"></i> Cadastrar Primeiro Cuidador
+            </button>
           </div>
         </div>
 

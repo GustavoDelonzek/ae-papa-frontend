@@ -5,14 +5,14 @@ import { API_URL } from '../../consts';
 
 export interface Caretaker {
   id?: number;
-  patient_id: number;
+  patient_id: number | null;
   full_name: string;
   cpf: string;
   rg?: string;
   birth_date: string;
   gender: string;
-  marital_status: string;
-  relationship?: string;
+  kinship?: string;
+  education_level?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -61,12 +61,12 @@ export class CaretakerService {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('per_page', perPage.toString());
-    
+
     // Adicionar filtro de pesquisa se fornecido
     if (searchTerm && searchTerm.trim()) {
       params = params.set('full_name', searchTerm.trim());
     }
-    
+
     return this.http.get<CaretakersListResponse>(`${API_URL}/caregivers`, { params });
   }
 
