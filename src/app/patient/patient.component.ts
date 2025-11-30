@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
-import { PatientService, Patient } from '../services';
+import { PatientService, Patient, CaretakerService, Caretaker } from '../services';
 
 @Component({
   selector: 'app-patient',
@@ -18,10 +18,15 @@ export class PatientComponent implements OnInit {
   // Dados reais do paciente do backend
   patientData: Patient | null = null;
 
+  // Dados dos cuidadores
+  caretakers: Caretaker[] = [];
+  loadingCaretakers: boolean = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private patientService: PatientService
+    private patientService: PatientService,
+    private caretakerService: CaretakerService
   ) { }
 
   ngOnInit(): void {
@@ -68,6 +73,11 @@ export class PatientComponent implements OnInit {
 
   selectTab(tab: string): void {
     this.activeTab = tab;
+    
+    // Carregar cuidadores quando a aba for selecionada
+    if (tab === 'Cuidador' && this.caretakers.length === 0) {
+      this.loadCaretakers();
+    }
   }
 
   getPatientAge(): number {
@@ -148,6 +158,75 @@ export class PatientComponent implements OnInit {
   addDocument(): void {
     // TODO: Implementar modal para upload de documento
     console.log('Adicionar novo documento');
+  }
+
+  // Métodos para gerenciar cuidadores
+  loadCaretakers(): void {
+    this.loadingCaretakers = true;
+    
+    this.caretakerService.getCaretakers(1, 100).subscribe({
+      next: (response: any) => {
+        console.log('Resposta da API (patient):', response);
+        // Filtrar apenas cuidadores deste paciente
+        this.caretakers = (response.data || []).filter(
+          (caretaker: Caretaker) => caretaker.patient_id === this.patientId
+        );
+        console.log('Cuidadores filtrados:', this.caretakers);
+        this.loadingCaretakers = false;
+      },
+      error: (error: any) => {
+        console.error('Erro ao carregar cuidadores:', error);
+        console.error('Detalhes do erro:', error.error);
+        this.loadingCaretakers = false;
+      }
+    });
+  }
+
+  addCaretaker(): void {
+    // Redirecionar para a página de cadastro passando o ID do paciente
+    this.router.navigate(['/registro-cuidador'], {
+      queryParams: { patientId: this.patientId }
+    });
+  }
+
+  editCaretaker(caretakerId: number): void {
+    this.router.navigate(['/registro-cuidador', caretakerId]);
+  }
+
+  deleteCaretaker(caretakerId: number): void {
+    if (confirm('Tem certeza que deseja excluir este cuidador?')) {
+      this.caretakerService.deleteCaretaker(caretakerId).subscribe({
+        next: () => {
+          // Recarregar lista de cuidadores
+          this.loadCaretakers();
+        },
+        error: (error: any) => {
+          console.error('Erro ao deletar cuidador:', error);
+          alert('Erro ao excluir cuidador. Tente novamente.');
+        }
+      });
+    }
+  }
+
+  getRelationshipText(relationship: string): string {
+    const relationshipMap: { [key: string]: string } = {
+      'son': 'Filho',
+      'daughter': 'Filha',
+      'spouse': 'Cônjuge',
+      'partner': 'Companheiro(a)',
+      'father': 'Pai',
+      'mother': 'Mãe',
+      'brother': 'Irmão',
+      'sister': 'Irmã',
+      'grand_son': 'Neto',
+      'grand_daughter': 'Neta',
+      'nephew': 'Sobrinho',
+      'niece': 'Sobrinha',
+      'friend': 'Amigo(a)',
+      'professional_caregiver': 'Cuidador Profissional',
+      'other': 'Outro'
+    };
+    return relationshipMap[relationship] || relationship;
   }
 
   goBack(): void {

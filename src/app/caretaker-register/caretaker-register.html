@@ -133,12 +133,14 @@
 
         <!-- Parentesco -->
         <div class="form-group">
-          <label for="relationship" class="form-label">Parentesco/Relação</label>
+          <label for="relationship" class="form-label">Parentesco/Relação *</label>
           <select 
             id="relationship"
             name="relationship"
             class="form-control"
-            [(ngModel)]="caretakerData.relationship">
+            [(ngModel)]="caretakerData.relationship"
+            required
+            #relationship="ngModel">
             <option value="">Selecione o parentesco</option>
             <option value="son">Filho</option>
             <option value="daughter">Filha</option>
@@ -156,6 +158,12 @@
             <option value="professional_caregiver">Cuidador Profissional</option>
             <option value="other">Outro</option>
           </select>
+          
+          <div *ngIf="relationship.invalid && relationship.touched" class="error-message">
+            <small *ngIf="relationship.errors?.['required']" class="text-danger">
+              Parentesco é obrigatório
+            </small>
+          </div>
         </div>
 
         <!-- ID do Paciente -->
@@ -167,9 +175,10 @@
             name="patient_id"
             class="form-control"
             [(ngModel)]="caretakerData.patient_id"
-            placeholder="Digite o ID do paciente"
+            placeholder="ID do paciente será preenchido automaticamente"
             required
             min="1"
+            readonly
             #patientId="ngModel">
           
           <div *ngIf="patientId.invalid && patientId.touched" class="error-message">

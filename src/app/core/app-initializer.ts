@@ -23,7 +23,7 @@ export function appInitializerFactory(
       next: (isValid) => {
         if (!isValid) {
           console.warn('Token inválido ou expirado');
-          // Redirecionar para login se estiver em rota protegida
+          // Redirecionar para login apenas se o token foi invalidado (erro 401)
           const currentUrl = router.url;
           if (currentUrl !== '/login') {
             router.navigate(['/login'], {
@@ -33,8 +33,9 @@ export function appInitializerFactory(
         }
         resolve();
       },
-      error: () => {
-        console.error('Erro ao validar token');
+      error: (err) => {
+        console.error('Erro ao validar token:', err);
+        // Não redirecionar em caso de erro de rede, apenas resolver
         resolve();
       }
     });

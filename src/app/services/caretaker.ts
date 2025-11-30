@@ -5,14 +5,16 @@ import { API_URL } from '../../consts';
 
 export interface Caretaker {
   id?: number;
-  patient_id: number;
+  patient_id: number | null;
   full_name: string;
   cpf: string;
   rg?: string;
   birth_date: string;
   gender: string;
-  marital_status: string;
+  marital_status?: string;
   relationship?: string;
+  kinship?: string;
+  education_level?: string;
   created_at?: string;
   updated_at?: string;
 }
