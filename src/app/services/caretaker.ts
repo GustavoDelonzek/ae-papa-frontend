@@ -11,8 +11,6 @@ export interface Caretaker {
   rg?: string;
   birth_date: string;
   gender: string;
-  marital_status?: string;
-  relationship?: string;
   kinship?: string;
   education_level?: string;
   created_at?: string;
@@ -63,12 +61,12 @@ export class CaretakerService {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('per_page', perPage.toString());
-    
+
     // Adicionar filtro de pesquisa se fornecido
     if (searchTerm && searchTerm.trim()) {
       params = params.set('full_name', searchTerm.trim());
     }
-    
+
     return this.http.get<CaretakersListResponse>(`${API_URL}/caregivers`, { params });
   }
 

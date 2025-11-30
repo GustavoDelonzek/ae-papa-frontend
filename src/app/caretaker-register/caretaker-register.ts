@@ -18,8 +18,7 @@ export class CaretakerRegister implements OnInit {
     rg: '',
     birth_date: '',
     gender: '',
-    marital_status: '',
-    relationship: '',
+    kinship: '',
     patient_id: null
   };
 
@@ -35,7 +34,7 @@ export class CaretakerRegister implements OnInit {
 
   ngOnInit(): void {
     // Capturar query params primeiro (para pegar patientId se vier da página do paciente)
-    this.route.queryParams.subscribe((queryParams) => {
+    this.route.queryParams.subscribe((queryParams: any) => {
       if (queryParams['patientId']) {
         this.caretakerData.patient_id = parseInt(queryParams['patientId'], 10);
       }
@@ -61,8 +60,7 @@ export class CaretakerRegister implements OnInit {
           rg: response.data.rg || '',
           birth_date: this.formatDateForAPI(response.data.birth_date) || '',
           gender: response.data.gender || '',
-          marital_status: response.data.marital_status || '',
-          relationship: response.data.relationship || '',
+          kinship: response.data.kinship || '',
           patient_id: response.data.patient_id || null
         };
         this.isEditing = true;
@@ -116,7 +114,7 @@ export class CaretakerRegister implements OnInit {
       return false;
     }
 
-    if (!this.caretakerData.relationship) {
+    if (!this.caretakerData.kinship) {
       this.errorMessage = 'Parentesco/Relação é obrigatório';
       return false;
     }
@@ -162,8 +160,7 @@ export class CaretakerRegister implements OnInit {
       birth_date: this.formatDateForAPI(this.caretakerData.birth_date)
     };
 
-    const payload: any = { ...formattedData };
-    delete payload.marital_status; // Campo não existe na tabela caregivers
+  const payload: any = { ...formattedData };
     if (payload.rg === '' || payload.rg === null || payload.rg === undefined) {
       delete payload.rg;
     }
@@ -197,9 +194,8 @@ export class CaretakerRegister implements OnInit {
       caretaker_id: this.caretakerId
     };
 
-    const payload: any = { ...formattedData };
-    delete payload.id;
-    delete payload.marital_status; // Campo não existe na tabela caregivers
+  const payload: any = { ...formattedData };
+  delete payload.id;
     
     if (payload.rg === '' || payload.rg === null || payload.rg === undefined) {
       delete payload.rg;

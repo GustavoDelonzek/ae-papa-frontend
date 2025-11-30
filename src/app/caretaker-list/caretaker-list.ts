@@ -93,7 +93,7 @@ export class CaretakerList implements OnInit, OnDestroy {
     return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
   }
 
-  getRelationshipLabel(relationship: string): string {
+  getKinshipLabel(kinship: string): string {
     const labels: { [key: string]: string } = {
       'son': 'Filho',
       'daughter': 'Filha',
@@ -111,7 +111,7 @@ export class CaretakerList implements OnInit, OnDestroy {
       'professional_caregiver': 'Cuidador Profissional',
       'other': 'Outro'
     };
-    return labels[relationship] || relationship;
+    return labels[kinship] || kinship;
   }
 
   getCaretakerAge(birthDate: string): number {

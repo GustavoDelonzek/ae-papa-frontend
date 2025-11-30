@@ -208,8 +208,8 @@ export class PatientComponent implements OnInit {
     }
   }
 
-  getRelationshipText(relationship: string): string {
-    const relationshipMap: { [key: string]: string } = {
+  getKinshipText(kinship: string): string {
+    const kinshipMap: { [key: string]: string } = {
       'son': 'Filho',
       'daughter': 'Filha',
       'spouse': 'Cônjuge',
@@ -226,7 +226,7 @@ export class PatientComponent implements OnInit {
       'professional_caregiver': 'Cuidador Profissional',
       'other': 'Outro'
     };
-    return relationshipMap[relationship] || relationship;
+    return kinshipMap[kinship] || kinship;
   }
 
   goBack(): void {

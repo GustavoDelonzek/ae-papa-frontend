@@ -176,9 +176,9 @@
                     <i class="fas fa-id-card"></i>
                     CPF: {{ formatCPF(caretaker.cpf) }}
                   </span>
-                  <span class="detail-item" *ngIf="caretaker.relationship">
-                    <i class="fas fa-heart"></i>
-                    {{ getRelationshipText(caretaker.relationship) }}
+                         <span class="detail-item" *ngIf="caretaker.kinship">
+                           <i class="fas fa-heart"></i>
+                           {{ getKinshipText(caretaker.kinship) }}
                   </span>
                   <span class="detail-item">
                     <i class="fas fa-calendar"></i>
