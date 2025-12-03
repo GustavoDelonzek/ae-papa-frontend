@@ -39,6 +39,17 @@ export class PatientComponent implements OnInit {
         this.errorMessage = 'ID do paciente não fornecido';
       }
     });
+
+    // Verificar se deve abrir a aba de cuidadores
+    this.route.queryParams.subscribe((queryParams: any) => {
+      if (queryParams['tab']) {
+        this.activeTab = queryParams['tab'];
+        // Se for aba de cuidador, carrega os cuidadores
+        if (queryParams['tab'] === 'Cuidador') {
+          this.loadCaretakers();
+        }
+      }
+    });
   }
 
   loadPatientData(): void {

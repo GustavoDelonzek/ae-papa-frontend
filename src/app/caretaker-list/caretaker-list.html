@@ -33,19 +33,19 @@
   </header>
 
   <div class="caretaker-list-content">
-    <div class="content-header">
-      <h2>Lista de cuidadores</h2>
-      <button class="btn-add-caretaker" (click)="addCaretaker()">
-        <i class="fas fa-plus"></i> Adicionar Cuidador
-      </button>
+
+    <!-- Loading state -->
+    <div class="loading-container" *ngIf="loading && !searching">
+      <div class="loading-spinner"></div>
+      <p>Carregando cuidadores...</p>
     </div>
 
     <!-- Exibir mensagem de erro -->
-    <div *ngIf="errorMessage" class="alert alert-danger">
+    <div *ngIf="errorMessage && !loading" class="alert alert-danger">
       {{ errorMessage }}
     </div>
 
-    <div class="caretakers-grid" *ngIf="filteredCaretakers && filteredCaretakers.length > 0; else noCaretakers">
+    <div class="caretakers-grid" *ngIf="!loading && filteredCaretakers && filteredCaretakers.length > 0;">
       <div 
         class="caretaker-card" 
         *ngFor="let caretaker of filteredCaretakers"
@@ -97,19 +97,6 @@
         </div>
       </div>
     </div>
-
-    <ng-template #noCaretakers>
-      <div class="no-data">
-        <div class="no-data-icon">
-          <i class="fas fa-user-nurse"></i>
-        </div>
-        <p *ngIf="!searchTerm">Nenhum cuidador cadastrado ainda.</p>
-        <p *ngIf="searchTerm">Nenhum cuidador encontrado com o termo "{{ searchTerm }}".</p>
-        <button class="btn-primary" (click)="addCaretaker()" *ngIf="!searchTerm">
-          <i class="fas fa-plus"></i> Adicionar primeiro cuidador
-        </button>
-      </div>
-    </ng-template>
 
     <!-- Paginação -->
     <div class="pagination-container" *ngIf="totalPages > 1">

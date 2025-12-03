@@ -166,13 +166,10 @@ export class PatientRegister implements OnInit {
         this.isLoading = false;
         this.successMessage = 'Paciente cadastrado com sucesso!';
         
-        // Resetar formulário após sucesso
+        // Redirecionar para lista de pacientes após sucesso
         setTimeout(() => {
-          this.resetForm();
-          this.successMessage = '';
-          // Opcionalmente redirecionar para lista de pacientes
-          // this.router.navigate(['/lista-pacientes']);
-        }, 2000);
+          this.router.navigate(['/lista-pacientes']);
+        }, 1200);
       },
   error: (error: any) => {
         console.error('Erro ao cadastrar paciente:', error);
@@ -294,6 +291,7 @@ export class PatientRegister implements OnInit {
       return;
     }
 
-    this.resetForm();
+    // Redirecionar para lista de pacientes ao cancelar criação
+    this.router.navigate(['/lista-pacientes']);
   }
 }

@@ -21,7 +21,7 @@
           <i class="fas fa-users"></i>
         </div>
         <div class="stat-content">
-          <h3>{{ totalPatients }}</h3>
+          <h3>{{ loading ? '...' : totalPatients }}</h3>
           <p>Total de Pacientes</p>
         </div>
         <div class="stat-action" (click)="navigateToPatients()">
@@ -34,7 +34,7 @@
           <i class="fas fa-calendar-check"></i>
         </div>
         <div class="stat-content">
-          <h3>{{ appointmentsToday }}</h3>
+          <h3>{{ loading ? '...' : appointmentsToday }}</h3>
           <p>Consultas Hoje</p>
         </div>
         <div class="stat-action">
@@ -47,7 +47,7 @@
           <i class="fas fa-tasks"></i>
         </div>
         <div class="stat-content">
-          <h3>{{ pendingTasks }}</h3>
+          <h3>{{ loading ? '...' : pendingTasks }}</h3>
           <p>Tarefas Pendentes</p>
         </div>
         <div class="stat-action">
@@ -60,7 +60,7 @@
           <i class="fas fa-chart-line"></i>
         </div>
         <div class="stat-content">
-          <h3>{{ recentActivity }}</h3>
+          <h3>{{ loading ? '...' : recentActivity }}</h3>
           <p>Atividades Recentes</p>
         </div>
         <div class="stat-action">
