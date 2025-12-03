@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { PatientService } from '../services';
+import { DashboardService, DashboardMetrics } from '../services';
 
 @Component({
   selector: 'app-home',
@@ -27,7 +27,7 @@ export class Home implements OnInit {
   
   constructor(
     private router: Router,
-    private patientService: PatientService
+    private dashboardService: DashboardService
   ) {}
   
   ngOnInit(): void {
@@ -38,22 +38,20 @@ export class Home implements OnInit {
   loadDashboardData(): void {
     this.loading = true;
     
-    // Carregar total de pacientes
-    this.patientService.getPatients(1, 1).subscribe({
-      next: (response: any) => {
-        this.totalPatients = response.meta.total || 0;
+    // Carregar métricas do dashboard
+    this.dashboardService.getMetrics().subscribe({
+      next: (metrics: DashboardMetrics) => {
+        this.totalPatients = metrics.patient_count;
+        this.appointmentsToday = metrics.appointments_count;
+        this.pendingTasks = metrics.documents_count;
+        this.recentActivity = 12;
         this.loading = false;
       },
       error: (error: any) => {
-        console.error('Erro ao carregar estatísticas:', error);
+        console.error('Erro ao carregar métricas do dashboard:', error);
         this.loading = false;
       }
     });
-    
-    // Simular outras estatísticas (você pode conectar com APIs reais)
-    this.appointmentsToday = 5;
-    this.pendingTasks = 3;
-    this.recentActivity = 12;
   }
   
   initializeCalendar(): void {

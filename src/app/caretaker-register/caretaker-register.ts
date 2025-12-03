@@ -11,6 +11,7 @@ import { CaretakerService, Caretaker, CaretakerResponse } from '../services';
 export class CaretakerRegister implements OnInit {
   isEditing: boolean = false;
   caretakerId: number | null = null;
+  fromPatientPage: boolean = false;
 
   caretakerData: Caretaker = {
     full_name: '',
@@ -37,6 +38,7 @@ export class CaretakerRegister implements OnInit {
     this.route.queryParams.subscribe((queryParams: any) => {
       if (queryParams['patientId']) {
         this.caretakerData.patient_id = parseInt(queryParams['patientId'], 10);
+        this.fromPatientPage = true;
       }
     });
 
@@ -176,7 +178,13 @@ export class CaretakerRegister implements OnInit {
         this.isLoading = false;
         
         setTimeout(() => {
-          this.router.navigate(['/lista-cuidadores']);
+          if (this.fromPatientPage && this.caretakerData.patient_id) {
+            this.router.navigate(['/paciente', this.caretakerData.patient_id], {
+              queryParams: { tab: 'Cuidador' }
+            });
+          } else {
+            this.router.navigate(['/lista-cuidadores']);
+          }
         }, 1500);
       },
       error: (error: any) => {
@@ -254,7 +262,13 @@ export class CaretakerRegister implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/lista-cuidadores']);
+    if (this.fromPatientPage && this.caretakerData.patient_id) {
+      this.router.navigate(['/paciente', this.caretakerData.patient_id], {
+        queryParams: { tab: 'Cuidador' }
+      });
+    } else {
+      this.router.navigate(['/lista-cuidadores']);
+    }
   }
 }
 
