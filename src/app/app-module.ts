@@ -12,6 +12,8 @@ import { Sidebar } from './sidebar/sidebar';
 import { PatientRegister } from './patient-register/patient-register';
 import { PatientComponent } from './patient/patient.component';
 import { PatientListComponent } from './patient-list/patient-list.component';
+import { DocumentListComponent } from './document-list/document-list.component';
+import { DocumentUploadComponent } from './document-upload/document-upload.component';
 
 // Services e Guards
 import { AuthService } from './services';
@@ -37,7 +39,9 @@ import { CaretakerRegister } from './caretaker-register/caretaker-register';
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    DocumentListComponent,
+    DocumentUploadComponent
   ],
   providers: [
     AuthService,

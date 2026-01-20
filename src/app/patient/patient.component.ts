@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { PatientService, Patient, CaretakerService, Caretaker } from '../services';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-patient',
@@ -22,14 +23,23 @@ export class PatientComponent implements OnInit {
   caretakers: Caretaker[] = [];
   loadingCaretakers: boolean = false;
 
+  // Controle do modal de upload de documentos
+  showUploadModal = false;
+  currentUserId: number = 0;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private patientService: PatientService,
-    private caretakerService: CaretakerService
+    private caretakerService: CaretakerService,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
+    // Obter ID do usuário logado
+    const user = this.authService.getCurrentUser();
+    this.currentUserId = user?.id || 0;
+
     // Pegar ID do paciente da rota
   this.route.params.subscribe((params: Params) => {
       if (params['id']) {
@@ -167,8 +177,16 @@ export class PatientComponent implements OnInit {
   }
 
   addDocument(): void {
-    // TODO: Implementar modal para upload de documento
-    console.log('Adicionar novo documento');
+    this.showUploadModal = true;
+  }
+
+  closeUploadModal(): void {
+    this.showUploadModal = false;
+  }
+
+  onDocumentUploadSuccess(): void {
+    this.showUploadModal = false;
+    // O componente filho (document-list) vai recarregar automaticamente
   }
 
   // Métodos para gerenciar cuidadores

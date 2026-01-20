@@ -134,18 +134,10 @@
         
         <!-- Aba Documentos -->
         <div *ngIf="activeTab === 'documentos'" class="tab-panel">
-          <div class="documents-header">
-            <h2>Documentos</h2>
-            <button class="btn-add" (click)="addDocument()">
-              <i class="fas fa-plus"></i> Adicionar Documento
-            </button>
-          </div>
-          
-          <div class="no-documents">
-            <i class="fas fa-folder-open"></i>
-            <p>Funcionalidade de documentos em desenvolvimento</p>
-            <p>Em breve você poderá gerenciar documentos do paciente</p>
-          </div>
+          <app-document-list 
+            [patientId]="patientId"
+            (onUploadClick)="addDocument()">
+          </app-document-list>
         </div>
 
         <!-- Aba Cuidador -->
@@ -213,3 +205,11 @@
   </div>
 </div>
 
+<!-- Modal de Upload de Documento -->
+<app-document-upload
+  *ngIf="showUploadModal"
+  [patientId]="patientId"
+  [user_id]="currentUserId"
+  (onClose)="closeUploadModal()"
+  (onSuccess)="onDocumentUploadSuccess()">
+</app-document-upload>
