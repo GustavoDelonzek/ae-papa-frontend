@@ -1,0 +1,159 @@
+<div>
+    <app-sidebar></app-sidebar>
+    <div class="main-content container">
+        <div class="header-section">
+            <h2>Criar Nova Consulta</h2>
+        </div>
+
+        <!-- Mensagem de sucesso -->
+        <div class="alert alert-success" *ngIf="successMessage">
+            <i class="fas fa-check-circle"></i>
+            {{ successMessage }}
+        </div>
+
+        <!-- Mensagem de erro -->
+        <div class="alert alert-error" *ngIf="errorMessage && !showSearchModal">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ errorMessage }}
+        </div>
+
+        <form (ngSubmit)="createAppointment()">
+            <div class="form-group">
+                <label for="patient">Atendido: *</label>
+                <div class="patient-selector">
+                    <input 
+                        type="text" 
+                        id="patient" 
+                        [value]="selectedPatient ? selectedPatient.full_name : ''"
+                        placeholder="Clique para buscar um atendido"
+                        readonly
+                        (click)="openPatientSearchModal()"
+                        required>
+                    <button type="button" class="btn-search" (click)="openPatientSearchModal()">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="date">Data da Consulta: *</label>
+                <input 
+                    type="date" 
+                    id="date" 
+                    [(ngModel)]="appointmentDate"
+                    name="date"
+                    [disabled]="submitting"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="objective">Objetivo: *</label>
+                <select 
+                    id="objective" 
+                    [(ngModel)]="appointmentObjective"
+                    name="objective"
+                    [disabled]="submitting"
+                    required>
+                    <option value="">Selecione o objetivo</option>
+                    <option value="donation">Doação</option>
+                    <option value="project">Projeto</option>
+                    <option value="treatment">Tratamento</option>
+                    <option value="research">Pesquisa</option>
+                    <option value="other">Outro</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="observations">Observações:</label>
+                <textarea 
+                    id="observations" 
+                    [(ngModel)]="observations"
+                    name="observations"
+                    placeholder="Adicione observações sobre a consulta"
+                    rows="4"
+                    [disabled]="submitting"></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button 
+                    type="button" 
+                    class="btn-cancel"
+                    (click)="resetForm()"
+                    [disabled]="submitting">
+                    Limpar
+                </button>
+                <button 
+                    type="submit" 
+                    class="btn-submit"
+                    [disabled]="!selectedPatient || !appointmentDate || !appointmentObjective || submitting">
+                    <i class="fas" [ngClass]="submitting ? 'fa-spinner fa-spin' : 'fa-check'"></i>
+                    {{ submitting ? 'Criando...' : 'Criar Consulta' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showSearchModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>Buscar Atendido</h2>
+            <button class="btn-close" (click)="closeModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <!-- Campo de busca por CPF -->
+            <div class="search-section">
+                <div class="search-input-group">
+                    <i class="fas fa-id-card"></i>
+                    <input 
+                        type="text" 
+                        [(ngModel)]="searchCpf"
+                        [ngModelOptions]="{standalone: true}"
+                        placeholder="Digite o CPF do atendido"
+                        (input)="onSearchCpfChange()"
+                        maxlength="14">
+                    <button 
+                        type="button" 
+                        class="btn-search-action"
+                        (click)="searchPatientByCpf()"
+                        [disabled]="searching || !searchCpf">
+                        <i class="fas" [ngClass]="searching ? 'fa-spinner fa-spin' : 'fa-search'"></i>
+                    </button>
+                </div>
+                <small class="hint">Formato: 000.000.000-00</small>
+            </div>
+
+            <!-- Mensagem de erro -->
+            <div class="alert alert-error" *ngIf="errorMessage">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ errorMessage }}
+            </div>
+
+            <!-- Resultado da busca -->
+            <div class="search-result" *ngIf="searchResult">
+                <div class="patient-card" (click)="selectPatient(searchResult)">
+                    <div class="patient-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="patient-info">
+                        <h3>{{ searchResult.full_name }}</h3>
+                        <p><strong>CPF:</strong> {{ formatCpf(searchResult.cpf) }}</p>
+                        <p *ngIf="searchResult.birth_date"><strong>Data de Nascimento:</strong> {{ searchResult.birth_date }}</p>
+                    </div>
+                    <div class="select-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estado vazio -->
+            <div class="empty-state" *ngIf="!searchResult && !searching && !errorMessage">
+                <i class="fas fa-search"></i>
+                <p>Digite o CPF do atendido para iniciar a busca</p>
+            </div>
+        </div>
+    </div>
+</div>

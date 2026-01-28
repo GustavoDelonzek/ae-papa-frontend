@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { PatientService, Patient, CaretakerService, Caretaker } from '../services';
 import { AuthService } from '../services/auth.service';
+import { AppointmentService } from '../services/appointment.service';
+import { Appointment, AppointmentCreate } from '../core/models/appointment.model';
 
 @Component({
   selector: 'app-patient',
@@ -27,12 +29,28 @@ export class PatientComponent implements OnInit {
   showUploadModal = false;
   currentUserId: number = 0;
 
+  // Dados das consultas
+  appointments: Appointment[] = [];
+  loadingAppointments: boolean = false;
+
+  // Controle do modal de consulta
+  showAppointmentModal = false;
+  newAppointment: AppointmentCreate = {
+    patient_id: 0,
+    date: '',
+    objective: '',
+    observations: ''
+  };
+  savingAppointment = false;
+  appointmentErrorMessage = '';
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private patientService: PatientService,
     private caretakerService: CaretakerService,
-    private authService: AuthService
+    private authService: AuthService,
+    private appointmentService: AppointmentService
   ) { }
 
   ngOnInit(): void {
@@ -73,6 +91,9 @@ export class PatientComponent implements OnInit {
         this.patientData = response.data;
         
         this.loading = false;
+        
+        // Carregar consultas automaticamente
+        this.loadAppointments();
       },
   error: (error: any) => {
         console.error('Erro ao carregar dados do paciente:', error);
@@ -260,5 +281,131 @@ export class PatientComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/lista-pacientes']);
+  }
+
+  // Métodos para gerenciar consultas
+  loadAppointments(): void {
+    this.loadingAppointments = true;
+    
+    this.appointmentService.listAppointments(1, 100, { patient_id: this.patientId }).subscribe({
+      next: (response: any) => {
+        this.appointments = response.data || [];
+        console.log('Consultas carregadas:', this.appointments);
+        this.loadingAppointments = false;
+      },
+      error: (error: any) => {
+        console.error('Erro ao carregar consultas:', error);
+        this.loadingAppointments = false;
+      }
+    });
+  }
+
+  openCreateAppointmentModal(): void {
+    // Resetar formulário
+    this.newAppointment = {
+      patient_id: this.patientId,
+      user_id: this.currentUserId,
+      date: '',
+      objective: '',
+      observations: ''
+    };
+    this.appointmentErrorMessage = '';
+    this.showAppointmentModal = true;
+  }
+
+  closeAppointmentModal(): void {
+    this.showAppointmentModal = false;
+    this.appointmentErrorMessage = '';
+  }
+
+  reloadAppointments(): void {
+    this.loadAppointments();
+  }
+
+  createAppointment(): void {
+    this.savingAppointment = true;
+    this.appointmentErrorMessage = '';
+
+    // Converter data de YYYY-MM-DD para MM-DD-YYYY sem usar Date object
+    // para evitar problemas com timezone
+    const dateParts = this.newAppointment.date.split('-');
+    const year = dateParts[0];
+    const month = dateParts[1];
+    const day = dateParts[2];
+    const formattedDate = `${month}-${day}-${year}`;
+
+    const appointmentData: AppointmentCreate = {
+      ...this.newAppointment,
+      date: formattedDate,
+      patient_id: this.patientId,
+      user_id: this.currentUserId
+    };
+
+    this.appointmentService.createAppointment(appointmentData).subscribe({
+      next: (response: any) => {
+        this.savingAppointment = false;
+        this.closeAppointmentModal();
+        // Recarregar lista de consultas
+        this.reloadAppointments();
+      },
+      error: (error: any) => {
+        console.error('Erro ao criar consulta:', error);
+        this.savingAppointment = false;
+        this.appointmentErrorMessage = 'Erro ao criar consulta. Tente novamente.';
+      }
+    });
+  }
+
+  formatAppointmentDate(date: string): string {
+    if (!date) return 'Data não informada';
+    
+    date = date.trim();
+    const parts = date.split('-');
+    
+    if (parts.length === 3) {
+      // Detectar formato: se a primeira parte tem 4 dígitos, é YYYY-MM-DD
+      if (parts[0].length === 4) {
+        // Formato YYYY-MM-DD
+        const year = parts[0];
+        const month = parts[1].padStart(2, '0');
+        const day = parts[2].padStart(2, '0');
+        return `${day}/${month}/${year}`;
+      } else {
+        // Formato MM-DD-YYYY
+        const month = parts[0].padStart(2, '0');
+        const day = parts[1].padStart(2, '0');
+        const year = parts[2];
+        return `${day}/${month}/${year}`;
+      }
+    }
+    
+    return date;
+  }
+
+  getStatusText(status: string): string {
+    const statusMap: { [key: string]: string } = {
+      'scheduled': 'Agendada',
+      'confirmed': 'Confirmada',
+      'completed': 'Realizada',
+      'cancelled': 'Cancelada',
+      'pending': 'Pendente'
+    };
+    return statusMap[status] || status;
+  }
+
+  getObjectiveText(objective: string): string {
+    const objectiveMap: { [key: string]: string } = {
+      'donation': 'Doação',
+      'project': 'Projeto',
+      'treatment': 'Tratamento',
+      'research': 'Pesquisa',
+      'other': 'Outro'
+    };
+    return objectiveMap[objective] || objective;
+  }
+
+  viewAppointment(appointmentId: number): void {
+    // Navegar para página de detalhes da consulta (se existir)
+    this.router.navigate(['/consulta', appointmentId]);
   }
 }

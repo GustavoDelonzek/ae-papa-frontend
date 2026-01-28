@@ -22,6 +22,8 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { appInitializerFactory } from './core/app-initializer';
 import { CaretakerList } from './caretaker-list/caretaker-list';
 import { CaretakerRegister } from './caretaker-register/caretaker-register';
+import { ApointmentCreate } from './apointment-create/apointment-create';
+import { ApointmentList } from './apointment-list/apointment-list';
 
 @NgModule({
   declarations: [
@@ -34,6 +36,8 @@ import { CaretakerRegister } from './caretaker-register/caretaker-register';
     PatientListComponent,
     CaretakerList,
     CaretakerRegister,
+    ApointmentCreate,
+    ApointmentList,
   ],
   imports: [
     BrowserModule,

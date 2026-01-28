@@ -205,4 +205,7 @@ export class Home implements OnInit {
   navigateToRegister(): void {
     this.router.navigate(['/registro-paciente']);
   }
+  navigateToAppointmentsCreate(): void {
+    this.router.navigate(['/criar-consulta']);
+  }
 }

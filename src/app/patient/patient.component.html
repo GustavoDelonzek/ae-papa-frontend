@@ -82,6 +82,12 @@
           (click)="selectTab('Cuidador')">
           Cuidador
         </button>
+        <button 
+          class="tab-button" 
+          [class.active]="isTabActive('consultas')"
+          (click)="selectTab('consultas')">
+          Consultas
+        </button>
       </div>
 
       <div class="tab-content">
@@ -199,6 +205,59 @@
           </div>
         </div>
 
+        <!-- Aba Consultas -->
+        <div *ngIf="activeTab === 'consultas'" class="tab-panel">
+          <div class="appointments-header">
+            <h2>Consultas do Paciente</h2>
+            <button class="btn-add" (click)="openCreateAppointmentModal()">
+              <i class="fas fa-plus"></i> Nova Consulta
+            </button>
+          </div>
+          
+          <!-- Loading state -->
+          <div class="loading-container" *ngIf="loadingAppointments">
+            <div class="loading-spinner"></div>
+            <p>Carregando consultas...</p>
+          </div>
+
+          <!-- Lista de consultas -->
+          <div class="appointments-list" *ngIf="!loadingAppointments && appointments.length > 0">
+            <div class="appointment-card" *ngFor="let appointment of appointments">
+              <div class="appointment-info">
+                <div class="appointment-date">
+                  <i class="fas fa-calendar-alt"></i>
+                  {{ formatAppointmentDate(appointment.date) }}
+                </div>
+                <div class="appointment-objective">
+                  <strong>Objetivo:</strong> {{ getObjectiveText(appointment.objective) }}
+                </div>
+                <div class="appointment-observations" *ngIf="appointment.observations">
+                  <strong>Observações:</strong> {{ appointment.observations }}
+                </div>
+                <div class="appointment-status" *ngIf="appointment.status">
+                  <span class="status-badge" [ngClass]="'status-' + appointment.status">
+                    {{ getStatusText(appointment.status) }}
+                  </span>
+                </div>
+              </div>
+              <div class="appointment-actions">
+                <button class="btn-view-small" (click)="viewAppointment(appointment.id!)" title="Ver detalhes">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estado vazio -->
+          <div class="no-appointments" *ngIf="!loadingAppointments && appointments.length === 0">
+            <i class="fas fa-calendar-check"></i>
+            <p>Nenhuma consulta cadastrada para este paciente</p>
+            <button class="btn-add" (click)="openCreateAppointmentModal()">
+              <i class="fas fa-plus"></i> Cadastrar Primeira Consulta
+            </button>
+          </div>
+        </div>
+
         
       </div>
     </div>
@@ -213,3 +272,86 @@
   (onClose)="closeUploadModal()"
   (onSuccess)="onDocumentUploadSuccess()">
 </app-document-upload>
+
+<!-- Modal de Criação de Consulta -->
+<div class="modal-overlay" *ngIf="showAppointmentModal" (click)="closeAppointmentModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Nova Consulta</h2>
+      <button class="btn-close" (click)="closeAppointmentModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <form (ngSubmit)="createAppointment()" #appointmentForm="ngForm">
+        <div class="form-group">
+          <label for="patient-name">Paciente</label>
+          <input 
+            type="text" 
+            id="patient-name" 
+            class="form-control" 
+            [value]="patientData?.full_name" 
+            disabled>
+        </div>
+
+        <div class="form-group">
+          <label for="appointment-date">Data da Consulta *</label>
+          <input 
+            type="date" 
+            id="appointment-date" 
+            name="date"
+            class="form-control" 
+            [(ngModel)]="newAppointment.date"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="appointment-objective">Objetivo *</label>
+          <select 
+            id="appointment-objective" 
+            name="objective"
+            class="form-control" 
+            [(ngModel)]="newAppointment.objective"
+            required>
+            <option value="" disabled selected>Selecione o objetivo da consulta</option>
+            <option value="donation">Doação</option>
+            <option value="project">Projeto</option>
+            <option value="treatment">Tratamento</option>
+            <option value="research">Pesquisa</option>
+            <option value="other">Outro</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="appointment-observations">Observações</label>
+          <textarea 
+            id="appointment-observations" 
+            name="observations"
+            class="form-control" 
+            rows="4"
+            [(ngModel)]="newAppointment.observations"
+            placeholder="Adicione observações relevantes (opcional)"></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" (click)="closeAppointmentModal()">
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="btn-submit" 
+            [disabled]="!appointmentForm.form.valid || savingAppointment">
+            <i class="fas fa-spinner fa-spin" *ngIf="savingAppointment"></i>
+            <span *ngIf="!savingAppointment">Criar Consulta</span>
+            <span *ngIf="savingAppointment">Salvando...</span>
+          </button>
+        </div>
+      </form>
+
+      <div class="alert alert-danger" *ngIf="appointmentErrorMessage">
+        {{ appointmentErrorMessage }}
+      </div>
+    </div>
+  </div>
+</div>
