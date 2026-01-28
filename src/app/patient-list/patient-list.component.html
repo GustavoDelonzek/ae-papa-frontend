@@ -2,7 +2,7 @@
 
 <div class="patient-list-container">
   <header class="patient-list-header">
-    <h1>Pacientes</h1>
+    <h1>Atendidos</h1>
     <div class="search-container">
       <input 
         type="text" 
@@ -34,9 +34,9 @@
 
   <div class="patient-list-content">
     <div class="content-header">
-      <h2>Lista de pacientes</h2>
+      <h2>Lista de Atendidos</h2>
       <button class="btn-add-patient" (click)="addPatient()">
-        <i class="fas fa-plus"></i> Adicionar Paciente
+        <i class="fas fa-plus"></i> Adicionar Atendido
       </button>
     </div>
 
@@ -100,11 +100,11 @@
     <ng-template #noPatients>
       <div class="no-patients">
         <i class="fas fa-users"></i>
-        <h3>Nenhum paciente encontrado</h3>
+        <h3>Nenhum Atendido encontrado</h3>
         <p *ngIf="searchTerm">Tente ajustar os termos de pesquisa</p>
-        <p *ngIf="!searchTerm">Comece adicionando seu primeiro paciente</p>
+        <p *ngIf="!searchTerm">Comece adicionando seu primeiro Atendido</p>
         <button class="btn-add-first" (click)="addPatient()">
-          <i class="fas fa-plus"></i> Adicionar Primeiro Paciente
+          <i class="fas fa-plus"></i> Adicionar Primeiro Atendido
         </button>
       </div>
     </ng-template>
@@ -148,6 +148,6 @@
   <!-- Loading state -->
   <div class="loading-container" *ngIf="loading">
     <div class="loading-spinner"></div>
-    <p>Carregando pacientes...</p>
+    <p>Carregando Atendidos...</p>
   </div>
 </div>

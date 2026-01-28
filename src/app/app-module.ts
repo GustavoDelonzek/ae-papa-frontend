@@ -12,6 +12,8 @@ import { Sidebar } from './sidebar/sidebar';
 import { PatientRegister } from './patient-register/patient-register';
 import { PatientComponent } from './patient/patient.component';
 import { PatientListComponent } from './patient-list/patient-list.component';
+import { DocumentListComponent } from './document-list/document-list.component';
+import { DocumentUploadComponent } from './document-upload/document-upload.component';
 
 // Services e Guards
 import { AuthService } from './services';
@@ -20,6 +22,8 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { appInitializerFactory } from './core/app-initializer';
 import { CaretakerList } from './caretaker-list/caretaker-list';
 import { CaretakerRegister } from './caretaker-register/caretaker-register';
+import { ApointmentCreate } from './apointment-create/apointment-create';
+import { ApointmentList } from './apointment-list/apointment-list';
 
 @NgModule({
   declarations: [
@@ -32,12 +36,16 @@ import { CaretakerRegister } from './caretaker-register/caretaker-register';
     PatientListComponent,
     CaretakerList,
     CaretakerRegister,
+    ApointmentCreate,
+    ApointmentList,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    DocumentListComponent,
+    DocumentUploadComponent
   ],
   providers: [
     AuthService,

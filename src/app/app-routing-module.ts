@@ -8,6 +8,8 @@ import { PatientListComponent } from './patient-list/patient-list.component';
 import { CaretakerList } from './caretaker-list/caretaker-list';
 import { CaretakerRegister } from './caretaker-register/caretaker-register';
 import { AuthGuard } from './guards/auth.guard';
+import { ApointmentCreate } from './apointment-create/apointment-create';
+import { ApointmentList } from './apointment-list/apointment-list';
 
 const routes: Routes = [
   { path: 'login', component: Login },
@@ -54,6 +56,16 @@ const routes: Routes = [
   { 
     path: 'registro-cuidador/:id', 
     component: CaretakerRegister,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'criar-consulta',
+    component: ApointmentCreate,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'lista-consultas',
+    component: ApointmentList,
     canActivate: [AuthGuard]
   },
   { 

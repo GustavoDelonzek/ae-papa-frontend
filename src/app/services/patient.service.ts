@@ -70,6 +70,17 @@ export class PatientService {
   }
 
   /**
+   * Buscar paciente por CPF
+   */
+  getPatientByCpf(cpf: string): Observable<PatientsListResponse> {
+    const params = new HttpParams()
+      .set('cpf', cpf)
+      .set('per_page', '1');
+    
+    return this.http.get<PatientsListResponse>(`${API_URL}/patients`, { params });
+  }
+
+  /**
    * Obter paciente por ID
    */
   getPatient(id: number): Observable<PatientResponse> {

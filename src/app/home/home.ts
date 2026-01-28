@@ -87,8 +87,17 @@ export class Home implements OnInit {
     this.calendarDays = [];
     
     // Dias do mês anterior
-    for (let i = 0; i < firstDayOfWeek; i++) {
-      this.calendarDays.push({ day: '', isCurrentMonth: false });
+    const prevMonthLastDay = new Date(year, month, 0).getDate();
+    for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+      const day = prevMonthLastDay - i;
+      const date = new Date(year, month - 1, day);
+      this.calendarDays.push({ 
+        day: day, 
+        date: date,
+        isCurrentMonth: false,
+        isToday: false,
+        isSelected: false
+      });
     }
     
     // Dias do mês atual
@@ -100,6 +109,19 @@ export class Home implements OnInit {
         date: date,
         isCurrentMonth: true,
         isToday: isToday,
+        isSelected: false
+      });
+    }
+    
+    // Completar com dias do próximo mês para ter sempre 42 células (6 semanas)
+    const remainingCells = 42 - this.calendarDays.length;
+    for (let day = 1; day <= remainingCells; day++) {
+      const date = new Date(year, month + 1, day);
+      this.calendarDays.push({
+        day: day,
+        date: date,
+        isCurrentMonth: false,
+        isToday: false,
         isSelected: false
       });
     }
@@ -182,5 +204,8 @@ export class Home implements OnInit {
   
   navigateToRegister(): void {
     this.router.navigate(['/registro-paciente']);
+  }
+  navigateToAppointmentsCreate(): void {
+    this.router.navigate(['/criar-consulta']);
   }
 }
