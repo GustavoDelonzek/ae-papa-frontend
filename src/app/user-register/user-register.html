@@ -1,0 +1,140 @@
+<div class="page-container">
+  <app-sidebar></app-sidebar>
+  
+  <div class="main-content">
+    <div class="content-header">
+      <h1>Cadastrar Novo Usuário</h1>
+      <p class="subtitle">Preencha os dados para criar um novo usuário do sistema</p>
+    </div>
+
+    <div class="form-card">
+      <!-- Mensagem de sucesso -->
+      <div *ngIf="successMessage" class="success-message">
+        <i class="fa-solid fa-check-circle"></i> {{ successMessage }}
+      </div>
+
+      <!-- Mensagem de erro -->
+      <div *ngIf="errorMessage" class="error-message">
+        <i class="fa-solid fa-times-circle"></i> {{ errorMessage }}
+      </div>
+
+      <form class="user-form" (ngSubmit)="onSubmit()" #userForm="ngForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name" class="form-label">Nome Completo *</label>
+            <input 
+              type="text" 
+              id="name"
+              name="name"
+              class="form-control"
+              [(ngModel)]="userData.name"
+              required
+              #name="ngModel"
+              placeholder="Digite o nome completo">
+            
+            <div *ngIf="name.invalid && name.touched" class="field-error">
+              <small *ngIf="name.errors?.['required']">Nome é obrigatório</small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">Email *</label>
+            <input 
+              type="email" 
+              id="email"
+              name="email"
+              class="form-control"
+              [(ngModel)]="userData.email"
+              required
+              email
+              #email="ngModel"
+              placeholder="Digite o email">
+            
+            <div *ngIf="email.invalid && email.touched" class="field-error">
+              <small *ngIf="email.errors?.['required']">Email é obrigatório</small>
+              <small *ngIf="email.errors?.['email']">Email inválido</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="password" class="form-label">Senha *</label>
+            <input 
+              type="password" 
+              id="password"
+              name="password"
+              class="form-control"
+              [(ngModel)]="userData.password"
+              required
+              minlength="6"
+              #password="ngModel"
+              placeholder="Digite a senha">
+            
+            <div *ngIf="password.invalid && password.touched" class="field-error">
+              <small *ngIf="password.errors?.['required']">Senha é obrigatória</small>
+              <small *ngIf="password.errors?.['minlength']">A senha deve ter pelo menos 6 caracteres</small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password_confirmation" class="form-label">Confirmar Senha *</label>
+            <input 
+              type="password" 
+              id="password_confirmation"
+              name="password_confirmation"
+              class="form-control"
+              [(ngModel)]="userData.password_confirmation"
+              required
+              #password_confirmation="ngModel"
+              placeholder="Confirme a senha">
+            
+            <div *ngIf="password_confirmation.touched && userData.password !== userData.password_confirmation" class="field-error">
+              <small>As senhas não conferem</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="role" class="form-label">Perfil de Acesso *</label>
+            <select 
+              id="role"
+              name="role"
+              class="form-control"
+              [(ngModel)]="userData.role"
+              required
+              #role="ngModel">
+              <option value="" disabled>Selecione o perfil</option>
+              <option *ngFor="let r of roles" [value]="r.value">{{ r.label }}</option>
+            </select>
+            
+            <div *ngIf="role.invalid && role.touched" class="field-error">
+              <small *ngIf="role.errors?.['required']">Perfil é obrigatório</small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <!-- Espaço reservado para manter layout -->
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="button" 
+            class="btn btn-secondary"
+            (click)="cancel()">
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="!userForm.form.valid || isLoading || userData.password !== userData.password_confirmation">
+            <span *ngIf="isLoading">Cadastrando...</span>
+            <span *ngIf="!isLoading">Cadastrar Usuário</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

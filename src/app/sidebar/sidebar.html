@@ -50,6 +50,16 @@
           <span class="nav-text">Nova Consulta</span>
         </a>
       </li>
+
+      <!-- Itens apenas para Admin -->
+      <li class="nav-item" *ngIf="isAdmin">
+        <a [routerLink]="['/registro-usuario']" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+          <div class="nav-icon">
+            <i class="fa-solid fa-user-shield"></i>
+          </div>
+          <span class="nav-text">Cadastrar Usuário</span>
+        </a>
+      </li>
     </ul>
   </nav>
 

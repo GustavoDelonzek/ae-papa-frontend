@@ -90,6 +90,21 @@ export class AuthService {
   }
 
   /**
+   * Registrar novo usuário (apenas admin)
+   */
+  register(userData: { name: string; email: string; password: string; password_confirmation: string; role: string }): Observable<any> {
+    return this.http.post<any>(`${API_URL}/register`, userData);
+  }
+
+  /**
+   * Verificar se o usuário atual é admin
+   */
+  isAdmin(): boolean {
+    const user = this.getCurrentUser();
+    return user && user.role === 'admin';
+  }
+
+  /**
    * Salvar dados de autenticação
    */
   setAuthData(user: any, token: string): void {

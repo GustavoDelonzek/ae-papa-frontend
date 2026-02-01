@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { AuthService } from '../services';
 
 @Component({
@@ -8,9 +8,14 @@ import { AuthService } from '../services';
   styleUrls: ['./sidebar.scss'],
   providers: [AuthService]
 })
-export class Sidebar {
+export class Sidebar implements OnInit {
+  isAdmin: boolean = false;
 
   constructor(@Inject(AuthService) private authService: AuthService) {}
+
+  ngOnInit(): void {
+    this.isAdmin = this.authService.isAdmin();
+  }
 
   logout(): void {
     if (confirm('Tem certeza que deseja sair?')) {

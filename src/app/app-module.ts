@@ -24,6 +24,7 @@ import { CaretakerList } from './caretaker-list/caretaker-list';
 import { CaretakerRegister } from './caretaker-register/caretaker-register';
 import { ApointmentCreate } from './apointment-create/apointment-create';
 import { ApointmentList } from './apointment-list/apointment-list';
+import { UserRegister } from './user-register/user-register';
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import { ApointmentList } from './apointment-list/apointment-list';
     CaretakerRegister,
     ApointmentCreate,
     ApointmentList,
+    UserRegister,
   ],
   imports: [
     BrowserModule,
