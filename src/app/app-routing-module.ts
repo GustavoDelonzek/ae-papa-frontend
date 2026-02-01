@@ -10,6 +10,7 @@ import { CaretakerRegister } from './caretaker-register/caretaker-register';
 import { AuthGuard } from './guards/auth.guard';
 import { ApointmentCreate } from './apointment-create/apointment-create';
 import { ApointmentList } from './apointment-list/apointment-list';
+import { UserRegister } from './user-register/user-register';
 
 const routes: Routes = [
   { path: 'login', component: Login },
@@ -66,6 +67,11 @@ const routes: Routes = [
   {
     path: 'lista-consultas',
     component: ApointmentList,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'registro-usuario',
+    component: UserRegister,
     canActivate: [AuthGuard]
   },
   { 
