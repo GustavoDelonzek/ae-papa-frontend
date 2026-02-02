@@ -29,7 +29,7 @@ export class PatientRegister implements OnInit {
     private router: Router,
     private patientService: PatientService,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.route.params.subscribe((params: Params) => {
@@ -118,32 +118,32 @@ export class PatientRegister implements OnInit {
   private isValidCPF(cpf: string): boolean {
     // Remover formatação
     cpf = cpf.replace(/[^\d]/g, '');
-    
+
     // Verificar se tem 11 dígitos
     if (cpf.length !== 11) return false;
-    
+
     // Verificar se todos os dígitos são iguais
     if (/^(\d)\1{10}$/.test(cpf)) return false;
-    
+
     // Validação dos dígitos verificadores
     let sum = 0;
     for (let i = 0; i < 9; i++) {
       sum += parseInt(cpf.charAt(i)) * (10 - i);
     }
-    
+
     let remainder = (sum * 10) % 11;
     if (remainder === 10 || remainder === 11) remainder = 0;
     if (remainder !== parseInt(cpf.charAt(9))) return false;
-    
+
     sum = 0;
     for (let i = 0; i < 10; i++) {
       sum += parseInt(cpf.charAt(i)) * (11 - i);
     }
-    
+
     remainder = (sum * 10) % 11;
     if (remainder === 10 || remainder === 11) remainder = 0;
     if (remainder !== parseInt(cpf.charAt(10))) return false;
-    
+
     return true;
   }
 
@@ -162,19 +162,19 @@ export class PatientRegister implements OnInit {
 
     this.patientService.createPatient(payload).subscribe({
       next: (response: any) => {
-        console.log('Paciente cadastrado com sucesso:', response);
+        console.log('Atendido cadastrado com sucesso:', response);
         this.isLoading = false;
-        this.successMessage = 'Paciente cadastrado com sucesso!';
-        
+        this.successMessage = 'Atendido cadastrado com sucesso!';
+
         // Redirecionar para lista de pacientes após sucesso
         setTimeout(() => {
           this.router.navigate(['/lista-pacientes']);
         }, 1200);
       },
-  error: (error: any) => {
+      error: (error: any) => {
         console.error('Erro ao cadastrar paciente:', error);
         this.isLoading = false;
-        
+
         if (error.status === 422) {
           // Erro de validação
           this.handleValidationErrors(error.error.errors);
@@ -214,15 +214,15 @@ export class PatientRegister implements OnInit {
 
     this.patientService.updatePatient(this.patientId, payload).subscribe({
       next: (response: any) => {
-        console.log('Paciente atualizado com sucesso:', response);
+        console.log('Atendido atualizado com sucesso:', response);
         this.isLoading = false;
-        this.successMessage = 'Paciente atualizado com sucesso!';
+        this.successMessage = 'Atendido atualizado com sucesso!';
         setTimeout(() => {
           // Após atualizar, redirecionar para a página do paciente
           this.router.navigate(['/paciente', this.patientId]);
         }, 1200);
       },
-  error: (error: any) => {
+      error: (error: any) => {
         console.error('Erro ao atualizar paciente:', error);
         this.isLoading = false;
         if (error.status === 422) {
@@ -237,7 +237,7 @@ export class PatientRegister implements OnInit {
   private formatDateForAPI(date: string): string {
     // Converter de YYYY-MM-DD para MM-DD-YYYY (formato esperado pelo backend)
     if (!date) return '';
-    
+
     const [year, month, day] = date.split('-');
     return `${month}-${day}-${year}`;
   }
@@ -245,7 +245,7 @@ export class PatientRegister implements OnInit {
   private handleValidationErrors(errors: any): void {
     // Log completo dos erros para debug
     console.log('Erros de validação do backend:', errors);
-    
+
     // Tratar erros de validação específicos
     if (errors.cpf) {
       this.errorMessage = `CPF: ${errors.cpf[0]}`;
@@ -265,8 +265,8 @@ export class PatientRegister implements OnInit {
         const messages = Array.isArray(errors[key]) ? errors[key] : [errors[key]];
         return `${key}: ${messages.join(', ')}`;
       });
-      this.errorMessage = errorMessages.length > 0 
-        ? `Erros: ${errorMessages.join('; ')}` 
+      this.errorMessage = errorMessages.length > 0
+        ? `Erros: ${errorMessages.join('; ')}`
         : 'Dados inválidos. Verifique os campos preenchidos.';
     }
   }
@@ -280,7 +280,7 @@ export class PatientRegister implements OnInit {
       cpf: '',
       rg: ''
     };
-    
+
     this.errorMessage = '';
     this.successMessage = '';
   }

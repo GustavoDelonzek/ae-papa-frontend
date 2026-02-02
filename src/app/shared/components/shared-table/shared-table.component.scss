@@ -1,0 +1,297 @@
+// Variables (Assuming duplicates from standard var file, ideally these should be imported)
+$primary-color: #009ca6;
+$text-color: #333;
+$text-muted: #6b7280;
+$border-color: #e5e7eb;
+$hover-bg: #f9fafb;
+$white: #ffffff;
+
+.table-container {
+    background: $white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border: 1px solid $border-color;
+    display: flex;
+    flex-direction: column;
+}
+
+// Toolbar
+.table-toolbar {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid $border-color;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: $white;
+    gap: 1rem;
+}
+
+.search-container.integrated {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    align-items: center;
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        color: $text-muted;
+        pointer-events: none;
+        transition: color 0.2s;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.625rem 1rem 0.625rem 2.5rem;
+        border: 1px solid $border-color;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        background-color: #f9fafb;
+
+        &:focus {
+            outline: none;
+            border-color: $primary-color;
+            background-color: $white;
+            box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+        }
+    }
+
+    .clear-btn {
+        position: absolute;
+        right: 0.75rem;
+        background: none;
+        border: none;
+        color: $text-muted;
+        cursor: pointer;
+        padding: 0.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+
+        &:hover {
+            color: #ef4444;
+        }
+    }
+
+    &.active-search .search-icon {
+        color: $primary-color;
+    }
+}
+
+.toolbar-stats {
+    .total-badge {
+        background-color: rgba($primary-color, 0.1);
+        color: $primary-color;
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+}
+
+// Table
+.shared-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+        padding: 1rem 1.5rem;
+        text-align: left;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: $text-muted;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid $border-color;
+        background-color: #f8fafc;
+        user-select: none;
+
+        &.sortable {
+            cursor: pointer;
+
+            &:hover {
+                background-color: #f1f5f9;
+                color: $text-color;
+            }
+        }
+
+        .sort-icon {
+            margin-left: 0.5rem;
+            display: inline-block;
+            width: 12px;
+
+            i {
+                &.placeholder {
+                    color: #cbd5e1;
+                }
+
+                &.active {
+                    color: $primary-color;
+                }
+            }
+        }
+    }
+
+    td {
+        padding: 1rem 1.5rem;
+        font-size: 0.95rem;
+        color: $text-color;
+        border-bottom: 1px solid $border-color;
+        vertical-align: middle;
+    }
+
+    tbody tr {
+        transition: background-color 0.15s ease;
+
+        &.clickable-row {
+            cursor: pointer;
+
+            &:hover {
+                background-color: $hover-bg;
+            }
+        }
+
+        &:last-child td {
+            border-bottom: none;
+        }
+    }
+}
+
+.empty-state-cell {
+    text-align: center;
+    padding: 4rem !important;
+    color: $text-muted;
+
+    .no-items-simple {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+
+        i {
+            font-size: 2rem;
+            opacity: 0.5;
+        }
+
+        p {
+            margin: 0;
+            font-size: 1rem;
+        }
+    }
+}
+
+// Pagination
+.pagination-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background-color: #f8fafc;
+    border-top: 1px solid $border-color;
+}
+
+.pagination-summary {
+    font-size: 0.9rem;
+    color: $text-muted;
+}
+
+.pagination-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .page-control {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid $border-color;
+        background: white;
+        border-radius: 6px;
+        cursor: pointer;
+        color: $text-muted;
+        transition: all 0.2s;
+
+        &:hover:not(:disabled) {
+            border-color: $primary-color;
+            color: $primary-color;
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #f3f4f6;
+        }
+    }
+
+    .page-list {
+        display: flex;
+        gap: 0.25rem;
+    }
+
+    .page-num {
+        min-width: 32px;
+        height: 32px;
+        padding: 0 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid transparent; // Invisible border to maintain size
+        border-radius: 6px;
+        background: transparent;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: $text-muted;
+        transition: all 0.2s;
+
+        &:hover {
+            background-color: #e5e7eb;
+            color: $text-color;
+        }
+
+        &.active {
+            background-color: $primary-color;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba($primary-color, 0.25);
+        }
+    }
+}
+
+// Loading Spinner
+.search-spinner {
+    margin-left: 0.5rem;
+    color: $primary-color;
+}
+
+.loading-state {
+    padding: 3rem;
+    display: flex;
+    justify-content: center;
+    color: $text-muted;
+
+    .spinner {
+        /* Add simple spinner styles if generic app-spinner not available, or assume app style */
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid $primary-color;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

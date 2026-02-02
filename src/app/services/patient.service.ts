@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_URL } from '../../consts';
+import { SocioeconomicProfile } from './socioeconomic-profile.service';
+import { Caretaker } from './caretaker';
+import { ClinicalRecord } from './clinical-record.service';
 
 export interface Patient {
   id?: number;
@@ -14,6 +17,31 @@ export interface Patient {
   photo?: string;
   created_at?: string;
   updated_at?: string;
+  socioeconomic_profile?: SocioeconomicProfile;
+  caregivers?: Caretaker[];
+  clinical_records?: ClinicalRecord[];
+  contacts?: PatientContact[];
+  addresses?: Address[];
+}
+
+export interface PatientContact {
+  id?: number;
+  type: string; // 'email', 'phone', 'whatsapp'
+  value: string;
+  is_primary: boolean;
+  patient_id?: number | null;
+}
+
+export interface Address {
+  id?: number;
+  patient_id?: number;
+  street: string;
+  number: string;
+  neighborhood: string;
+  city: string;
+  cep: string;
+  reference_point?: string;
+  state?: string; // Adding state mostly standard even if not in example payload
 }
 
 export interface PatientResponse {
@@ -44,52 +72,41 @@ export interface PatientsListResponse {
 })
 export class PatientService {
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  /**
-   * Criar novo paciente
-   */
   createPatient(patientData: Patient): Observable<PatientResponse> {
     return this.http.post<PatientResponse>(`${API_URL}/patients`, patientData);
   }
 
-  /**
-   * Obter lista de pacientes com paginação e filtros
-   */
-  getPatients(page: number = 1, perPage: number = 15, searchTerm?: string): Observable<PatientsListResponse> {
+  getPatients(page: number = 1, perPage: number = 15, filters: any = {}): Observable<PatientsListResponse> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('per_page', perPage.toString());
-    
-    // Adicionar filtro de pesquisa se fornecido
-    if (searchTerm && searchTerm.trim()) {
-      params = params.set('full_name', searchTerm.trim());
-    }
-    
+
+    // Map frontend filters to standardized backend query params
+    if (filters.search) params = params.set('search', filters.search.trim());
+    if (filters.gender) params = params.set('gender', filters.gender);
+    if (filters.age_min) params = params.set('age_min', filters.age_min.toString());
+    if (filters.age_max) params = params.set('age_max', filters.age_max.toString());
+    if (filters.created_at) params = params.set('created_at', filters.created_at);
+    if (filters.sort_by) params = params.set('sort_by', filters.sort_by);
+    if (filters.sort_order) params = params.set('sort_order', filters.sort_order);
+
     return this.http.get<PatientsListResponse>(`${API_URL}/patients`, { params });
   }
 
-  /**
-   * Buscar paciente por CPF
-   */
   getPatientByCpf(cpf: string): Observable<PatientsListResponse> {
     const params = new HttpParams()
       .set('cpf', cpf)
       .set('per_page', '1');
-    
+
     return this.http.get<PatientsListResponse>(`${API_URL}/patients`, { params });
   }
 
-  /**
-   * Obter paciente por ID
-   */
   getPatient(id: number): Observable<PatientResponse> {
     return this.http.get<PatientResponse>(`${API_URL}/patients/${id}`);
   }
 
-  /**
-   * Atualizar paciente
-   */
   updatePatient(id: number, patientData: Partial<Patient>): Observable<PatientResponse> {
     return this.http.patch<PatientResponse>(`${API_URL}/patients/${id}`, patientData);
   }
@@ -99,5 +116,33 @@ export class PatientService {
    */
   deletePatient(id: number): Observable<any> {
     return this.http.delete(`${API_URL}/patients/${id}`);
+  }
+
+  // --- Contacts ---
+
+  createContact(contact: PatientContact): Observable<any> {
+    return this.http.post(`${API_URL}/contacts`, contact);
+  }
+
+  updateContact(id: number, contact: Partial<PatientContact>): Observable<any> {
+    return this.http.patch(`${API_URL}/contacts/${id}`, contact);
+  }
+
+  deleteContact(id: number): Observable<any> {
+    return this.http.delete(`${API_URL}/contacts/${id}`);
+  }
+
+  // --- Addresses ---
+
+  createAddress(address: Address): Observable<any> {
+    return this.http.post(`${API_URL}/addresses`, address);
+  }
+
+  updateAddress(id: number, address: Partial<Address>): Observable<any> {
+    return this.http.patch(`${API_URL}/addresses/${id}`, address);
+  }
+
+  deleteAddress(id: number): Observable<any> {
+    return this.http.delete(`${API_URL}/addresses/${id}`);
   }
 }

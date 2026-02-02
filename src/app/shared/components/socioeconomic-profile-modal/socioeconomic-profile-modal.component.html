@@ -1,0 +1,163 @@
+<div class="modal-overlay" *ngIf="visible" (click)="onClose()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+            <h2>Perfil Socioeconômico</h2>
+            <button class="btn-close" (click)="onClose()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-header-subtitle">
+            Preencha os dados do contexto social e habitacional do paciente.
+        </div>
+
+        <div class="modal-body">
+            <form (ngSubmit)="save()" #profileForm="ngForm">
+
+                <!-- Section: Trabalho e Renda -->
+                <div class="section-container">
+                    <h3 class="section-title-icon">
+                        <i class="fas fa-briefcase"></i> CLASSIFICAÇÃO PROFISSIONAL
+                    </h3>
+                    <div class="card-box">
+                        <div class="radio-grid-cols">
+                            <label class="radio-item" *ngFor="let option of occupationOptions">
+                                <input type="radio" name="income_category" [value]="option"
+                                    [(ngModel)]="incomeSourceData.category">
+                                <span class="radio-custom"></span>
+                                <span class="label-text">{{ option }}</span>
+                            </label>
+                        </div>
+                        <div class="other-input" *ngIf="incomeSourceData.category === 'Outros'">
+                            <input type="text" name="income_other" class="form-control" placeholder="Especifique..."
+                                [(ngModel)]="incomeSourceData.other">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Aspecto Habitacional -->
+                <div class="section-container">
+                    <h3 class="section-title-icon">
+                        <i class="fas fa-home"></i> ASPECTO HABITACIONAL
+                    </h3>
+
+                    <div class="card-box split-layout">
+                        <!-- Left Column: Radios -->
+                        <div class="left-col">
+                            <div class="group-block">
+                                <label class="group-label">Casa</label>
+                                <div class="radio-grid-small">
+                                    <label class="radio-item-sm" *ngFor="let option of housingOptions">
+                                        <input type="radio" name="housing_ownership" [value]="option"
+                                            [(ngModel)]="currentProfile.housing_ownership">
+                                        <span class="radio-custom"></span>
+                                        <span>{{ option }}</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="group-block" style="margin-top: 1.5rem;">
+                                <label class="group-label">Construção</label>
+                                <div class="radio-grid-small">
+                                    <label class="radio-item-sm" *ngFor="let option of constructionOptions">
+                                        <input type="radio" name="construction_type" [value]="option"
+                                            [(ngModel)]="currentProfile.construction_type">
+                                        <span class="radio-custom"></span>
+                                        <span>{{ option }}</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Stats Box -->
+                        <div class="right-col stats-box">
+                            <div class="stat-input-group">
+                                <label>Nº de cômodos</label>
+                                <div class="input-wrapper">
+                                    <input type="number" name="number_of_rooms" class="form-control"
+                                        [(ngModel)]="currentProfile.number_of_rooms" min="1" step="1" placeholder="0"
+                                        (keydown)="onlyNumbers($event)">
+                                    <i class="fas fa-door-open input-icon"></i>
+                                </div>
+                            </div>
+                            <div class="stat-input-group">
+                                <label>Nº de Pessoas</label>
+                                <div class="input-wrapper">
+                                    <input type="number" name="number_of_residents" class="form-control"
+                                        [(ngModel)]="currentProfile.number_of_residents" min="1" step="1"
+                                        placeholder="0" (keydown)="onlyNumbers($event)">
+                                    <i class="fas fa-users input-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Saneamento e Infraestrutura -->
+                <div class="section-container">
+                    <h3 class="section-title-icon">
+                        <i class="fas fa-tint"></i> SANEAMENTO E INFRAESTRUTURA
+                    </h3>
+                    <div class="card-box">
+                        <div class="sanitation-grid">
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="piped_water" [(ngModel)]="sanitationData.piped_water">
+                                <span class="checkbox-custom"></span>
+                                <span>Água Encanada</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="water_tank" [(ngModel)]="sanitationData.water_tank">
+                                <span class="checkbox-custom"></span>
+                                <span>Caixa D'água</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="electricity" [(ngModel)]="sanitationData.electricity">
+                                <span class="checkbox-custom"></span>
+                                <span>Luz Elétrica</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="sewage" [(ngModel)]="sanitationData.sewage">
+                                <span class="checkbox-custom"></span>
+                                <span>Rede de Esgoto</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="septic_tank" [(ngModel)]="sanitationData.septic_tank">
+                                <span class="checkbox-custom"></span>
+                                <span>Fossa</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="trash_collection"
+                                    [(ngModel)]="sanitationData.trash_collection">
+                                <span class="checkbox-custom"></span>
+                                <span>Coleta de Lixo</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="sanitary_installations"
+                                    [(ngModel)]="sanitationData.sanitary_installations">
+                                <span class="checkbox-custom"></span>
+                                <span>Instalações Sanitárias</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Actions -->
+                <div class="modal-footer">
+                    <div class="left-action">
+                        <button type="button" class="btn-cancel" (click)="onClose()">Cancelar</button>
+                    </div>
+                    <button type="submit" class="btn-submit" [disabled]="isSaving">
+                        <span *ngIf="!isSaving">Salvar Ficha <i class="fas fa-save"></i></span>
+                        <span *ngIf="isSaving"><i class="fas fa-spinner fa-spin"></i></span>
+                    </button>
+                </div>
+
+            </form>
+
+            <div class="alert-error" *ngIf="errorMessage">
+                {{ errorMessage }}
+            </div>
+        </div>
+    </div>
+</div>

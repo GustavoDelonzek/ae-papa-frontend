@@ -25,6 +25,14 @@ import { CaretakerRegister } from './caretaker-register/caretaker-register';
 import { ApointmentCreate } from './apointment-create/apointment-create';
 import { ApointmentList } from './apointment-list/apointment-list';
 import { UserRegister } from './user-register/user-register';
+import { PatientFormModalComponent } from './shared/components/patient-form-modal/patient-form-modal.component';
+import { CaretakerFormModalComponent } from './shared/components/caretaker-form-modal/caretaker-form-modal.component';
+import { SharedTableComponent } from './shared/components/shared-table/shared-table.component';
+import { CaretakerComponent } from './caretaker/caretaker.component';
+import { SocioeconomicProfileModalComponent } from './shared/components/socioeconomic-profile-modal/socioeconomic-profile-modal.component';
+import { ClinicalRecordModalComponent } from './shared/components/clinical-record-modal/clinical-record-modal.component';
+import { AppointmentDetailsModalComponent } from './shared/components/appointment-details-modal/appointment-details-modal.component';
+import { ToastComponent } from './shared/components/toast/toast.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +48,13 @@ import { UserRegister } from './user-register/user-register';
     ApointmentCreate,
     ApointmentList,
     UserRegister,
+    PatientFormModalComponent,
+    CaretakerFormModalComponent,
+    SocioeconomicProfileModalComponent,
+    ClinicalRecordModalComponent,
+    SharedTableComponent,
+    CaretakerComponent,
+    ToastComponent
   ],
   imports: [
     BrowserModule,
@@ -47,7 +62,8 @@ import { UserRegister } from './user-register/user-register';
     FormsModule,
     HttpClientModule,
     DocumentListComponent,
-    DocumentUploadComponent
+    DocumentUploadComponent,
+    AppointmentDetailsModalComponent
   ],
   providers: [
     AuthService,

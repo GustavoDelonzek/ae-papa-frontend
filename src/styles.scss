@@ -1,1 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
+
+.patient-list-container,
+.patient-page-container,
+.caretaker-list-container,
+.caretaker-page-container {
+    padding: 2rem;
+    margin-left: 260px; // Sidebar width (260px)
+    background-color: #f3f4f6;
+    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+
+    @media (max-width: 768px) {
+        margin-left: 0;
+        padding: 1rem;
+        padding-top: 80px;
+    }
+}

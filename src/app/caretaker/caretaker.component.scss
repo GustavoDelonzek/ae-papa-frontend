@@ -1,0 +1,542 @@
+@use "sass:color";
+
+// Variables
+$primary-color: #6a307d;
+$primary-light: #f3e5f5;
+$text-dark: #1f2937;
+$text-secondary: #6b7280;
+$danger-color: #ef4444;
+$success-color: #10b981;
+$bg-color: #f9fafb;
+$card-bg: #ffffff;
+$border-color: #e5e7eb;
+
+.caretaker-page-container {
+    padding: 2rem;
+    background-color: $bg-color;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+}
+
+// Header
+.page-header {
+    margin-bottom: 2rem;
+
+    .header-breadcrumb {
+        color: $text-secondary;
+        font-size: 0.9rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        transition: color 0.2s;
+
+        &:hover {
+            color: $primary-color;
+        }
+    }
+
+    .header-main {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: $text-dark;
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+    }
+}
+
+// Buttons
+.btn-primary,
+.btn-sm-primary {
+    background-color: $primary-color;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: color.adjust($primary-color, $lightness: -5%);
+    }
+}
+
+.btn-primary {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+}
+
+.btn-sm-primary {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+}
+
+.btn-outline-danger {
+    background: white;
+    color: $danger-color;
+    border: 1px solid $border-color;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+
+    &:hover {
+        background-color: #fef2f2;
+        border-color: $danger-color;
+    }
+}
+
+// Grid Layout
+.caretaker-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: start;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+// Cards
+.card {
+    background: $card-bg;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    margin-bottom: 2rem;
+}
+
+// Profile Card
+.profile-card {
+    background: linear-gradient(to right, #ffffff, #fdf4ff);
+    display: flex;
+    align-items: center;
+
+    .profile-content {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        width: 100%;
+
+        @media (max-width: 640px) {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+
+    .avatar-large {
+        width: 100px;
+        height: 100px;
+        background-color: #8e44ad;
+        border-radius: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-shadow: 0 4px 12px rgba(142, 68, 173, 0.3);
+
+        i {
+            font-size: 3rem;
+            color: white;
+        }
+
+        .status-dot {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            width: 18px;
+            height: 18px;
+            background-color: $success-color;
+            border: 3px solid white;
+            border-radius: 50%;
+        }
+    }
+
+    .profile-details {
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: $text-dark;
+            margin: 0 0 0.25rem 0;
+        }
+
+        .role-text {
+            color: $text-secondary;
+            font-size: 0.95rem;
+            margin: 0 0 1rem 0;
+        }
+
+        .badges-row {
+            display: flex;
+            gap: 0.75rem;
+
+            @media (max-width: 640px) {
+                justify-content: center;
+            }
+        }
+
+        .badge-soft-purple {
+            background-color: #f3e8ff;
+            color: #7e22ce;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .badge-outline {
+            background-color: white;
+            border: 1px solid $border-color;
+            color: $text-secondary;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+    }
+}
+
+// Info Card
+.info-card {
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+
+        .icon-wrapper {
+            width: 40px;
+            height: 40px;
+            background-color: #f3e8ff;
+            color: $primary-color;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+            color: $text-dark;
+        }
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+
+            label {
+                font-size: 0.75rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: $text-secondary;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+
+                i {
+                    font-size: 0.9rem;
+                }
+            }
+
+            span {
+                font-size: 1.1rem;
+                font-weight: 500;
+                color: $text-dark;
+
+                &.italic {
+                    font-style: italic;
+                    color: $text-secondary;
+                }
+            }
+        }
+    }
+}
+
+// Patients Sidebar
+.patients-card {
+    .card-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: $text-dark;
+
+            i {
+                color: $primary-color;
+            }
+
+            h3 {
+                font-size: 1.1rem;
+                font-weight: 700;
+                margin: 0;
+            }
+        }
+    }
+
+    .patients-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .patient-item-card {
+        background: white;
+        border: 1px solid $border-color;
+        border-radius: 12px;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.2s;
+        cursor: pointer;
+
+        &:hover {
+            border-color: $primary-color;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .patient-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+
+            &.bg-blue {
+                background-color: #3b82f6;
+            }
+
+            &.bg-green {
+                background-color: #10b981;
+            }
+
+            &.bg-purple {
+                background-color: #8b5cf6;
+            }
+
+            &.bg-orange {
+                background-color: #f97316;
+            }
+
+            &.bg-teal {
+                background-color: #14b8a6;
+            }
+        }
+
+        .patient-details {
+            flex: 1;
+
+            h4 {
+                font-size: 1rem;
+                font-weight: 600;
+                color: $text-dark;
+                margin: 0 0 0.25rem 0;
+            }
+
+            .sub-details {
+                font-size: 0.8rem;
+                color: $text-secondary;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+
+                .badget-id {
+                    background: #f3f4f6;
+                    padding: 0.1rem 0.4rem;
+                    border-radius: 4px;
+                }
+
+                .kinship-text i {
+                    color: $primary-color;
+                    margin-right: 0.25rem;
+                }
+            }
+        }
+
+        .btn-icon-unlink {
+            background: none;
+            border: none;
+            color: $text-secondary;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+
+            &:hover {
+                color: $danger-color;
+                background-color: #fee2e2;
+            }
+        }
+    }
+}
+
+.timestamps {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: color.adjust($text-secondary, $lightness: 10%);
+    display: flex;
+    gap: 1.5rem;
+}
+
+// Modals Overlay (Reimported/Redefined if needed or global)
+// Assuming app-caretaker-form-modal handles its own overlay, but for relation modal:
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+
+    h3 {
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+        color: $text-dark;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        i {
+            color: $primary-color;
+        }
+    }
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: $text-dark;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid $border-color;
+        border-radius: 8px;
+        font-size: 1rem;
+
+        &:focus {
+            outline: none;
+            border-color: $primary-color;
+            box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+        }
+    }
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+
+    button {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-cancel {
+        background: #f3f4f6;
+        color: $text-secondary;
+
+        &:hover {
+            background: #e5e7eb;
+        }
+    }
+
+    .btn-save {
+        background: $primary-color;
+        color: white;
+
+        &:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        &:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+    }
+}
+
+.loading-state,
+.error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem;
+    color: $text-secondary;
+    font-size: 1.1rem;
+    gap: 1rem;
+
+    i {
+        font-size: 3rem;
+        opacity: 0.5;
+    }
+}

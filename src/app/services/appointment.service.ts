@@ -10,7 +10,7 @@ import { Appointment, AppointmentCreate, AppointmentResponse, AppointmentsListRe
 export class AppointmentService {
   private apiUrl = `${API_URL}/appointments`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
    * Criar novo agendamento
@@ -23,8 +23,10 @@ export class AppointmentService {
    * Listar agendamentos com filtros
    */
   listAppointments(page: number, perPage: number, filters?: AppointmentFilters): Observable<AppointmentsListResponse> {
-    let params = new HttpParams();
-    
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('per_page', (filters?.per_page || perPage).toString());
+
     if (filters) {
       if (filters.patient_id) {
         params = params.set('patient_id', filters.patient_id.toString());
@@ -38,8 +40,11 @@ export class AppointmentService {
       if (filters.status) {
         params = params.set('status', filters.status);
       }
-      if (filters.per_page) {
-        params = params.set('per_page', filters.per_page.toString());
+      if (filters.search) {
+        params = params.set('search', filters.search);
+      }
+      if (filters.objective) {
+        params = params.set('objective', filters.objective);
       }
     }
 

@@ -1,132 +1,170 @@
 <app-sidebar></app-sidebar>
 
 <div class="caretaker-list-container">
-  <header class="caretaker-list-header">
-    <h1>Cuidadores</h1>
-    <div class="search-container">
-      <input 
-        type="text" 
-        placeholder="Pesquisar cuidadores..." 
-        class="search-input"
-        [(ngModel)]="searchTerm"
-        (keyup.enter)="performSearch()"
-        aria-label="Pesquisar cuidadores">
-      
-      <!-- Indicador de loading da pesquisa -->
-      <div *ngIf="searching" class="search-loading">
-        <i class="fas fa-spinner fa-spin"></i>
+  <!-- Header -->
+  <header class="patient-list-header">
+    <div class="header-top">
+      <div class="back-link" (click)="goHome()">
+        <i class="fas fa-arrow-left"></i>
+        <span>Voltar ao início</span>
       </div>
-      
-      <!-- Botão para limpar pesquisa -->
-      <button 
-        *ngIf="searchTerm && !searching" 
-        class="clear-search-button"
-        (click)="clearSearch()"
-        title="Limpar pesquisa">
-        <i class="fas fa-times"></i>
-      </button>
-      
-      <button class="search-button" (click)="performSearch()" title="Pesquisar" [disabled]="searching">
-        Pesquisar
+    </div>
+
+    <div class="header-main-row">
+      <div class="title-section">
+        <h1>Cuidadores</h1>
+        <p class="subtitle">Gerencie os cuidadores e seus vínculos.</p>
+      </div>
+      <button class="btn-primary" (click)="addCaretaker()">
+        <i class="fas fa-plus"></i> Novo Cuidador
       </button>
     </div>
   </header>
 
-  <div class="caretaker-list-content">
-
-    <!-- Loading state -->
-    <div class="loading-container" *ngIf="loading && !searching">
-      <div class="loading-spinner"></div>
-      <p>Carregando cuidadores...</p>
+  <!-- Filters Bar -->
+  <div class="filters-container">
+    <div class="search-wrapper">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="Buscar por nome, CPF ou ID..." [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearch($event)">
+      <span class="count-badge" *ngIf="totalItems > 0">{{ totalItems }} registros encontrados</span>
     </div>
 
-    <!-- Exibir mensagem de erro -->
-    <div *ngIf="errorMessage && !loading" class="alert alert-danger">
-      {{ errorMessage }}
-    </div>
+    <div class="filters-row">
+      <div class="filter-group">
 
-    <div class="caretakers-grid" *ngIf="!loading && filteredCaretakers && filteredCaretakers.length > 0;">
-      <div 
-        class="caretaker-card" 
-        *ngFor="let caretaker of filteredCaretakers"
-        (click)="viewCaretaker(caretaker.id!)">
-        
-        <div class="caretaker-icon">
-          <i class="fas fa-user-nurse"></i>
+        <!-- Gender Filter (Select) -->
+        <div class="select-wrapper">
+          <i class="far fa-user-circle input-icon"></i>
+          <select [(ngModel)]="genderFilter" (change)="onFilterChange()" [class.active-select]="genderFilter">
+            <option [ngValue]="null" disabled selected>Gênero</option>
+            <option [ngValue]="null">Todos</option>
+            <option value="M">Masculino</option>
+            <option value="F">Feminino</option>
+          </select>
+          <i class="fas fa-chevron-down select-arrow"></i>
         </div>
 
-        <div class="caretaker-info">
-          <h3>{{ caretaker.full_name }}</h3>
-          <p class="caretaker-age">{{ getCaretakerAge(caretaker.birth_date) }} anos</p>
-          <p class="caretaker-id">ID: {{ caretaker.id }}</p>
-          <p class="caretaker-cpf">CPF: {{ formatCPF(caretaker.cpf) }}</p>
+        <!-- Age Filter (Select) -->
+        <div class="select-wrapper">
+          <i class="fas fa-birthday-cake input-icon"></i>
+          <select [(ngModel)]="ageFilter" (change)="onFilterChange()" [class.active-select]="ageFilter">
+            <option value="" disabled selected>Faixa Etária</option>
+            <option value="">Todas</option>
+            <option value="20-30">20 - 30 anos</option>
+            <option value="31-50">31 - 50 anos</option>
+            <option value="51+">51+ anos</option>
+          </select>
+          <i class="fas fa-chevron-down select-arrow"></i>
         </div>
 
-        <div class="caretaker-contact">
-          <p class="caretaker-info">
-            <i class="fas fa-user"></i> Gênero: {{ caretaker.gender === 'M' ? 'Masculino' : 'Feminino' }}
-          </p>
-          <p class="caretaker-info">
-            <i class="fas fa-hospital-user"></i> Paciente ID: {{ caretaker.patient_id }}
-          </p>
+        <!-- Kinship Filter (Select) -->
+        <div class="select-wrapper">
+          <i class="fas fa-users input-icon"></i>
+          <select [(ngModel)]="kinshipFilter" (change)="onFilterChange()" [class.active-select]="kinshipFilter">
+            <option value="" disabled selected>Parentesco</option>
+            <option value="">Todos</option>
+            <option value="son">Filho(a)</option>
+            <option value="spouse">Cônjuge</option>
+            <option value="professional_caregiver">Profissional</option>
+            <option value="other">Outro</option>
+          </select>
+          <i class="fas fa-chevron-down select-arrow"></i>
         </div>
 
-        <div class="caretaker-kinship" *ngIf="caretaker.kinship">
-          <span class="kinship-badge">{{ getKinshipLabel(caretaker.kinship) }}</span>
-        </div>
-
-        <div class="caretaker-actions">
-          <button 
-            class="btn-view" 
-            (click)="viewCaretaker(caretaker.id!); $event.stopPropagation()"
-            title="Visualizar">
-            <i class="fas fa-eye"></i>
-          </button>
-          <button 
-            class="btn-edit" 
-            (click)="editCaretaker(caretaker.id!); $event.stopPropagation()"
-            title="Editar">
-            <i class="fas fa-edit"></i>
-          </button>
-          <button 
-            class="btn-delete" 
-            (click)="deleteCaretaker(caretaker.id!); $event.stopPropagation()"
-            title="Deletar">
-            <i class="fas fa-trash"></i>
-          </button>
-        </div>
       </div>
+
+      <button class="btn-clear" (click)="clearFilters()" *ngIf="hasActiveFilters()">
+        <i class="fas fa-times"></i> Limpar Filtros
+      </button>
+    </div>
+  </div>
+
+  <!-- Content Table -->
+  <div class="table-card">
+    <div class="loading-state" *ngIf="loading">
+      <div class="spinner"></div>
     </div>
 
-    <!-- Paginação -->
-    <div class="pagination-container" *ngIf="totalPages > 1">
-      <div class="pagination-info">
-        {{ getPaginationInfo() }}
-      </div>
-      
+    <table class="custom-table" *ngIf="!loading">
+      <thead>
+        <tr>
+          <th (click)="onSort('full_name')">NOME <i class="fas fa-sort" *ngIf="sortColumn !== 'full_name'"></i><i
+              class="fas" [ngClass]="sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down'"
+              *ngIf="sortColumn === 'full_name'"></i></th>
+          <th>CPF</th>
+          <th (click)="onSort('birth_date')">IDADE <i class="fas fa-sort" *ngIf="sortColumn !== 'birth_date'"></i><i
+              class="fas" [ngClass]="sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down'"
+              *ngIf="sortColumn === 'birth_date'"></i></th>
+          <th>GÊNERO</th>
+          <th>ATENDIDOS</th>
+          <th class="text-right">AÇÕES</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let caretaker of filteredCaretakers" (click)="onRowClick(caretaker)">
+          <td>
+            <div class="patient-cell">
+              <div class="avatar-circle" [ngClass]="(caretaker.id || 0) % 2 === 0 ? 'bg-blue' : 'bg-purple'">
+                {{ caretaker.full_name.charAt(0) }}
+              </div>
+              <div class="info">
+                <span class="name">{{ caretaker.full_name }}</span>
+                <span class="id">ID: #{{ caretaker.id }}</span>
+              </div>
+            </div>
+          </td>
+          <td class="cpf-text">{{ formatCPF(caretaker.cpf) }}</td>
+          <td>
+            <div class="age-cell">
+              <span class="years">{{ getCaretakerAge(caretaker.birth_date) }} anos</span>
+              <span class="year-born">({{ caretaker.birth_date | date:'yyyy' }})</span>
+            </div>
+          </td>
+          <td>
+            <span class="gender-pill" [class.male]="caretaker.gender === 'M'" [class.female]="caretaker.gender === 'F'">
+              {{ caretaker.gender === 'M' ? 'Masculino' : 'Feminino' }}
+            </span>
+          </td>
+          <td>
+            <span class="kinship-text">{{ getPatientsSummary(caretaker.patients) }}</span>
+          </td>
+          <td class="actions-cell">
+            <button class="btn-icon edit" (click)="editCaretaker(caretaker.id!); $event.stopPropagation()">
+              <i class="fas fa-pencil-alt"></i>
+            </button>
+            <button class="btn-icon delete" (click)="deleteCaretaker(caretaker.id!); $event.stopPropagation()">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="empty-state" *ngIf="!loading && filteredCaretakers.length === 0">
+      <i class="fas fa-users-slash"></i>
+      <p>Nenhum cuidador encontrado com os filtros selecionados.</p>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-footer" *ngIf="totalPages > 1">
+      <span class="showing-text">Mostrando {{ (currentPage - 1) * perPage + 1 }}-{{ Math.min(currentPage * perPage,
+        totalItems) }} de {{ totalItems }} registros</span>
       <div class="pagination-controls">
-        <button 
-          class="pagination-btn"
-          [disabled]="currentPage === 1"
-          (click)="previousPage()">
-          <i class="fas fa-chevron-left"></i> Anterior
+        <button [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)">
+          <i class="fas fa-chevron-left"></i>
         </button>
-        
-        <button 
-          *ngFor="let page of getVisiblePages()"
-          class="pagination-number"
-          [class.active]="page === currentPage"
-          (click)="goToPage(page)">
-          {{ page }}
-        </button>
-        
-        <button 
-          class="pagination-btn"
-          [disabled]="currentPage === totalPages"
-          (click)="nextPage()">
-          Próximo <i class="fas fa-chevron-right"></i>
+        <button [disabled]="currentPage === totalPages" (click)="onPageChange(currentPage + 1)">
+          <i class="fas fa-chevron-right"></i>
         </button>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Modal logic typically would be here, assuming app-caretaker-register-modal exists or similar -->
+<!-- For now retaining existing logic structure but ensuring UI wrapper is correct -->
+
+<app-caretaker-register *ngIf="showCaretakerModal" [visible]="showCaretakerModal" [caretakerToEdit]="currentCaretaker"
+  (close)="closeCaretakerModal()" (save)="onCaretakerSuccess()">
+</app-caretaker-register>
