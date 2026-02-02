@@ -1,279 +1,288 @@
 <app-sidebar></app-sidebar>
+<div class="patient-page-container">
+  <!-- Top Navigation Bar -->
+  <header class="top-nav">
+    <div class="back-link" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+      <span>Voltar para lista</span>
+    </div>
+    <div class="top-actions">
+      <!-- Clinical Record Button (Dynamic) -->
+      <button class="btn-primary" (click)="handleClinicalRecordAction()">
+        <ng-container *ngIf="!existingClinicalRecord">
+          <i class="fas fa-plus"></i> Adicionar Registro Clínico
+        </ng-container>
+        <ng-container *ngIf="existingClinicalRecord">
+          <i class="fas fa-file-medical"></i> Visualizar Registro Clínico
+        </ng-container>
+      </button>
 
-<div class="patient-container">
-  <header class="patient-header">
-    <h1>Paciente</h1>
-    <button class="btn-back" (click)="goBack()">
-      <i class="fas fa-arrow-left"></i> Voltar
-    </button>
+      <button class="btn-secondary" (click)="openEditModal()">
+        <i class="fas fa-pen"></i> Editar Perfil
+      </button>
+    </div>
   </header>
 
-  <!-- Loading state -->
-  <div class="loading-container" *ngIf="loading">
-    <div class="loading-spinner"></div>
-    <p>Carregando dados do paciente...</p>
+  <div class="main-content" *ngIf="loading">
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando dados...</p>
+    </div>
   </div>
 
-  <!-- Error state -->
-  <div class="error-container" *ngIf="errorMessage && !loading">
-    <div class="alert alert-danger">
-      {{ errorMessage }}
+  <div class="main-content" *ngIf="errorMessage && !loading">
+    <div class="error-state">
+      <i class="fas fa-exclamation-circle"></i>
+      <p>{{ errorMessage }}</p>
+      <button class="btn-secondary" (click)="goBack()">Voltar</button>
     </div>
-    <button class="btn-back" (click)="goBack()">
-      <i class="fas fa-arrow-left"></i> Voltar à Lista
-    </button>
   </div>
 
-  <!-- Patient content -->
-  <div class="patient-content" *ngIf="patientData && !loading && !errorMessage">
-    <!-- Seção principal com foto e informações básicas -->
-    <div class="patient-info-section">
-      <div class="patient-photo">
-        <div class="photo-placeholder" (click)="fileInput.click()">
-          <img *ngIf="patientData.photo" [src]="patientData.photo" alt="Foto do paciente">
-          <span *ngIf="!patientData.photo">Foto do paciente</span>
-          <input #fileInput type="file" accept="image/*" (change)="onPhotoUpload($event)" style="display: none;">
-        </div>
-      </div>
-
-      <div class="patient-basic-info">
-        <div class="info-row">
-          <label>Nome:</label>
-          <span class="patient-name">{{ patientData.full_name || 'Nome não informado' }}</span>
-        </div>
-        <div class="info-row">
-          <label>Idade:</label>
-          <span class="patient-age">{{ getPatientAge() }} anos</span>
-        </div>
-        <div class="info-row">
-          <label>Gênero:</label>
-          <span class="patient-gender">{{ getGenderText() }}</span>
-        </div>
-      </div>
-
-      <div class="patient-status">
-        <div class="status-item">
-          <span class="status-label">{{ getMaritalStatusText() }}</span>
-        </div>
-        <div class="status-item">
-          <span class="status-label">CPF: {{ formatCPF(patientData.cpf) }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Seção de abas -->
-    <div class="tabs-container">
-      <div class="tabs-header">
-        <button 
-          class="tab-button" 
-          [class.active]="isTabActive('detalhes')"
-          (click)="selectTab('detalhes')">
-          Detalhes
-        </button>
-        <button 
-          class="tab-button" 
-          [class.active]="isTabActive('documentos')"
-          (click)="selectTab('documentos')">
-          Documentos
-        </button>
-        <button 
-          class="tab-button" 
-          [class.active]="isTabActive('Cuidador')"
-          (click)="selectTab('Cuidador')">
-          Cuidador
-        </button>
-        <button 
-          class="tab-button" 
-          [class.active]="isTabActive('consultas')"
-          (click)="selectTab('consultas')">
-          Consultas
-        </button>
-      </div>
-
-      <div class="tab-content">
-        <!-- Aba Detalhes -->
-        <div *ngIf="activeTab === 'detalhes'" class="tab-panel">
-          <div class="details-header">
-            <h2>Detalhes sobre o paciente</h2>
-            <button class="btn-edit" (click)="editPatient()">
-              <i class="fas fa-edit"></i> Editar
-            </button>
+  <div class="main-content" *ngIf="patientData && !loading">
+    <!-- Profile Header Card -->
+    <div class="profile-header-card">
+      <div class="profile-content">
+        <div class="profile-image-container">
+          <div class="profile-image">
+            <img [src]="patientData.photo || 'assets/default-avatar.png'" alt="Foto do Paciente"
+              *ngIf="patientData.photo">
+            <div class="avatar-placeholder" *ngIf="!patientData.photo">
+              <span>{{ patientData.full_name.charAt(0) }}</span>
+            </div>
           </div>
-          
-          <div class="details-grid">
-            <div class="detail-item">
+        </div>
+
+        <div class="profile-info">
+          <div class="profile-name-row">
+            <h1>{{ patientData.full_name }}</h1>
+          </div>
+
+          <div class="profile-stats-row">
+            <div class="stat-item">
+              <span class="stat-label">IDADE</span>
+              <span class="stat-value">{{ getPatientAge() }} anos</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">GÊNERO</span>
+              <span class="stat-value">{{ getGenderText() }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">ESTADO CIVIL</span>
+              <span class="stat-value">{{ getMaritalStatusText() }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">CPF</span>
+              <span class="stat-value">{{ formatCPF(patientData.cpf) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <nav class="page-tabs">
+      <button class="tab-btn" [class.active]="isTabActive('detalhes')" (click)="selectTab('detalhes')">Detalhes</button>
+      <button class="tab-btn" [class.active]="isTabActive('documentos')"
+        (click)="selectTab('documentos')">Documentos</button>
+      <button class="tab-btn" [class.active]="isTabActive('Cuidador')" (click)="selectTab('Cuidador')">Cuidador</button>
+      <button class="tab-btn" [class.active]="isTabActive('consultas')" (click)="selectTab('consultas')">Histórico de
+        Consultas</button>
+    </nav>
+
+    <!-- Tab Content -->
+    <div class="tab-content-area">
+
+      <!-- DETALHES TAB -->
+      <div *ngIf="activeTab === 'detalhes'" class="details-tab fade-in">
+
+
+
+        <!-- Personal Info Section -->
+        <section class="info-section">
+          <h2 class="section-title">
+            <i class="far fa-user"></i> Informações Pessoais
+          </h2>
+          <div class="info-grid">
+            <div class="info-card">
               <label>CPF</label>
-              <span>{{ formatCPF(patientData.cpf) }}</span>
+              <div class="value">{{ formatCPF(patientData.cpf) }}</div>
             </div>
-            
-            <div class="detail-item">
+            <div class="info-card">
               <label>RG</label>
-              <span>{{ patientData.rg || 'Não informado' }}</span>
+              <div class="value">{{ patientData.rg || 'Não informado' }}</div>
             </div>
-            
-            <div class="detail-item">
-              <label>Data de Nascimento</label>
-              <span>{{ formatDate(patientData.birth_date) }}</span>
-            </div>
-            
-            <div class="detail-item">
-              <label>Gênero</label>
-              <span>{{ getGenderText() }}</span>
-            </div>
-            
-            <div class="detail-item">
-              <label>Estado Civil</label>
-              <span>{{ getMaritalStatusText() }}</span>
-            </div>
-            
-            <div class="detail-item">
-              <label>Data de Cadastro</label>
-              <span>{{ formatDate(patientData.created_at || '') }}</span>
-            </div>
-            
-            <div class="detail-item">
-              <label>Última Atualização</label>
-              <span>{{ formatDate(patientData.updated_at || '') }}</span>
+            <div class="info-card">
+              <label>DATA DE NASCIMENTO</label>
+              <div class="value">{{ formatDate(patientData.birth_date) }}</div>
             </div>
           </div>
-        </div>
-        
-        <!-- Aba Documentos -->
-        <div *ngIf="activeTab === 'documentos'" class="tab-panel">
-          <app-document-list 
-            [patientId]="patientId"
-            (onUploadClick)="addDocument()">
-          </app-document-list>
-        </div>
+        </section>
 
-        <!-- Aba Cuidador -->
-        <div *ngIf="activeTab === 'Cuidador'" class="tab-panel">
-          <div class="caretaker-header">
-            <h2>Cuidadores do Paciente</h2>
-            <button class="btn-add" (click)="addCaretaker()">
-              <i class="fas fa-plus"></i> Cadastrar Cuidador
+        <!-- Registry History Section -->
+        <section class="info-section">
+          <h2 class="section-title">
+            <i class="fas fa-history"></i> Histórico do Registro
+          </h2>
+          <div class="info-grid">
+            <div class="info-card">
+              <label>DATA DE CADASTRO</label>
+              <div class="value">{{ formatDate(patientData.created_at || '') }}</div>
+              <i class="far fa-calendar-alt card-icon"></i>
+            </div>
+            <div class="info-card">
+              <label>ÚLTIMA ATUALIZAÇÃO</label>
+              <div class="value">{{ formatDate(patientData.updated_at || '') }}</div>
+              <i class="fas fa-history card-icon"></i>
+            </div>
+          </div>
+        </section>
+
+        <!-- Socioeconomic Context Section -->
+        <section class="info-section">
+          <div class="section-header"
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2 class="section-title" style="margin-bottom: 0;">
+              <i class="fas fa-hand-holding-usd"></i> Perfil Socioeconômico
+            </h2>
+            <button class="btn-primary-small" (click)="openSocioeconomicModal()">
+              <i class="fas" [ngClass]="patientData?.socioeconomic_profile ? 'fa-pen' : 'fa-plus'"></i>
+              {{ patientData?.socioeconomic_profile ? 'Editar' : 'Preencher' }}
             </button>
           </div>
-          
-          <!-- Loading state -->
-          <div class="loading-container" *ngIf="loadingCaretakers">
-            <div class="loading-spinner"></div>
-            <p>Carregando cuidadores...</p>
-          </div>
 
-          <!-- Lista de cuidadores -->
-          <div class="caretakers-list" *ngIf="!loadingCaretakers && caretakers.length > 0">
-            <div class="caretaker-card" *ngFor="let caretaker of caretakers">
-              <div class="caretaker-info">
-                <div class="caretaker-name">
-                  <i class="fas fa-user-nurse"></i>
-                  {{ caretaker.full_name }}
-                </div>
-                <div class="caretaker-details">
-                  <span class="detail-item">
-                    <i class="fas fa-id-card"></i>
-                    CPF: {{ formatCPF(caretaker.cpf) }}
-                  </span>
-                         <span class="detail-item" *ngIf="caretaker.kinship">
-                           <i class="fas fa-heart"></i>
-                           {{ getKinshipText(caretaker.kinship) }}
-                  </span>
-                  <span class="detail-item">
-                    <i class="fas fa-calendar"></i>
-                    {{ formatDate(caretaker.birth_date) }}
-                  </span>
-                </div>
-              </div>
-              <div class="caretaker-actions">
-                <button class="btn-edit-small" (click)="caretaker.id && editCaretaker(caretaker.id)" title="Editar" [disabled]="!caretaker.id">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn-delete-small" (click)="caretaker.id && deleteCaretaker(caretaker.id)" title="Excluir" [disabled]="!caretaker.id">
-                  <i class="fas fa-trash"></i>
-                </button>
+          <div class="info-grid" *ngIf="patientData?.socioeconomic_profile">
+            <!-- Occupação (JSON or String) -->
+            <div class="info-card">
+              <label>OCUPAÇÃO</label>
+              <div class="value">{{ getIncomeDisplay(patientData!.socioeconomic_profile!.income_source) }}</div>
+            </div>
+            <div class="info-card">
+              <label>MORADIA</label>
+              <div class="value">{{ patientData?.socioeconomic_profile?.housing_ownership || 'Não informado' }}</div>
+            </div>
+            <div class="info-card">
+              <label>CONSTRUÇÃO</label>
+              <div class="value">{{ patientData?.socioeconomic_profile?.construction_type || 'Não informado' }}</div>
+            </div>
+            <!-- Sanitation (JSON) -->
+            <div class="info-card" style="grid-column: span 2;">
+              <label>SANEAMENTO</label>
+              <div class="value" style="font-size: 0.9rem;">
+                {{ getSanitationDisplay(patientData!.socioeconomic_profile!.sanitation_details) }}
               </div>
             </div>
           </div>
-
-          <!-- Estado vazio -->
-          <div class="no-caretakers" *ngIf="!loadingCaretakers && caretakers.length === 0">
-            <i class="fas fa-user-friends"></i>
-            <p>Nenhum cuidador cadastrado para este paciente</p>
-            <button class="btn-add" (click)="addCaretaker()">
-              <i class="fas fa-plus"></i> Cadastrar Primeiro Cuidador
-            </button>
+          <div class="empty-state-small" *ngIf="!patientData?.socioeconomic_profile"
+            style="background: #F3F4F6; padding: 1.5rem; text-align: center; border-radius: 8px;">
+            <p style="color: #6B7280; font-style: italic;">Nenhum dado socioeconômico registrado.</p>
           </div>
-        </div>
+        </section>
 
-        <!-- Aba Consultas -->
-        <div *ngIf="activeTab === 'consultas'" class="tab-panel">
-          <div class="appointments-header">
-            <h2>Consultas do Paciente</h2>
-            <button class="btn-add" (click)="openCreateAppointmentModal()">
-              <i class="fas fa-plus"></i> Nova Consulta
-            </button>
-          </div>
-          
-          <!-- Loading state -->
-          <div class="loading-container" *ngIf="loadingAppointments">
-            <div class="loading-spinner"></div>
-            <p>Carregando consultas...</p>
-          </div>
 
-          <!-- Lista de consultas -->
-          <div class="appointments-list" *ngIf="!loadingAppointments && appointments.length > 0">
-            <div class="appointment-card" *ngFor="let appointment of appointments">
-              <div class="appointment-info">
-                <div class="appointment-date">
-                  <i class="fas fa-calendar-alt"></i>
-                  {{ formatAppointmentDate(appointment.date) }}
-                </div>
-                <div class="appointment-objective">
-                  <strong>Objetivo:</strong> {{ getObjectiveText(appointment.objective) }}
-                </div>
-                <div class="appointment-observations" *ngIf="appointment.observations">
-                  <strong>Observações:</strong> {{ appointment.observations }}
-                </div>
-                <div class="appointment-status" *ngIf="appointment.status">
-                  <span class="status-badge" [ngClass]="'status-' + appointment.status">
-                    {{ getStatusText(appointment.status) }}
-                  </span>
-                </div>
-              </div>
-              <div class="appointment-actions">
-                <button class="btn-view-small" (click)="viewAppointment(appointment.id!)" title="Ver detalhes">
-                  <i class="fas fa-eye"></i>
-                </button>
-              </div>
-            </div>
-          </div>
 
-          <!-- Estado vazio -->
-          <div class="no-appointments" *ngIf="!loadingAppointments && appointments.length === 0">
-            <i class="fas fa-calendar-check"></i>
-            <p>Nenhuma consulta cadastrada para este paciente</p>
-            <button class="btn-add" (click)="openCreateAppointmentModal()">
-              <i class="fas fa-plus"></i> Cadastrar Primeira Consulta
-            </button>
-          </div>
-        </div>
 
-        
       </div>
+
+      <!-- DOCUMENTOS TAB (Existing Component) -->
+      <div *ngIf="activeTab === 'documentos'" class="documents-tab fade-in">
+        <app-document-list [patientId]="patientId" (onUploadClick)="addDocument()">
+        </app-document-list>
+      </div>
+
+      <!-- CUIDADOR TAB -->
+      <div *ngIf="activeTab === 'Cuidador'" class="caretaker-tab fade-in">
+        <div class="caretaker-header-actions">
+          <h2>Cuidadores</h2>
+          <button class="btn-primary-small" (click)="addCaretaker()">
+            <i class="fas fa-plus"></i> Novo Cuidador
+          </button>
+        </div>
+
+        <div class="loading-state" *ngIf="loadingCaretakers">
+          <div class="spinner"></div>
+        </div>
+
+        <div class="empty-state" *ngIf="!loadingCaretakers && caretakers.length === 0">
+          <i class="fas fa-user-nurse"></i>
+          <p>Nenhum cuidador vinculado.</p>
+        </div>
+
+        <div class="caretaker-grid" *ngIf="!loadingCaretakers && caretakers.length > 0">
+          <div class="caretaker-card-item" *ngFor="let caretaker of caretakers" (click)="viewCaretaker(caretaker.id!)">
+            <div class="card-header">
+              <span class="name">{{ caretaker.full_name }}</span>
+              <div class="actions">
+                <button (click)="caretaker.id && editCaretaker(caretaker.id); $event.stopPropagation()"><i
+                    class="fas fa-edit"></i></button>
+                <button (click)="caretaker.id && deleteCaretaker(caretaker.id); $event.stopPropagation()"
+                  class="delete"><i class="fas fa-trash"></i></button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="detail-row">
+                <i class="fas fa-id-card"></i> <span>{{ formatCPF(caretaker.cpf) }}</span>
+              </div>
+              <div class="detail-row" *ngIf="caretaker.kinship">
+                <i class="fas fa-heart"></i> <span>{{ getKinshipText(caretaker.kinship) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONSULTAS TAB -->
+      <div *ngIf="activeTab === 'consultas'" class="appointments-tab fade-in">
+        <div class="appointments-header-actions">
+          <h2>Histórico de Consultas</h2>
+          <button class="btn-primary-small" (click)="openCreateAppointmentModal()">
+            <i class="fas fa-plus"></i> Nova Consulta
+          </button>
+        </div>
+
+        <div class="loading-state" *ngIf="loadingAppointments">
+          <div class="spinner"></div>
+        </div>
+
+        <div class="empty-state" *ngIf="!loadingAppointments && appointments.length === 0">
+          <i class="fas fa-calendar-check"></i>
+          <p>Nenhuma consulta registrada.</p>
+        </div>
+
+        <div class="appointments-list" *ngIf="!loadingAppointments && appointments.length > 0">
+          <div class="appointment-item" *ngFor="let appointment of appointments"
+            (click)="viewAppointment(appointment.id!)">
+            <div class="date-badge">
+              <span class="day">{{ formatAppointmentDate(appointment.date).split('/')[0] }}</span>
+              <span class="month">{{ formatAppointmentDate(appointment.date).split('/')[1] }}</span>
+              <span class="year">{{ formatAppointmentDate(appointment.date).split('/')[2] }}</span>
+            </div>
+            <div class="appt-details">
+              <h3>{{ getObjectiveText(appointment.objective) }}</h3>
+              <p class="obs" *ngIf="appointment.observations">{{ appointment.observations }}</p>
+              <span class="status-tag" [ngClass]="appointment.status || 'pending'">
+                {{ getStatusText(appointment.status || 'pending') }}
+              </span>
+            </div>
+            <div class="appt-actions">
+              <button (click)="viewAppointment(appointment.id!); $event.stopPropagation()" class="btn-icon">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
     </div>
   </div>
 </div>
 
-<!-- Modal de Upload de Documento -->
-<app-document-upload
-  *ngIf="showUploadModal"
-  [patientId]="patientId"
-  [user_id]="currentUserId"
-  (onClose)="closeUploadModal()"
-  (onSuccess)="onDocumentUploadSuccess()">
+<!-- Modals (Upload, Appointment) -->
+<app-document-upload *ngIf="showUploadModal" [patientId]="patientId" [user_id]="currentUserId"
+  (onClose)="closeUploadModal()" (onSuccess)="onDocumentUploadSuccess()">
 </app-document-upload>
 
-<!-- Modal de Criação de Consulta -->
 <div class="modal-overlay" *ngIf="showAppointmentModal" (click)="closeAppointmentModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
@@ -282,39 +291,23 @@
         <i class="fas fa-times"></i>
       </button>
     </div>
-    
+
     <div class="modal-body">
       <form (ngSubmit)="createAppointment()" #appointmentForm="ngForm">
         <div class="form-group">
-          <label for="patient-name">Paciente</label>
-          <input 
-            type="text" 
-            id="patient-name" 
-            class="form-control" 
-            [value]="patientData?.full_name" 
-            disabled>
+          <label>Paciente</label>
+          <input type="text" class="form-control" [value]="patientData?.full_name" disabled>
         </div>
 
         <div class="form-group">
-          <label for="appointment-date">Data da Consulta *</label>
-          <input 
-            type="date" 
-            id="appointment-date" 
-            name="date"
-            class="form-control" 
-            [(ngModel)]="newAppointment.date"
-            required>
+          <label>Data da Consulta *</label>
+          <input type="date" name="date" class="form-control" [(ngModel)]="newAppointment.date" required>
         </div>
 
         <div class="form-group">
-          <label for="appointment-objective">Objetivo *</label>
-          <select 
-            id="appointment-objective" 
-            name="objective"
-            class="form-control" 
-            [(ngModel)]="newAppointment.objective"
-            required>
-            <option value="" disabled selected>Selecione o objetivo da consulta</option>
+          <label>Objetivo *</label>
+          <select name="objective" class="form-control" [(ngModel)]="newAppointment.objective" required>
+            <option value="" disabled selected>Selecione...</option>
             <option value="donation">Doação</option>
             <option value="project">Projeto</option>
             <option value="treatment">Tratamento</option>
@@ -324,34 +317,49 @@
         </div>
 
         <div class="form-group">
-          <label for="appointment-observations">Observações</label>
-          <textarea 
-            id="appointment-observations" 
-            name="observations"
-            class="form-control" 
-            rows="4"
-            [(ngModel)]="newAppointment.observations"
-            placeholder="Adicione observações relevantes (opcional)"></textarea>
+          <label>Observações</label>
+          <textarea name="observations" class="form-control" rows="4"
+            [(ngModel)]="newAppointment.observations"></textarea>
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn-cancel" (click)="closeAppointmentModal()">
-            Cancelar
-          </button>
-          <button 
-            type="submit" 
-            class="btn-submit" 
-            [disabled]="!appointmentForm.form.valid || savingAppointment">
-            <i class="fas fa-spinner fa-spin" *ngIf="savingAppointment"></i>
-            <span *ngIf="!savingAppointment">Criar Consulta</span>
-            <span *ngIf="savingAppointment">Salvando...</span>
+          <button type="button" class="btn-cancel" (click)="closeAppointmentModal()">Cancelar</button>
+          <button type="submit" class="btn-submit" [disabled]="!appointmentForm.form.valid || savingAppointment">
+            <span *ngIf="!savingAppointment">Agendar</span>
+            <span *ngIf="savingAppointment"><i class="fas fa-spinner fa-spin"></i></span>
           </button>
         </div>
       </form>
-
-      <div class="alert alert-danger" *ngIf="appointmentErrorMessage">
+      <div class="alert-error" *ngIf="appointmentErrorMessage">
         {{ appointmentErrorMessage }}
       </div>
     </div>
   </div>
 </div>
+
+<!-- Edit Patient Modal -->
+<app-patient-form-modal [visible]="showEditModal" [patient]="patientData" (close)="closeEditModal()"
+  (success)="onEditSuccess()">
+</app-patient-form-modal>
+
+<!-- Caretaker Modal -->
+<app-caretaker-form-modal [visible]="showCaretakerModal" [patientId]="patientId" [caretaker]="currentCaretaker"
+  (close)="closeCaretakerModal()" (success)="onCaretakerSuccess()">
+</app-caretaker-form-modal>
+
+<!-- Socioeconomic Profile Modal -->
+<app-socioeconomic-profile-modal [visible]="showSocioeconomicModal" [patientId]="patientId"
+  [profile]="patientData?.socioeconomic_profile || null" (close)="closeSocioeconomicModal()"
+  (success)="onSocioeconomicSuccess($event)">
+</app-socioeconomic-profile-modal>
+
+<!-- Clinical Record Modal -->
+<app-clinical-record-modal [visible]="showClinicalRecordModal" [patientId]="patientId"
+  [patientName]="patientData?.full_name || ''" [record]="currentClinicalRecord" (close)="closeClinicalRecordModal()"
+  (success)="onClinicalRecordSuccess($event)">
+</app-clinical-record-modal>
+
+<!-- Appointment Details Modal -->
+<app-appointment-details-modal [visible]="showDetailsModal" [appointment]="selectedAppointment"
+  (close)="closeDetailsModal()" (edit)="onEditAppointmentDetails($event)">
+</app-appointment-details-modal>

@@ -1,0 +1,76 @@
+<div class="modal-overlay" *ngIf="visible" (click)="onClose()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>{{ isEditing ? 'Editar Atendido' : 'Novo Atendido' }}</h2>
+            <button class="btn-close" (click)="onClose()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <form (ngSubmit)="save()" #createForm="ngForm">
+
+                <div class="form-group">
+                    <label>Nome Completo *</label>
+                    <input type="text" name="full_name" class="form-control" [(ngModel)]="currentPatient.full_name"
+                        required placeholder="Nome do atendido">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Data de Nascimento *</label>
+                        <input type="date" name="birth_date" class="form-control"
+                            [(ngModel)]="currentPatient.birth_date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Gênero *</label>
+                        <select name="gender" class="form-control" [(ngModel)]="currentPatient.gender" required>
+                            <option value="" disabled>Selecione...</option>
+                            <option value="M">Masculino</option>
+                            <option value="F">Feminino</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>CPF *</label>
+                        <input type="text" name="cpf" class="form-control" [(ngModel)]="currentPatient.cpf" required
+                            mask="000.000.000-00" placeholder="000.000.000-00">
+                    </div>
+
+                    <div class="form-group">
+                        <label>RG</label>
+                        <input type="text" name="rg" class="form-control" [(ngModel)]="currentPatient.rg"
+                            placeholder="Opcional">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Estado Civil *</label>
+                    <select name="marital_status" class="form-control" [(ngModel)]="currentPatient.marital_status"
+                        required>
+                        <option value="" disabled>Selecione...</option>
+                        <option value="single">Solteiro(a)</option>
+                        <option value="married">Casado(a)</option>
+                        <option value="divorced">Divorciado(a)</option>
+                        <option value="widowed">Viúvo(a)</option>
+                    </select>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" (click)="onClose()">Cancelar</button>
+                    <button type="submit" class="btn-submit" [disabled]="!createForm.form.valid || isSaving">
+                        <span *ngIf="!isSaving">{{ isEditing ? 'Atualizar' : 'Salvar' }}</span>
+                        <span *ngIf="isSaving"><i class="fas fa-spinner fa-spin"></i></span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="alert-error" *ngIf="errorMessage">
+                {{ errorMessage }}
+            </div>
+        </div>
+    </div>
+</div>

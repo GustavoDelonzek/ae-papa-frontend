@@ -1,0 +1,180 @@
+// Variables
+$primary-color: #009ca6;
+$text-color: #333;
+$text-muted: #6b7280;
+$border-color: #e5e7eb;
+$danger-color: #ef4444;
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(2px);
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+    background: white;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+
+    .modal-header {
+        padding: 1.25rem;
+        border-bottom: 1px solid $border-color;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f9fafb;
+
+        h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: $text-color;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: $text-muted;
+            cursor: pointer;
+            transition: color 0.2s;
+
+            &:hover {
+                color: $danger-color;
+            }
+        }
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: $text-color;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.625rem;
+            border: 1px solid $border-color;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+
+            &:focus {
+                outline: none;
+                border-color: $primary-color;
+                box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+            }
+        }
+    }
+
+    .form-row {
+        display: flex;
+        gap: 1rem;
+
+        .form-group {
+            flex: 1;
+        }
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 2rem;
+
+        button {
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+
+            &.btn-cancel {
+                background: white;
+                border: 1px solid $border-color;
+                color: $text-color;
+
+                &:hover {
+                    background: #f3f4f6;
+                }
+            }
+
+            &.btn-submit {
+                background: $primary-color;
+                color: white;
+                border: none;
+                min-width: 100px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                &:hover {
+                    background: darken($primary-color, 5%);
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 6px -1px rgba($primary-color, 0.2);
+                }
+
+                &:disabled {
+                    opacity: 0.7;
+                    cursor: not-allowed;
+                    transform: none;
+                }
+            }
+        }
+    }
+
+    .alert-error {
+        margin-top: 1rem;
+        padding: 0.75rem;
+        background-color: #fef2f2;
+        color: $danger-color;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        border: 1px solid rgba($danger-color, 0.2);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

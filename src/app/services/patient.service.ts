@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_URL } from '../../consts';
+import { SocioeconomicProfile } from './socioeconomic-profile.service';
+import { Caretaker } from './caretaker';
+import { ClinicalRecord } from './clinical-record.service';
 
 export interface Patient {
   id?: number;
@@ -14,6 +17,9 @@ export interface Patient {
   photo?: string;
   created_at?: string;
   updated_at?: string;
+  socioeconomic_profile?: SocioeconomicProfile;
+  caregivers?: Caretaker[];
+  clinical_records?: ClinicalRecord[];
 }
 
 export interface PatientResponse {
@@ -44,7 +50,7 @@ export interface PatientsListResponse {
 })
 export class PatientService {
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
    * Criar novo paciente
@@ -60,12 +66,12 @@ export class PatientService {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('per_page', perPage.toString());
-    
+
     // Adicionar filtro de pesquisa se fornecido
     if (searchTerm && searchTerm.trim()) {
       params = params.set('full_name', searchTerm.trim());
     }
-    
+
     return this.http.get<PatientsListResponse>(`${API_URL}/patients`, { params });
   }
 
@@ -76,7 +82,7 @@ export class PatientService {
     const params = new HttpParams()
       .set('cpf', cpf)
       .set('per_page', '1');
-    
+
     return this.http.get<PatientsListResponse>(`${API_URL}/patients`, { params });
   }
 

@@ -1,0 +1,103 @@
+<div class="modal-overlay" *ngIf="visible" (click)="closeModal()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="modal-header">
+            <div class="title-area">
+                <div class="icon-box">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <h2>Detalhes do Atendimento <span class="id-badge">#{{ appointment?.id }}</span></h2>
+            </div>
+            <button class="close-btn" (click)="closeModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body" *ngIf="appointment">
+
+            <!-- Patient Card -->
+            <div class="patient-card">
+                <div class="card-left-border"></div>
+                <div class="patient-info">
+                    <div class="patient-main">
+                        <h3 class="patient-name">{{ appointment?.patient?.full_name || 'Paciente não identificado' }}
+                        </h3>
+                        <!-- <span class="patient-status badge-blue">Paciente Regular</span> -->
+                    </div>
+                    <div class="patient-details-grid">
+                        <div class="detail-item">
+                            <label>CPF</label>
+                            <span>{{ appointment?.patient?.cpf || '---' }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>NASCIMENTO</label>
+                            <span>{{ formatDate(appointment?.patient?.birth_date) }}</span>
+                        </div>
+                        <!-- Add Gender or Phone if available in model, otherwise skip -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date & Objective Bar -->
+            <div class="meta-bar">
+                <div class="date-time-group">
+                    <div class="meta-item">
+                        <i class="far fa-calendar-alt"></i>
+                        <span>{{ formatDate(appointment?.date) }}</span>
+                    </div>
+                    <!-- Assuming time is part of date string or separate, usually ISO string has time -->
+                    <div class="meta-item">
+                        <i class="far fa-clock"></i>
+                        <span>{{ extractTime(appointment?.date) }}</span>
+                    </div>
+                </div>
+
+                <div class="objective-group">
+                    <label>OBJETIVO:</label>
+                    <span class="objective-badge">{{ getObjectiveLabel(appointment?.objective) }}</span>
+                </div>
+            </div>
+
+            <!-- Observations Section -->
+            <div class="observations-card">
+                <div class="card-header-simple">
+                    <i class="fas fa-align-left"></i>
+                    <h4>Observações do Atendimento</h4>
+                </div>
+                <div class="card-content">
+                    <p class="observations-text" *ngIf="appointment?.observations; else noObs">
+                        {{ appointment?.observations }}
+                    </p>
+                    <ng-template #noObs>
+                        <p class="placeholder-text">Nenhuma observação registrada para este atendimento.</p>
+                    </ng-template>
+                </div>
+
+                <!-- Alert/Footer Area inside card if needed, e.g. status -->
+                <div class="card-footer-alert" *ngIf="appointment?.status === 'pending'">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Atendimento pendente de finalização.</span>
+                </div>
+            </div>
+
+            <!-- Footer Meta (Created By/At) -->
+            <div class="creation-meta">
+                <i class="fas fa-history"></i>
+                <span>Data do registro: {{ appointment?.created_at ? formatDate(appointment.created_at) : '---'
+                    }}</span>
+            </div>
+
+        </div>
+
+        <!-- Action Footer -->
+        <div class="modal-footer actions-bar">
+            <!-- <button class="btn-cancel" (click)="closeModal()">Fechar</button> -->
+            <!-- Only show Edit/Action if relevant -->
+            <button class="btn-primary-action" (click)="onEdit()">
+                <i class="fas fa-pen"></i> Editar Atendimento
+            </button>
+        </div>
+
+    </div>
+</div>

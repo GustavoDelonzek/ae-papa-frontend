@@ -2,131 +2,81 @@
 
 <div class="caretaker-list-container">
   <header class="caretaker-list-header">
-    <h1>Cuidadores</h1>
-    <div class="search-container">
-      <input 
-        type="text" 
-        placeholder="Pesquisar cuidadores..." 
-        class="search-input"
-        [(ngModel)]="searchTerm"
-        (keyup.enter)="performSearch()"
-        aria-label="Pesquisar cuidadores">
-      
-      <!-- Indicador de loading da pesquisa -->
-      <div *ngIf="searching" class="search-loading">
-        <i class="fas fa-spinner fa-spin"></i>
+    <div class="header-content">
+      <div class="back-link" (click)="goHome()">
+        <i class="fas fa-arrow-left"></i>
+        <span class="back-link">Voltar ao início</span>
       </div>
-      
-      <!-- Botão para limpar pesquisa -->
-      <button 
-        *ngIf="searchTerm && !searching" 
-        class="clear-search-button"
-        (click)="clearSearch()"
-        title="Limpar pesquisa">
-        <i class="fas fa-times"></i>
-      </button>
-      
-      <button class="search-button" (click)="performSearch()" title="Pesquisar" [disabled]="searching">
-        Pesquisar
-      </button>
+      <div class="header-title">
+        <h1>Cuidadores</h1>
+      </div>
     </div>
+    <button class="btn-primary" (click)="addCaretaker()">
+      <i class="fas fa-plus"></i> Novo Cuidador
+    </button>
   </header>
 
-  <div class="caretaker-list-content">
+  <app-shared-table [data]="filteredCaretakers" [columns]="columns" [loading]="loading"
+    [paginationMeta]="paginationMeta" [searchTerm]="searchTerm" [sortColumn]="sortColumn"
+    [sortDirection]="sortDirection" emptyMessage="Nenhum cuidador encontrado." (search)="onSearch($event)"
+    (sort)="onSort($event)" (pageChange)="onPageChange($event)" (rowClick)="onRowClick($event)">
+  </app-shared-table>
+</div>
 
-    <!-- Loading state -->
-    <div class="loading-container" *ngIf="loading && !searching">
-      <div class="loading-spinner"></div>
-      <p>Carregando cuidadores...</p>
+<!-- Templates for Custom Columns -->
+<ng-template #nameTpl let-item>
+  <div class="caretaker-info-cell">
+    <div class="caretaker-icon-small">
+      <i class="fas fa-user-nurse"></i>
     </div>
-
-    <!-- Exibir mensagem de erro -->
-    <div *ngIf="errorMessage && !loading" class="alert alert-danger">
-      {{ errorMessage }}
-    </div>
-
-    <div class="caretakers-grid" *ngIf="!loading && filteredCaretakers && filteredCaretakers.length > 0;">
-      <div 
-        class="caretaker-card" 
-        *ngFor="let caretaker of filteredCaretakers"
-        (click)="viewCaretaker(caretaker.id!)">
-        
-        <div class="caretaker-icon">
-          <i class="fas fa-user-nurse"></i>
-        </div>
-
-        <div class="caretaker-info">
-          <h3>{{ caretaker.full_name }}</h3>
-          <p class="caretaker-age">{{ getCaretakerAge(caretaker.birth_date) }} anos</p>
-          <p class="caretaker-id">ID: {{ caretaker.id }}</p>
-          <p class="caretaker-cpf">CPF: {{ formatCPF(caretaker.cpf) }}</p>
-        </div>
-
-        <div class="caretaker-contact">
-          <p class="caretaker-info">
-            <i class="fas fa-user"></i> Gênero: {{ caretaker.gender === 'M' ? 'Masculino' : 'Feminino' }}
-          </p>
-          <p class="caretaker-info">
-            <i class="fas fa-hospital-user"></i> Paciente ID: {{ caretaker.patient_id }}
-          </p>
-        </div>
-
-        <div class="caretaker-kinship" *ngIf="caretaker.kinship">
-          <span class="kinship-badge">{{ getKinshipLabel(caretaker.kinship) }}</span>
-        </div>
-
-        <div class="caretaker-actions">
-          <button 
-            class="btn-view" 
-            (click)="viewCaretaker(caretaker.id!); $event.stopPropagation()"
-            title="Visualizar">
-            <i class="fas fa-eye"></i>
-          </button>
-          <button 
-            class="btn-edit" 
-            (click)="editCaretaker(caretaker.id!); $event.stopPropagation()"
-            title="Editar">
-            <i class="fas fa-edit"></i>
-          </button>
-          <button 
-            class="btn-delete" 
-            (click)="deleteCaretaker(caretaker.id!); $event.stopPropagation()"
-            title="Deletar">
-            <i class="fas fa-trash"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Paginação -->
-    <div class="pagination-container" *ngIf="totalPages > 1">
-      <div class="pagination-info">
-        {{ getPaginationInfo() }}
-      </div>
-      
-      <div class="pagination-controls">
-        <button 
-          class="pagination-btn"
-          [disabled]="currentPage === 1"
-          (click)="previousPage()">
-          <i class="fas fa-chevron-left"></i> Anterior
-        </button>
-        
-        <button 
-          *ngFor="let page of getVisiblePages()"
-          class="pagination-number"
-          [class.active]="page === currentPage"
-          (click)="goToPage(page)">
-          {{ page }}
-        </button>
-        
-        <button 
-          class="pagination-btn"
-          [disabled]="currentPage === totalPages"
-          (click)="nextPage()">
-          Próximo <i class="fas fa-chevron-right"></i>
-        </button>
-      </div>
+    <div class="name-details">
+      <span class="fullname">{{ item.full_name }}</span>
+      <span class="id-sub">ID: {{ item.id }}</span>
     </div>
   </div>
-</div>
+</ng-template>
+
+<ng-template #ageTpl let-item>
+  {{ getCaretakerAge(item.birth_date) }} anos
+</ng-template>
+
+<ng-template #genderTpl let-item>
+  <span class="gender-badge" [ngClass]="item.gender">
+    {{ item.gender === 'M' ? 'M' : 'F' }}
+  </span>
+</ng-template>
+
+<ng-template #kinshipTpl let-item>
+  <div class="patients-cell">
+    <ng-container *ngIf="item.patients && item.patients.length > 0; else noPatients">
+      <div *ngFor="let p of item.patients | slice:0:2" class="patient-badge">
+        <span class="p-name">{{ $any(p).full_name.split(' ')[0] }}</span>
+        <span class="p-kinship">({{ getKinshipLabel($any(p).kinship) }})</span>
+      </div>
+      <div *ngIf="item.patients.length > 2" class="more-badge">
+        +{{ item.patients.length - 2 }}
+      </div>
+    </ng-container>
+    <ng-template #noPatients>
+      <span class="text-muted">-</span>
+    </ng-template>
+  </div>
+</ng-template>
+
+<ng-template #actionsTpl let-item>
+  <div class="actions-cell">
+    <button class="btn-icon view" (click)="viewCaretaker(item.id!); $event.stopPropagation()" title="Visualizar">
+      <i class="fas fa-eye"></i>
+    </button>
+    <button class="btn-icon edit" (click)="editCaretaker(item.id!); $event.stopPropagation()" title="Editar">
+      <i class="fas fa-pencil"></i>
+    </button>
+    <button class="btn-icon delete" (click)="deleteCaretaker(item.id!); $event.stopPropagation()" title="Deletar">
+      <i class="fas fa-trash-can"></i>
+    </button>
+  </div>
+</ng-template>
+
+<app-caretaker-form-modal [visible]="showCaretakerModal" [patientId]="currentCaretaker?.patient_id || null"
+  [caretaker]="currentCaretaker" (close)="closeCaretakerModal()" (success)="onCaretakerSuccess()">
+</app-caretaker-form-modal>

@@ -20,7 +20,7 @@ export class CaretakerRegister implements OnInit {
     birth_date: '',
     gender: '',
     kinship: '',
-    patient_id: null
+    patient_id: undefined
   };
 
   isLoading: boolean = false;
@@ -31,7 +31,7 @@ export class CaretakerRegister implements OnInit {
     private router: Router,
     private caretakerService: CaretakerService,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // Capturar query params primeiro (para pegar patientId se vier da página do paciente)
@@ -62,8 +62,8 @@ export class CaretakerRegister implements OnInit {
           rg: response.data.rg || '',
           birth_date: this.formatDateForAPI(response.data.birth_date) || '',
           gender: response.data.gender || '',
-          kinship: response.data.kinship || '',
-          patient_id: response.data.patient_id || null
+          kinship: '', // Relationship is N:N now
+          patient_id: undefined
         };
         this.isEditing = true;
         this.isLoading = false;
@@ -116,14 +116,17 @@ export class CaretakerRegister implements OnInit {
       return false;
     }
 
-    if (!this.caretakerData.kinship) {
-      this.errorMessage = 'Parentesco/Relação é obrigatório';
-      return false;
-    }
+    // Validação de relacionamento apenas na criação
+    if (!this.isEditing) {
+      if (!this.caretakerData.kinship) {
+        this.errorMessage = 'Parentesco/Relação é obrigatório';
+        return false;
+      }
 
-    if (!this.caretakerData.patient_id) {
-      this.errorMessage = 'ID do paciente é obrigatório';
-      return false;
+      if (!this.caretakerData.patient_id) {
+        this.errorMessage = 'ID do paciente é obrigatório';
+        return false;
+      }
     }
 
     return true;
@@ -131,28 +134,28 @@ export class CaretakerRegister implements OnInit {
 
   private isValidCPF(cpf: string): boolean {
     cpf = cpf.replace(/[^\d]/g, '');
-    
+
     if (cpf.length !== 11) return false;
     if (/^(\d)\1{10}$/.test(cpf)) return false;
-    
+
     let sum = 0;
     for (let i = 0; i < 9; i++) {
       sum += parseInt(cpf.charAt(i)) * (10 - i);
     }
-    
+
     let remainder = (sum * 10) % 11;
     if (remainder === 10 || remainder === 11) remainder = 0;
     if (remainder !== parseInt(cpf.charAt(9))) return false;
-    
+
     sum = 0;
     for (let i = 0; i < 10; i++) {
       sum += parseInt(cpf.charAt(i)) * (11 - i);
     }
-    
+
     remainder = (sum * 10) % 11;
     if (remainder === 10 || remainder === 11) remainder = 0;
     if (remainder !== parseInt(cpf.charAt(10))) return false;
-    
+
     return true;
   }
 
@@ -162,7 +165,7 @@ export class CaretakerRegister implements OnInit {
       birth_date: this.formatDateForAPI(this.caretakerData.birth_date)
     };
 
-  const payload: any = { ...formattedData };
+    const payload: any = { ...formattedData };
     if (payload.rg === '' || payload.rg === null || payload.rg === undefined) {
       delete payload.rg;
     }
@@ -176,7 +179,7 @@ export class CaretakerRegister implements OnInit {
         console.log('Cuidador criado com sucesso:', response);
         this.successMessage = 'Cuidador cadastrado com sucesso!';
         this.isLoading = false;
-        
+
         setTimeout(() => {
           if (this.fromPatientPage && this.caretakerData.patient_id) {
             this.router.navigate(['/paciente', this.caretakerData.patient_id], {
@@ -202,9 +205,9 @@ export class CaretakerRegister implements OnInit {
       caretaker_id: this.caretakerId
     };
 
-  const payload: any = { ...formattedData };
-  delete payload.id;
-    
+    const payload: any = { ...formattedData };
+    delete payload.id;
+
     if (payload.rg === '' || payload.rg === null || payload.rg === undefined) {
       delete payload.rg;
     }
@@ -214,7 +217,7 @@ export class CaretakerRegister implements OnInit {
         console.log('Cuidador atualizado com sucesso:', response);
         this.successMessage = 'Cuidador atualizado com sucesso!';
         this.isLoading = false;
-        
+
         setTimeout(() => {
           this.router.navigate(['/lista-cuidadores']);
         }, 1500);
@@ -229,25 +232,25 @@ export class CaretakerRegister implements OnInit {
 
   private formatDateForAPI(date: string): string {
     if (!date) return '';
-    
+
     // Se a data já está no formato yyyy-mm-dd
     if (date.includes('-') && date.split('-')[0].length === 4) {
       const [year, month, day] = date.split('-');
       return `${month}-${day}-${year}`;
     }
-    
+
     // Se a data está em outro formato, tenta parsear
     const dateObj = new Date(date);
     const month = String(dateObj.getMonth() + 1).padStart(2, '0');
     const day = String(dateObj.getDate()).padStart(2, '0');
     const year = dateObj.getFullYear();
-    
+
     return `${month}-${day}-${year}`;
   }
 
   formatCPF(cpf: string): void {
     let cleaned = cpf.replace(/\D/g, '');
-    
+
     if (cleaned.length <= 11) {
       if (cleaned.length > 9) {
         cleaned = cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
@@ -256,7 +259,7 @@ export class CaretakerRegister implements OnInit {
       } else if (cleaned.length > 3) {
         cleaned = cleaned.replace(/(\d{3})(\d{1,3})/, '$1.$2');
       }
-      
+
       this.caretakerData.cpf = cleaned;
     }
   }

@@ -1,12 +1,21 @@
 <div>
     <app-sidebar></app-sidebar>
-    <div class="main-content container">
-        <div class="header-section">
-            <h2>Lista de Consultas</h2>
+    <div class="main-content">
+        <header class="header-section">
+            <div class="header-content">
+                <div class="back-link" (click)="goHome()">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Voltar ao início</span>
+                </div>
+                <div class="header-title">
+                    <h2>Lista de Atendimentos</h2>
+                    <p class="subtitle">Gerencie os atendimentos e consultas do dia.</p>
+                </div>
+            </div>
             <button class="btn-primary" (click)="createAppointment()">
-                <i class="fas fa-plus"></i> Nova Consulta
+                <i class="fas fa-plus"></i> Novo Atendimento
             </button>
-        </div>
+        </header>
 
         <!-- Mensagem de erro -->
         <div class="alert alert-error" *ngIf="errorMessage">
@@ -14,114 +23,48 @@
             {{ errorMessage }}
         </div>
 
-        <!-- Filtros -->
-        <div class="filters-section">
-            <div class="filter-group">
-                <label for="filterStatus">Status:</label>
-                <select id="filterStatus" [(ngModel)]="filterStatus" (change)="applyFilters()">
-                    <option value="">Todos</option>
-                    <option value="pending">Pendente</option>
-                    <option value="confirmed">Confirmado</option>
-                    <option value="completed">Concluído</option>
-                    <option value="cancelled">Cancelado</option>
-                </select>
-            </div>
-            
-            <button class="btn-secondary" (click)="clearFilters()" *ngIf="filterStatus">
-                <i class="fas fa-times"></i> Limpar Filtros
-            </button>
-        </div>
-
-        <!-- Loading -->
-        <div class="loading-container" *ngIf="loading">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>Carregando consultas...</p>
-        </div>
-
-        <!-- Lista de consultas -->
-        <div class="appointment-list" *ngIf="!loading && appointments.length > 0">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Atendido</th>
-                        <th>Data da Consulta</th>
-                        <th>Objetivo</th>
-                        <th>Status</th>
-                        <th>Observações</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let appointment of appointments" (click)="viewAppointment(appointment.id!)" class="clickable-row">
-                        <td>{{ appointment.id }}</td>
-                        <td>
-                            <div class="patient-info">
-                                <i class="fas fa-user-circle"></i>
-                                {{ appointment.patient?.full_name || 'N/A' }}
-                            </div>
-                        </td>
-                        <td>{{ formatDate(appointment.date) }}</td>
-                        <td>
-                            <span class="badge badge-objective">
-                                {{ getObjectiveText(appointment.objective) }}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="badge" [ngClass]="'badge-' + getStatusClass(appointment.status || '')">
-                                {{ getStatusText(appointment.status || 'pending') }}
-                            </span>
-                        </td>
-                        <td class="observations">{{ appointment.observations || '-' }}</td>
-                        <td class="actions">
-                            <button class="btn-icon" (click)="viewAppointment(appointment.id!); $event.stopPropagation()" title="Ver detalhes">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <!-- Paginação -->
-            <div class="pagination-container" *ngIf="totalPages > 1">
-                <div class="pagination-info">
-                    {{ getPaginationInfo() }}
-                </div>
-                
-                <div class="pagination">
-                    <button 
-                        class="pagination-btn" 
-                        (click)="previousPage()" 
-                        [disabled]="currentPage === 1">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    
-                    <button 
-                        *ngFor="let page of getVisiblePages()"
-                        class="pagination-btn"
-                        [class.active]="page === currentPage"
-                        (click)="goToPage(page)">
-                        {{ page }}
-                    </button>
-                    
-                    <button 
-                        class="pagination-btn" 
-                        (click)="nextPage()" 
-                        [disabled]="currentPage === totalPages">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Estado vazio -->
-        <div class="empty-state" *ngIf="!loading && appointments.length === 0">
-            <i class="fas fa-calendar-times"></i>
-            <h3>Nenhuma consulta encontrada</h3>
-            <p>Não há consultas cadastradas no momento.</p>
-            <button class="btn-primary" (click)="createAppointment()">
-                <i class="fas fa-plus"></i> Criar primeira consulta
-            </button>
-        </div>
+        <app-shared-table [data]="appointments" [columns]="columns" [loading]="loading"
+            [paginationMeta]="paginationMeta" [searchTerm]="filterText" emptyMessage="Nenhum atendimento encontrado."
+            (search)="onSearch($event)" (pageChange)="onPageChange($event)" (rowClick)="onRowClick($event)">
+        </app-shared-table>
     </div>
 </div>
+
+<!-- Templates for Custom Columns -->
+<ng-template #patientTpl let-item>
+    <div class="patient-cell">
+        <div class="avatar">
+            <span *ngIf="!item.patient?.photo">{{ getInitials(item.patient?.full_name || '') }}</span>
+            <img *ngIf="item.patient?.photo" [src]="item.patient?.photo" alt="Avatar">
+        </div>
+        <div class="info">
+            <span class="name">{{ item.patient?.full_name || 'Paciente não identificado' }}</span>
+            <span class="sub-info">CPF: {{ formatCPF(item.patient?.cpf || '') }}</span>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #dateTpl let-item>
+    <div class="date-cell">
+        <span class="date">{{ formatDate(item.date) }}</span>
+        <!-- Assuming backend doesn't return time yet, using placeholder or just date -->
+        <!-- <span class="time">09:30 AM</span> -->
+    </div>
+</ng-template>
+
+<ng-template #objectiveTpl let-item>
+    <span class="badge badge-objective" [ngClass]="getObjectiveClass(item.objective)">
+        {{ getObjectiveText(item.objective) }}
+    </span>
+</ng-template>
+
+<ng-template #statusTpl let-item>
+    <span class="status-dot-badge" [ngClass]="getStatusClass(item.status || '')">
+        <i class="fas fa-circle"></i>
+        {{ getStatusText(item.status || 'pending') }}
+    </span>
+</ng-template>
+
+<app-appointment-details-modal [visible]="showDetailsModal" [appointment]="selectedAppointment"
+    (close)="closeDetailsModal()" (edit)="onEditAppointment($event)">
+</app-appointment-details-modal>

@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
-import { PatientService, Patient, CaretakerService, Caretaker } from '../services';
+import { PatientService, Patient, CaretakerService, Caretaker, SocioeconomicProfileService, SocioeconomicProfile } from '../services';
 import { AuthService } from '../services/auth.service';
 import { AppointmentService } from '../services/appointment.service';
 import { Appointment, AppointmentCreate } from '../core/models/appointment.model';
+import { ClinicalRecord, ClinicalRecordService } from '../services/clinical-record.service';
 
 @Component({
   selector: 'app-patient',
@@ -12,14 +13,19 @@ import { Appointment, AppointmentCreate } from '../core/models/appointment.model
   standalone: false,
 })
 export class PatientComponent implements OnInit {
-  
+
   patientId: number = 0;
   activeTab: string = 'detalhes';
   loading: boolean = false;
   errorMessage: string = '';
-  
+
   // Dados reais do paciente do backend
   patientData: Patient | null = null;
+
+  // Socioeconomic Profile
+  socioeconomicProfile: SocioeconomicProfile | null = null;
+  showSocioeconomicModal: boolean = false;
+  loadingProfile: boolean = false;
 
   // Dados dos cuidadores
   caretakers: Caretaker[] = [];
@@ -28,6 +34,15 @@ export class PatientComponent implements OnInit {
   // Controle do modal de upload de documentos
   showUploadModal = false;
   currentUserId: number = 0;
+
+  // Controle do modal de cuidador
+  showCaretakerModal = false;
+  currentCaretaker: Caretaker | null = null;
+
+  // Controle do modal de Registros Clínicos
+  showClinicalRecordModal = false;
+  currentClinicalRecord: ClinicalRecord | null = null;
+  existingClinicalRecord: ClinicalRecord | null = null; // Single record reference
 
   // Dados das consultas
   appointments: Appointment[] = [];
@@ -44,13 +59,19 @@ export class PatientComponent implements OnInit {
   savingAppointment = false;
   appointmentErrorMessage = '';
 
+  // Appointment Details Modal
+  showDetailsModal = false;
+  selectedAppointment: Appointment | null = null;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private patientService: PatientService,
     private caretakerService: CaretakerService,
+    private profileService: SocioeconomicProfileService,
     private authService: AuthService,
-    private appointmentService: AppointmentService
+    private appointmentService: AppointmentService,
+    private clinicalRecordService: ClinicalRecordService
   ) { }
 
   ngOnInit(): void {
@@ -59,7 +80,7 @@ export class PatientComponent implements OnInit {
     this.currentUserId = user?.id || 0;
 
     // Pegar ID do paciente da rota
-  this.route.params.subscribe((params: Params) => {
+    this.route.params.subscribe((params: Params) => {
       if (params['id']) {
         this.patientId = parseInt(params['id'], 10);
         this.loadPatientData();
@@ -82,23 +103,33 @@ export class PatientComponent implements OnInit {
 
   loadPatientData(): void {
     if (!this.patientId) return;
-    
+
     this.loading = true;
     this.errorMessage = '';
-    
+
     this.patientService.getPatient(this.patientId).subscribe({
       next: (response: any) => {
         this.patientData = response.data;
-        
+
+        // Populate caretakers from patient data (Pivot mapping)
+        if (this.patientData?.caregivers) {
+          this.caretakers = this.patientData.caregivers.map(c => ({
+            ...c,
+            kinship: c.pivot?.kinship || c.kinship || '',
+            patient_id: this.patientId
+          }));
+        }
+
         this.loading = false;
-        
-        // Carregar consultas automaticamente
+
+        // Load related data
         this.loadAppointments();
+        this.loadClinicalRecords();
       },
-  error: (error: any) => {
+      error: (error: any) => {
         console.error('Erro ao carregar dados do paciente:', error);
         this.loading = false;
-        
+
         if (error.status === 404) {
           this.errorMessage = 'Paciente não encontrado';
         } else {
@@ -115,7 +146,7 @@ export class PatientComponent implements OnInit {
 
   selectTab(tab: string): void {
     this.activeTab = tab;
-    
+
     // Carregar cuidadores quando a aba for selecionada
     if (tab === 'Cuidador' && this.caretakers.length === 0) {
       this.loadCaretakers();
@@ -124,16 +155,16 @@ export class PatientComponent implements OnInit {
 
   getPatientAge(): number {
     if (!this.patientData?.birth_date) return 0;
-    
+
     const birth = new Date(this.patientData.birth_date);
     const today = new Date();
     let age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
       age--;
     }
-    
+
     return age;
   }
 
@@ -144,7 +175,7 @@ export class PatientComponent implements OnInit {
 
   getMaritalStatusText(): string {
     if (!this.patientData?.marital_status) return 'Não informado';
-    
+
     const statusMap: { [key: string]: string } = {
       'single': 'Solteiro(a)',
       'married': 'Casado(a)',
@@ -165,8 +196,23 @@ export class PatientComponent implements OnInit {
     return new Date(date).toLocaleDateString('pt-BR');
   }
 
+  // Controle do modal de edição
+  showEditModal: boolean = false;
+
+  openEditModal(): void {
+    this.showEditModal = true;
+  }
+
+  closeEditModal(): void {
+    this.showEditModal = false;
+  }
+
+  onEditSuccess(): void {
+    this.loadPatientData();
+  }
+
   editPatient(): void {
-    this.router.navigate(['/registro-paciente', this.patientId]);
+    this.openEditModal();
   }
 
   onPhotoUpload(event: any): void {
@@ -213,34 +259,44 @@ export class PatientComponent implements OnInit {
   // Métodos para gerenciar cuidadores
   loadCaretakers(): void {
     this.loadingCaretakers = true;
-    
+
     this.caretakerService.getCaretakers(1, 100).subscribe({
       next: (response: any) => {
-        console.log('Resposta da API (patient):', response);
         // Filtrar apenas cuidadores deste paciente
         this.caretakers = (response.data || []).filter(
           (caretaker: Caretaker) => caretaker.patient_id === this.patientId
         );
-        console.log('Cuidadores filtrados:', this.caretakers);
         this.loadingCaretakers = false;
       },
       error: (error: any) => {
         console.error('Erro ao carregar cuidadores:', error);
-        console.error('Detalhes do erro:', error.error);
         this.loadingCaretakers = false;
       }
     });
   }
 
   addCaretaker(): void {
-    // Redirecionar para a página de cadastro passando o ID do paciente
-    this.router.navigate(['/registro-cuidador'], {
-      queryParams: { patientId: this.patientId }
-    });
+    this.currentCaretaker = null;
+    this.showCaretakerModal = true;
   }
 
   editCaretaker(caretakerId: number): void {
-    this.router.navigate(['/registro-cuidador', caretakerId]);
+    // Find the caretaker and open modal for editing
+    const caretaker = this.caretakers.find(c => c.id === caretakerId);
+    if (caretaker) {
+      this.currentCaretaker = { ...caretaker, patient_id: this.patientId };
+      this.showCaretakerModal = true;
+    }
+  }
+
+  closeCaretakerModal(): void {
+    this.showCaretakerModal = false;
+    this.currentCaretaker = null;
+  }
+
+  onCaretakerSuccess(): void {
+    this.closeCaretakerModal();
+    this.loadCaretakers();
   }
 
   deleteCaretaker(caretakerId: number): void {
@@ -286,11 +342,10 @@ export class PatientComponent implements OnInit {
   // Métodos para gerenciar consultas
   loadAppointments(): void {
     this.loadingAppointments = true;
-    
+
     this.appointmentService.listAppointments(1, 100, { patient_id: this.patientId }).subscribe({
       next: (response: any) => {
         this.appointments = response.data || [];
-        console.log('Consultas carregadas:', this.appointments);
         this.loadingAppointments = false;
       },
       error: (error: any) => {
@@ -358,12 +413,11 @@ export class PatientComponent implements OnInit {
 
   formatAppointmentDate(date: string): string {
     if (!date) return 'Data não informada';
-    
+
     date = date.trim();
     const parts = date.split('-');
-    
+
     if (parts.length === 3) {
-      // Detectar formato: se a primeira parte tem 4 dígitos, é YYYY-MM-DD
       if (parts[0].length === 4) {
         // Formato YYYY-MM-DD
         const year = parts[0];
@@ -378,7 +432,7 @@ export class PatientComponent implements OnInit {
         return `${day}/${month}/${year}`;
       }
     }
-    
+
     return date;
   }
 
@@ -405,7 +459,151 @@ export class PatientComponent implements OnInit {
   }
 
   viewAppointment(appointmentId: number): void {
-    // Navegar para página de detalhes da consulta (se existir)
-    this.router.navigate(['/consulta', appointmentId]);
+    console.log('Viewing appointment:', appointmentId);
+    const appointment = this.appointments.find(a => a.id === appointmentId);
+    if (appointment) {
+      // Ensure patient data is attached if missing (since we are in patient context)
+      if (!appointment.patient && this.patientData) {
+        appointment.patient = this.patientData;
+      }
+      this.selectedAppointment = appointment;
+      this.showDetailsModal = true;
+    }
+  }
+
+  closeDetailsModal(): void {
+    this.showDetailsModal = false;
+    this.selectedAppointment = null;
+  }
+
+  onEditAppointmentDetails(appointment: Appointment): void {
+    this.closeDetailsModal();
+    // Logic to edit appointment if needed, maybe open edit modal?
+    console.log('Edit appointment from details', appointment);
+  }
+
+  viewCaretaker(caretakerId: number): void {
+    this.router.navigate(['/cuidador', caretakerId]);
+  }
+
+  // Socioeconomic Profile Methods
+  openSocioeconomicModal(): void {
+    this.showSocioeconomicModal = true;
+  }
+
+  closeSocioeconomicModal(): void {
+    this.showSocioeconomicModal = false;
+  }
+
+  onSocioeconomicSuccess(profile: SocioeconomicProfile): void {
+    this.socioeconomicProfile = profile;
+    this.closeSocioeconomicModal();
+    this.loadPatientData();
+  }
+
+  getIncomeDisplay(data: any): string {
+    if (!data) return 'Não informado';
+
+    let parsed = data;
+    if (typeof data === 'string') {
+      try {
+        parsed = JSON.parse(data);
+      } catch (e) {
+        return data;
+      }
+    }
+
+    if (typeof parsed === 'object' && parsed !== null) {
+      const category = parsed.category || '';
+      const other = parsed.other ? ` (${parsed.other})` : '';
+      return (category + other) || 'Não informado';
+    }
+
+    return typeof parsed === 'string' ? parsed : 'Não informado';
+  }
+
+  getSanitationDisplay(data: any): string {
+    if (!data) return 'Não informado';
+    let parsed = data;
+    if (typeof data === 'string') {
+      try { parsed = JSON.parse(data); } catch (e) { return data; }
+    }
+
+    if (typeof parsed !== 'object' || parsed === null) return parsed || 'Não informado';
+
+    const parts = [];
+    if (parsed.piped_water) parts.push('Água Encanada');
+    if (parsed.water_tank) parts.push('Caixa D\'água');
+    if (parsed.electricity) parts.push('Luz Elétrica');
+    if (parsed.sewage) parts.push('Rede de Esgoto');
+    if (parsed.septic_tank) parts.push('Fossa');
+    if (parsed.trash_collection) parts.push('Coleta de Lixo');
+    if (parsed.sanitary_installations) parts.push('Instalações Sanitárias');
+
+    return parts.length > 0 ? parts.join(', ') : 'Nenhum item selecionado';
+  }
+
+  // Clinical Records Helpers & Logic
+  loadClinicalRecords(): void {
+    if (!this.patientId) return;
+
+    this.clinicalRecordService.getClinicalRecords(this.patientId).subscribe({
+      next: (response: any) => {
+        const records = response.data || [];
+        // Take the first one if any exist
+        this.existingClinicalRecord = records.length > 0 ? records[0] : null;
+      },
+      error: (error: any) => {
+        console.error('Erro ao carregar registros clínicos:', error);
+      }
+    });
+  }
+
+  handleClinicalRecordAction(): void {
+    if (this.existingClinicalRecord) {
+      this.editClinicalRecord(this.existingClinicalRecord);
+    } else {
+      this.openClinicalRecordModal();
+    }
+  }
+
+  getStageClass(stage: string): string {
+    if (!stage) return 'status-neutral';
+    switch (stage.toLowerCase()) {
+      case 'inicial': return 'status-success'; // Green
+      case 'intermediário':
+      case 'intermediario': return 'status-warning'; // Yellow
+      case 'avançado':
+      case 'avancado': return 'status-danger'; // Orange/Red
+      default: return 'status-neutral';
+    }
+  }
+
+  getInitials(name: string): string {
+    if (!name) return '??';
+    const parts = name.split(' ');
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  // Clinical Record Modal Methods
+  openClinicalRecordModal() {
+    this.currentClinicalRecord = null;
+    this.showClinicalRecordModal = true;
+  }
+
+  editClinicalRecord(record: any) {
+    this.currentClinicalRecord = record;
+    this.showClinicalRecordModal = true;
+  }
+
+  closeClinicalRecordModal() {
+    this.showClinicalRecordModal = false;
+    this.currentClinicalRecord = null;
+  }
+
+  onClinicalRecordSuccess(record: any) {
+    this.closeClinicalRecordModal();
+    this.loadPatientData();
   }
 }

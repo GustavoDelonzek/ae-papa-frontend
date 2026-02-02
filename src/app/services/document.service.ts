@@ -10,27 +10,24 @@ import { Document, DocumentFilters, DocumentUpload, DocumentsResponse } from '..
 export class DocumentService {
   private apiUrl = `${API_URL}/documents`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  /**
-   * Upload de documento
-   */
   uploadDocument(documentData: DocumentUpload): Observable<Document> {
     const formData = new FormData();
-    
+
     formData.append('file', documentData.file);
     formData.append('patient_id', documentData.patient_id.toString());
     formData.append('user_id', documentData.user_id.toString());
     formData.append('file_name', documentData.file_name);
-    
+
     if (documentData.appointment_id) {
       formData.append('appointment_id', documentData.appointment_id.toString());
     }
-    
+
     if (documentData.document_type) {
       formData.append('document_type', documentData.document_type);
     }
-    
+
     if (documentData.description) {
       formData.append('description', documentData.description);
     }
@@ -38,12 +35,9 @@ export class DocumentService {
     return this.http.post<Document>(this.apiUrl, formData);
   }
 
-  /**
-   * Listar documentos com filtros
-   */
   listDocuments(filters?: DocumentFilters): Observable<DocumentsResponse> {
     let params = new HttpParams();
-    
+
     if (filters) {
       if (filters.patient_id) {
         params = params.set('patient_id', filters.patient_id.toString());
@@ -65,42 +59,21 @@ export class DocumentService {
     return this.http.get<DocumentsResponse>(this.apiUrl, { params });
   }
 
-  /**
-   * Buscar documento por ID
-   */
   getDocument(id: number): Observable<{ data: Document }> {
     return this.http.get<{ data: Document }>(`${this.apiUrl}/${id}`);
   }
 
-  /**
-   * Deletar documento
-   */
   deleteDocument(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  /**
-   * Abrir documento em nova aba
-   */
   openDocument(publicUrl: string): void {
     window.open(publicUrl, '_blank');
   }
 
-  /**
-   * Baixar documento
-   */
-  downloadDocument(publicUrl: string, fileName: string): void {
-    fetch(publicUrl)
-      .then(response => response.blob())
-      .then(blob => {
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      });
+  downloadFile(id: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/${id}/download`, { responseType: 'blob' });
   }
+
+
 }

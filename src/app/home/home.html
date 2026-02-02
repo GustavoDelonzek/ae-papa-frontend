@@ -24,9 +24,6 @@
           <h3>{{ loading ? '...' : totalPatients }}</h3>
           <p>Total de Atendidos</p>
         </div>
-        <div class="stat-action" (click)="navigateToPatients()">
-          <i class="fas fa-arrow-right"></i>
-        </div>
       </div>
 
       <div class="stat-card success">
@@ -36,9 +33,6 @@
         <div class="stat-content">
           <h3>{{ loading ? '...' : appointmentsToday }}</h3>
           <p>Consultas Hoje</p>
-        </div>
-        <div class="stat-action">
-          <i class="fas fa-arrow-right"></i>
         </div>
       </div>
 
@@ -50,9 +44,6 @@
           <h3>{{ loading ? '...' : pendingTasks }}</h3>
           <p>Tarefas Pendentes</p>
         </div>
-        <div class="stat-action">
-          <i class="fas fa-arrow-right"></i>
-        </div>
       </div>
 
       <div class="stat-card info">
@@ -63,9 +54,6 @@
           <h3>{{ loading ? '...' : recentActivity }}</h3>
           <p>Atividades Recentes</p>
         </div>
-        <div class="stat-action">
-          <i class="fas fa-arrow-right"></i>
-        </div>
       </div>
     </div>
 
@@ -73,28 +61,56 @@
     <div class="content-grid">
       <!-- Left Section: Quick Actions & Recent -->
       <div class="left-section">
-        <!-- Quick Actions -->
+        <!-- Quick Actions - New Style -->
         <div class="card quick-actions">
           <div class="card-header">
+            <i class="fas fa-bolt header-icon"></i>
             <h2>Ações Rápidas</h2>
           </div>
           <div class="card-body">
-            <button class="action-btn register" (click)="navigateToRegister()">
-              <i class="fas fa-user-plus"></i>
-              <span>Cadastrar Atendido</span>
-            </button>
-            <button class="action-btn appointments" (click)="navigateToAppointmentsCreate()">
-              <i class="fas fa-calendar-plus"></i>
-              <span>Nova Consulta</span>
-            </button>
-            <button class="action-btn patients" (click)="navigateToPatients()">
-              <i class="fas fa-list"></i>
-              <span>Ver Atendidos</span>
-            </button>
-            <button class="action-btn reports">
-              <i class="fas fa-file-medical"></i>
-              <span>Relatórios</span>
-            </button>
+            <div class="actions-grid-new">
+              <div class="action-card-new" (click)="navigateToRegister()">
+                <div class="action-icon-new">
+                  <i class="fas fa-user-plus"></i>
+                </div>
+                <span class="action-label-new">Cadastrar<br>Atendido</span>
+              </div>
+
+              <div class="action-card-new" (click)="navigateToAppointmentsCreate()">
+                <div class="action-icon-new">
+                  <i class="fas fa-folder-plus"></i>
+                </div>
+                <span class="action-label-new">Nova<br>Consulta</span>
+              </div>
+
+              <div class="action-card-new" (click)="navigateToPatients()">
+                <div class="action-icon-new">
+                  <i class="fas fa-users"></i>
+                </div>
+                <span class="action-label-new">Ver<br>Pacientes</span>
+              </div>
+
+              <div class="action-card-new">
+                <div class="action-icon-new">
+                  <i class="fas fa-brain"></i>
+                </div>
+                <span class="action-label-new">Evolução<br>Cognitiva</span>
+              </div>
+
+              <div class="action-card-new">
+                <div class="action-icon-new">
+                  <i class="fas fa-pills"></i>
+                </div>
+                <span class="action-label-new">Registrar<br>Medicamento</span>
+              </div>
+
+              <div class="action-card-new">
+                <div class="action-icon-new">
+                  <i class="fas fa-chart-bar"></i>
+                </div>
+                <span class="action-label-new">Gerar<br>Relatórios</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -141,24 +157,27 @@
       <div class="right-section">
         <div class="card calendar-card">
           <div class="card-header">
-            <h2>Calendário</h2>
+            <i class="fas fa-calendar-alt header-icon"></i>
+            <h2>AGENDA</h2>
           </div>
           <div class="card-body">
             <div class="calendar">
               <!-- Calendar Navigation -->
               <div class="calendar-nav">
-                <button class="nav-btn" (click)="previousMonth()" title="Mês anterior">
-                  <i class="fas fa-chevron-left"></i>
-                </button>
                 <div class="month-year">
                   <span class="month">{{ currentMonth }}</span>
                   <span class="year">{{ currentYear }}</span>
                 </div>
-                <button class="nav-btn" (click)="nextMonth()" title="Próximo mês">
-                  <i class="fas fa-chevron-right"></i>
-                </button>
+                <div class="nav-buttons">
+                  <button class="nav-btn" (click)="previousMonth()" title="Mês anterior">
+                    <i class="fas fa-chevron-left"></i>
+                  </button>
+                  <button class="nav-btn" (click)="nextMonth()" title="Próximo mês">
+                    <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
               </div>
-              
+
               <!-- Today Button -->
               <div class="calendar-actions" *ngIf="!isCurrentMonth()">
                 <button class="today-btn" (click)="goToToday()">
@@ -168,23 +187,20 @@
 
               <!-- Weekday Headers -->
               <div class="calendar-weekdays">
-                <div class="weekday">Dom</div>
-                <div class="weekday">Seg</div>
-                <div class="weekday">Ter</div>
-                <div class="weekday">Qua</div>
-                <div class="weekday">Qui</div>
-                <div class="weekday">Sex</div>
-                <div class="weekday">Sáb</div>
+                <div class="weekday">D</div>
+                <div class="weekday">S</div>
+                <div class="weekday">T</div>
+                <div class="weekday">Q</div>
+                <div class="weekday">Q</div>
+                <div class="weekday">S</div>
+                <div class="weekday">S</div>
               </div>
 
               <!-- Calendar Days -->
               <div class="calendar-days">
-                <div *ngFor="let dayData of calendarDays" 
-                     class="calendar-day"
-                     [class.today]="dayData.isToday"
-                     [class.selected]="dayData.isSelected"
-                     [class.other-month]="!dayData.isCurrentMonth"
-                     (click)="selectDate(dayData)">
+                <div *ngFor="let dayData of calendarDays" class="calendar-day" [class.today]="dayData.isToday"
+                  [class.selected]="dayData.isSelected" [class.other-month]="!dayData.isCurrentMonth"
+                  (click)="selectDate(dayData)">
                   {{ dayData.day }}
                 </div>
               </div>
@@ -197,13 +213,48 @@
                 </p>
                 <p class="events-text">Nenhum evento agendado</p>
               </div>
-              
+
               <!-- No Selection Message -->
               <div class="no-selection-info" *ngIf="!selectedDate">
                 <p class="hint-text">
                   <i class="fas fa-hand-pointer"></i>
                   Clique em um dia para ver os detalhes
                 </p>
+              </div>
+            </div>
+
+            <!-- Próximos Alertas -->
+            <div class="alerts-section">
+              <div class="alerts-header">
+                <i class="fas fa-bell"></i>
+                <h3>PRÓXIMOS ALERTAS</h3>
+              </div>
+              <div class="alerts-list">
+                <div class="alert-item urgent">
+                  <div class="alert-indicator"></div>
+                  <div class="alert-time">14:00</div>
+                  <div class="alert-content">
+                    <span class="alert-title">Insulina - Sr. João</span>
+                    <span class="alert-description">Verificar glicemia antes.</span>
+                  </div>
+                  <span class="alert-badge">URGENTE</span>
+                </div>
+                <div class="alert-item warning">
+                  <div class="alert-indicator"></div>
+                  <div class="alert-time">15:30</div>
+                  <div class="alert-content">
+                    <span class="alert-title">Neurologista - D. Maria</span>
+                    <span class="alert-description">Levar exames recentes.</span>
+                  </div>
+                </div>
+                <div class="alert-item">
+                  <div class="alert-indicator"></div>
+                  <div class="alert-time">17:00</div>
+                  <div class="alert-content">
+                    <span class="alert-title">Troca de Turno</span>
+                    <span class="alert-description">Enfermeira Julia assume.</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

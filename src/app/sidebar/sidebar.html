@@ -1,77 +1,79 @@
-<div class="sidebar">
+<!-- Mobile Toggle Button -->
+<button class="mobile-toggle" (click)="toggleSidebar()">
+  <i class="fa-solid fa-bars"></i>
+</button>
+
+<!-- Overlay for Mobile -->
+<div class="sidebar-overlay" [class.open]="isSidebarOpen" (click)="closeSidebar()"></div>
+
+<div class="sidebar" [class.open]="isSidebarOpen">
+  <!-- Header -->
   <div class="sidebar-header">
-    <div class="logo">
-      <img src="assets/images/logo.png" alt="Logo AEPAPA" style="width: 50px;">
+    <div class="logo-area">
+      <div class="logo-icon">
+        <img src="assets/images/logo.png" alt="AEPAPA Logo" class="brand-logo" style="width: 50px;">
+      </div>
+      <div class="logo-text">
+        <h1 class="brand-name">AEPAPA</h1>
+        <span class="brand-subtitle">GESTÃO DE SAÚDE</span>
+      </div>
     </div>
   </div>
 
+  <!-- Nav -->
   <nav class="sidebar-nav">
     <ul class="nav-list">
-      <li class="nav-item">
-        <a [routerLink]="['/']" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-          <div class="nav-icon">
-            <i class="fa-solid fa-house"></i>
-          </div>
-          <span class="nav-text">Início</span>
-        </a>
-      </li>
+      <ng-container *ngFor="let item of menuItems">
 
-      <li class="nav-item">
-        <a [routerLink]="['/lista-pacientes']" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-          <div class="nav-icon">
-            <i class="fa-solid fa-people-group"></i>
-          </div>
-          <span class="nav-text">Lista de Atendidos</span>
-        </a>
-      </li>
+        <!-- SECTION HEADER -->
+        <li class="nav-section-header" *ngIf="item.type === 'header' && (!item.adminOnly || isAdmin)">
+          {{ item.text }}
+        </li>
 
-      <li class="nav-item">
-        <a [routerLink]="['/registro-paciente']" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-          <div class="nav-icon">
-            <i class="fa-solid fa-user-plus"></i>
-          </div>
-          <span class="nav-text">Cadastrar Atendido</span>
-        </a>
-      </li>
+        <!-- LINK ITEM (No Children) -->
+        <li class="nav-item" *ngIf="item.type === 'link' && !item.children && (!item.adminOnly || isAdmin)">
+          <a [routerLink]="[item.link]" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+            class="nav-link" (click)="closeSidebar()">
+            <div class="nav-icon" *ngIf="item.icon">
+              <i [class]="item.icon"></i>
+            </div>
+            <span class="nav-text">{{ item.text }}</span>
+          </a>
+        </li>
 
-      <li class="nav-item">
-        <a [routerLink]="['/lista-cuidadores']" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-          <div class="nav-icon">
-            <i class="fa-solid fa-hands-holding-child"></i>
-          </div>
-          <span class="nav-text">Lista de Cuidadores</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a [routerLink]="['/criar-consulta']" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-          <div class="nav-icon">
-           <i class="fa-solid fa-calendar"></i>
-          </div>
-          <span class="nav-text">Nova Consulta</span>
-        </a>
-      </li>
+        <!-- GROUP ITEM (With Children) -->
+        <li class="nav-item has-children" *ngIf="item.type === 'link' && item.children && (!item.adminOnly || isAdmin)"
+          [class.expanded]="item.expanded">
+          <a class="nav-link parent-link" (click)="toggleGroup(item)">
+            <div class="nav-icon" *ngIf="item.icon">
+              <i [class]="item.icon"></i>
+            </div>
+            <span class="nav-text">{{ item.text }}</span>
+            <i class="fa-solid fa-chevron-right arrow-icon"></i>
+          </a>
 
-      <!-- Itens apenas para Admin -->
-      <li class="nav-item" *ngIf="isAdmin">
-        <a [routerLink]="['/registro-usuario']" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-          <div class="nav-icon">
-            <i class="fa-solid fa-user-shield"></i>
-          </div>
-          <span class="nav-text">Cadastrar Usuário</span>
-        </a>
-      </li>
+          <ul class="submenu" [style.max-height]="item.expanded ? '500px' : '0'">
+            <li class="nav-item" *ngFor="let subItem of item.children">
+              <a [routerLink]="[subItem.link]" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+                class="nav-link sub-link" (click)="closeSidebar()">
+                <div class="bullet-point"></div>
+                <span class="nav-text">{{ subItem.text }}</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+      </ng-container>
     </ul>
   </nav>
 
-  <!-- Botão de Logout -->
+  <!-- Footer -->
   <div class="sidebar-footer">
     <button class="logout-button" (click)="logout()">
       <div class="nav-icon">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z"/>
-        </svg>
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
       </div>
-      <span class="nav-text">Sair</span>
+      <span class="nav-text">Sair do Sistema</span>
     </button>
   </div>
 </div>

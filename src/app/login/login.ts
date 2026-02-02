@@ -24,6 +24,11 @@ export class Login implements OnInit {
   errorMessage: string = '';
   sessionExpiredMessage: string = '';
   returnUrl: string = '/';
+  showPassword: boolean = false;
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
 
   constructor(
     private router: Router,
@@ -40,7 +45,7 @@ export class Login implements OnInit {
     // Capturar parâmetros da URL
     this.route.queryParams.subscribe(params => {
       this.returnUrl = params['returnUrl'] || '/';
-      
+
       // Verificar se foi redirecionado por sessão expirada
       if (params['expired'] === 'true') {
         this.sessionExpiredMessage = 'Sua sessão expirou. Por favor, faça login novamente.';
@@ -58,19 +63,19 @@ export class Login implements OnInit {
         .subscribe({
           next: (response) => {
             console.log('Login realizado com sucesso:', response);
-            
+
             // Salvar dados de autenticação
             this.authService.setAuthData(response.user, response.token);
-            
+
             this.isLoading = false;
-            
+
             // Redirecionar para a URL de retorno ou página inicial
             this.router.navigate([this.returnUrl]);
           },
           error: (error) => {
             console.error('Erro no login:', error);
             this.isLoading = false;
-            
+
             if (error.status === 401) {
               this.errorMessage = 'Email ou senha incorretos';
             } else {

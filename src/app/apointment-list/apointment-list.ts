@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { AppointmentService } from '../services/appointment.service';
 import { Router } from '@angular/router';
 import { Appointment } from '../core/models/appointment.model';
+import { TableColumn } from '../shared/components/shared-table/shared-table.component';
 
 @Component({
   selector: 'app-apointment-list',
@@ -11,64 +12,110 @@ import { Appointment } from '../core/models/appointment.model';
 })
 export class ApointmentList implements OnInit {
 
+  @ViewChild('patientTpl') patientTpl!: TemplateRef<any>;
+  @ViewChild('dateTpl') dateTpl!: TemplateRef<any>;
+  @ViewChild('objectiveTpl') objectiveTpl!: TemplateRef<any>;
+  @ViewChild('statusTpl') statusTpl!: TemplateRef<any>;
+
   appointments: Appointment[] = [];
   loading: boolean = false;
   errorMessage: string = '';
-  
-  // Paginação
-  currentPage: number = 1;
-  perPage: number = 15;
-  totalPages: number = 0;
-  totalItems: number = 0;
+
+  // Shared Table Configuration
+  columns: TableColumn[] = [];
   paginationMeta: any = null;
-  
+
+  // Modal Detail
+  showDetailsModal: boolean = false;
+  selectedAppointment: Appointment | null = null;
+
   // Filtros
-  filterPatientId: number | undefined;
-  filterDate: string = '';
+  filterText: string = '';
   filterStatus: string = '';
+  filterDate: string = '';
 
   constructor(
     private router: Router,
     private appointmentService: AppointmentService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
+    // Columns will be initialized in ngAfterViewInit normally, but for simple cases we can define them here 
+    // if templates are not static. However, since we use @ViewChild, we should better set them 
+    // after view init or use a timeout, or just rely on Angular to resolve them.
+    // Actually, simply defining them in ngAfterViewInit is safer for ViewChild templates.
+    this.initialLoad();
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.columns = [
+        { key: 'id', label: 'ID', sortable: true, cellClass: 'text-muted' },
+        { key: 'patient', label: 'PACIENTE', type: 'template', cellTemplate: this.patientTpl },
+        { key: 'date', label: 'DATA DO ATENDIMENTO', type: 'template', cellTemplate: this.dateTpl },
+        { key: 'objective', label: 'OBJETIVO', type: 'template', cellTemplate: this.objectiveTpl },
+        { key: 'status', label: 'STATUS', type: 'template', cellTemplate: this.statusTpl },
+        { key: 'observations', label: 'OBSERVAÇÕES', type: 'text', cellClass: 'text-truncate', headerClass: 'w-25' }
+      ];
+    });
+  }
+
+  initialLoad() {
     this.loadAppointments();
   }
 
   loadAppointments(page: number = 1): void {
     this.loading = true;
     this.errorMessage = '';
-    this.currentPage = page;
 
     const filters: any = {
-      per_page: this.perPage
+      per_page: 15
     };
 
-    if (this.filterPatientId) {
-      filters.patient_id = this.filterPatientId;
-    }
-    if (this.filterDate) {
-      filters.date = this.filterDate;
-    }
-    if (this.filterStatus) {
-      filters.status = this.filterStatus;
-    }
+    if (this.filterText) filters.search = this.filterText;
+    if (this.filterDate) filters.date = this.filterDate;
+    if (this.filterStatus) filters.status = this.filterStatus;
 
-    this.appointmentService.listAppointments(page, this.perPage, filters).subscribe({
-      next: (response) => {
+    this.appointmentService.listAppointments(page, 15, filters).subscribe({
+      next: (response: any) => {
         this.appointments = response.data;
         this.paginationMeta = response.meta;
-        this.totalPages = response.meta.last_page;
-        this.totalItems = response.meta.total;
         this.loading = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Erro ao carregar consultas:', error);
-        this.errorMessage = 'Erro ao carregar lista de consultas. Tente novamente.';
+        this.errorMessage = 'Erro ao carregar lista de atendimentos. Tente novamente.';
         this.loading = false;
       }
     });
+  }
+
+  // Event Handlers for Shared Table
+  onSearch(term: string): void {
+    this.filterText = term;
+    this.applyFilters();
+  }
+
+  onPageChange(page: number): void {
+    this.loadAppointments(page);
+  }
+
+  onRowClick(appointment: Appointment): void {
+    console.log('Row clicked:', appointment);
+    this.viewAppointment(appointment.id!);
+  }
+
+  getInitials(name: string): string {
+    if (!name) return '??';
+    const parts = name.split(' ');
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  formatCPF(cpf: string): string {
+    if (!cpf) return '';
+    const cleaned = cpf.replace(/\D/g, '');
+    return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
   }
 
   formatDate(date: string): string {
@@ -91,6 +138,15 @@ export class ApointmentList implements OnInit {
     return objectiveMap[objective] || objective;
   }
 
+  getObjectiveClass(objective: string): string {
+    const map: { [key: string]: string } = {
+      'donation': 'objective-donation',
+      'treatment': 'objective-treatment',
+      'exam': 'objective-exam'
+    };
+    return map[objective] || '';
+  }
+
   getStatusClass(status: string): string {
     return status || 'pending';
   }
@@ -105,77 +161,39 @@ export class ApointmentList implements OnInit {
     return statusMap[status] || status;
   }
 
-  // Métodos de paginação
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
-      this.loadAppointments(page);
-    }
-  }
-
-  previousPage(): void {
-    if (this.currentPage > 1) {
-      this.goToPage(this.currentPage - 1);
-    }
-  }
-
-  nextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.goToPage(this.currentPage + 1);
-    }
-  }
-
-  getVisiblePages(): number[] {
-    const pages: number[] = [];
-    const maxVisible = 5;
-    
-    if (this.totalPages <= maxVisible) {
-      for (let i = 1; i <= this.totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      let start = Math.max(1, this.currentPage - 2);
-      let end = Math.min(this.totalPages, this.currentPage + 2);
-      
-      if (this.currentPage <= 3) {
-        end = Math.min(this.totalPages, 5);
-      }
-      if (this.currentPage > this.totalPages - 3) {
-        start = Math.max(1, this.totalPages - 4);
-      }
-      
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
-    }
-    
-    return pages;
-  }
-
-  getPaginationInfo(): string {
-    if (!this.paginationMeta) return '';
-    
-    const { from, to, total } = this.paginationMeta;
-    return `Mostrando ${from} a ${to} de ${total} consultas`;
-  }
-
   createAppointment(): void {
     this.router.navigate(['/criar-consulta']);
   }
 
   viewAppointment(id: number): void {
-    this.router.navigate(['/consulta', id]);
+    const appointment = this.appointments.find(a => a.id === id);
+    if (appointment) {
+      this.selectedAppointment = appointment;
+      this.showDetailsModal = true;
+    }
+  }
+
+  closeDetailsModal(): void {
+    this.showDetailsModal = false;
+    this.selectedAppointment = null;
+  }
+
+  onEditAppointment(appointment: Appointment): void {
+    // Navigate to edit page (assuming reusing creation page or specific edit route)
+    // currently we don't have a clear edit route, but we can structure this for future
+    console.log('Edit appointment:', appointment);
+    // this.router.navigate(['/consulta/editar', appointment.id]); 
+    // For now just close or keep logic placeholder
+    this.closeDetailsModal();
   }
 
   applyFilters(): void {
-    this.currentPage = 1;
     this.loadAppointments(1);
   }
 
-  clearFilters(): void {
-    this.filterPatientId = undefined;
-    this.filterDate = '';
-    this.filterStatus = '';
-    this.loadAppointments(1);
+  goHome(): void {
+    this.router.navigate(['/']);
   }
 }
+
 

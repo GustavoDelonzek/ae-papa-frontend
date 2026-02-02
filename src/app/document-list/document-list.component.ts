@@ -18,18 +18,18 @@ export class DocumentListComponent implements OnInit {
   documents: Document[] = [];
   loading = false;
   errorMessage = '';
-  
+
   // Filtros
-  statusFilter: '' | 'pending' | 'uploaded' | 'failed' = '';
+  statusFilter: '' | 'pending' | 'completed' | 'failed' = '';
   searchTerm = '';
-  
+
   // Paginação
   currentPage = 1;
   lastPage = 1;
   perPage = 15;
   total = 0;
 
-  constructor(private documentService: DocumentService) {}
+  constructor(private documentService: DocumentService) { }
 
   ngOnInit(): void {
     this.loadDocuments();
@@ -77,7 +77,7 @@ export class DocumentListComponent implements OnInit {
   getStatusText(status: string): string {
     const statusMap: { [key: string]: string } = {
       'pending': 'Pendente',
-      'uploaded': 'Enviado',
+      'completed': 'Enviado',
       'failed': 'Falhou'
     };
     return statusMap[status] || status;
@@ -96,16 +96,12 @@ export class DocumentListComponent implements OnInit {
   }
 
   openDocument(doc: Document): void {
-    if (doc.public_url && doc.status === 'uploaded') {
+    if (doc.public_url && doc.status === 'completed') {
       this.documentService.openDocument(doc.public_url);
     }
   }
 
-  downloadDocument(doc: Document): void {
-    if (doc.public_url && doc.status === 'uploaded') {
-      this.documentService.downloadDocument(doc.public_url, doc.file_name);
-    }
-  }
+
 
   deleteDocument(doc: Document): void {
     if (confirm(`Tem certeza que deseja excluir o documento "${doc.file_name}"?`)) {

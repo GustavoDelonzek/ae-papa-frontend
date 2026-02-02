@@ -7,6 +7,7 @@ import { PatientComponent } from './patient/patient.component';
 import { PatientListComponent } from './patient-list/patient-list.component';
 import { CaretakerList } from './caretaker-list/caretaker-list';
 import { CaretakerRegister } from './caretaker-register/caretaker-register';
+import { CaretakerComponent } from './caretaker/caretaker.component';
 import { AuthGuard } from './guards/auth.guard';
 import { ApointmentCreate } from './apointment-create/apointment-create';
 import { ApointmentList } from './apointment-list/apointment-list';
@@ -14,49 +15,54 @@ import { UserRegister } from './user-register/user-register';
 
 const routes: Routes = [
   { path: 'login', component: Login },
-  { 
-    path: '', 
-    component: Home, 
-    canActivate: [AuthGuard] 
+  {
+    path: '',
+    component: Home,
+    canActivate: [AuthGuard]
   },
-  { 
-    path: 'registro-paciente', 
+  {
+    path: 'registro-paciente',
     component: PatientRegister,
     canActivate: [AuthGuard]
   },
-  { 
-    path: 'paciente', 
+  {
+    path: 'paciente',
     component: PatientComponent,
     canActivate: [AuthGuard]
   },
-  { 
-    path: 'paciente/:id', 
+  {
+    path: 'paciente/:id',
     component: PatientComponent,
     canActivate: [AuthGuard]
   },
-  { 
-    path: 'lista-pacientes', 
+  {
+    path: 'lista-pacientes',
     component: PatientListComponent,
     canActivate: [AuthGuard]
   },
-  { 
-    path: 'registro-paciente/:id', 
+  {
+    path: 'registro-paciente/:id',
     component: PatientRegister,
     canActivate: [AuthGuard]
   },
-  { 
-    path: 'lista-cuidadores', 
+  {
+    path: 'lista-cuidadores',
     component: CaretakerList,
     canActivate: [AuthGuard]
   },
-  { 
-    path: 'registro-cuidador', 
+  {
+    path: 'registro-cuidador',
     component: CaretakerRegister,
     canActivate: [AuthGuard]
   },
-  { 
-    path: 'registro-cuidador/:id', 
+  {
+    path: 'registro-cuidador/:id',
     component: CaretakerRegister,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'cuidador/:id',
+    component: CaretakerComponent,
     canActivate: [AuthGuard]
   },
   {
@@ -74,9 +80,9 @@ const routes: Routes = [
     component: UserRegister,
     canActivate: [AuthGuard]
   },
-  { 
-    path: '**', 
-    redirectTo: '/login' 
+  {
+    path: '**',
+    redirectTo: '/login'
   }
 ];
 

@@ -8,7 +8,7 @@ export interface Document {
   document_type?: string;
   mime_type: string;
   description?: string;
-  status: 'pending' | 'uploaded' | 'failed';
+  status: 'pending' | 'completed' | 'failed';
   public_url?: string;
   created_at: string;
   updated_at: string;
@@ -17,7 +17,7 @@ export interface Document {
 export interface DocumentFilters {
   patient_id?: number;
   document_type?: string;
-  status?: 'pending' | 'uploaded' | 'failed';
+  status?: 'pending' | 'completed' | 'failed';
   name?: string;
   per_page?: number;
 }

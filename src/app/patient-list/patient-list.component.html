@@ -1,153 +1,71 @@
 <app-sidebar></app-sidebar>
 
 <div class="patient-list-container">
+  <!-- Header -->
   <header class="patient-list-header">
-    <h1>Atendidos</h1>
-    <div class="search-container">
-      <input 
-        type="text" 
-        placeholder="Pesquisar pacientes..." 
-        class="search-input"
-        [(ngModel)]="searchTerm"
-        (keyup.enter)="performSearch()"
-        aria-label="Pesquisar pacientes">
-      
-      <!-- Indicador de loading da pesquisa -->
-      <div *ngIf="searching" class="search-loading">
-        <i class="fas fa-spinner fa-spin"></i>
+    <div class="header-content">
+      <div class="back-link" (click)="goHome()">
+        <i class="fas fa-arrow-left"></i>
+        <span>Voltar ao início</span>
       </div>
-      
-      <!-- Botão para limpar pesquisa -->
-      <button 
-        *ngIf="searchTerm && !searching" 
-        class="clear-search-button"
-        (click)="clearSearch()"
-        title="Limpar pesquisa">
-        <i class="fas fa-times"></i>
-      </button>
-      
-      <button class="search-button" (click)="performSearch()" title="Pesquisar" style="font-size: 1vh;">
-        pesquisar
-      </button>
+      <div class="header-title">
+        <h1>Atendidos</h1>
+      </div>
     </div>
+
+    <button class="btn-primary" (click)="openModal()">
+      <i class="fas fa-plus"></i> Novo Atendido
+    </button>
   </header>
 
-  <div class="patient-list-content">
-    <div class="content-header">
-      <h2>Lista de Atendidos</h2>
-      <button class="btn-add-patient" (click)="addPatient()">
-        <i class="fas fa-plus"></i> Adicionar Atendido
-      </button>
-    </div>
-
-    <!-- Exibir mensagem de erro -->
-    <div *ngIf="errorMessage" class="alert alert-danger">
-      {{ errorMessage }}
-    </div>
-
-    <div class="patients-grid" *ngIf="filteredPatients && filteredPatients.length > 0; else noPatients">
-      <div 
-        class="patient-card" 
-        *ngFor="let patient of filteredPatients"
-        (click)="viewPatient(patient.id!)">
-        
-        <div class="patient-photo">
-          <img *ngIf="patient.photo" [src]="patient.photo" [alt]="patient.full_name">
-          <div *ngIf="!patient.photo" class="photo-placeholder">
-            <i class="fas fa-user"></i>
-          </div>
-        </div>
-
-        <div class="patient-info">
-          <h3>{{ patient.full_name }}</h3>
-          <p class="patient-age">{{ getPatientAge(patient.birth_date) }} anos</p>
-          <p class="patient-id">ID: {{ patient.id }}</p>
-          <p class="patient-cpf">CPF: {{ formatCPF(patient.cpf) }}</p>
-        </div>
-
-        <div class="patient-status">
-          <span class="status-badge" [ngClass]="getStatusClass('active')">
-            {{ patient.gender === 'M' ? 'Masculino' : 'Feminino' }}
-          </span>
-          <span class="marital-status">
-            {{ getMaritalStatusText(patient.marital_status) }}
-          </span>
-        </div>
-
-        <div class="patient-actions">
-          <button 
-            class="btn-view" 
-            (click)="viewPatient(patient.id!); $event.stopPropagation()"
-            title="Visualizar">
-            <i class="fas fa-eye"></i>
-          </button>
-          <button 
-            class="btn-edit" 
-            (click)="editPatient(patient.id!); $event.stopPropagation()"
-            title="Editar">
-            <i class="fas fa-edit"></i>
-          </button>
-          <button 
-            class="btn-delete" 
-            (click)="deletePatient(patient.id!); $event.stopPropagation()"
-            title="Deletar">
-            <i class="fas fa-trash"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <ng-template #noPatients>
-      <div class="no-patients">
-        <i class="fas fa-users"></i>
-        <h3>Nenhum Atendido encontrado</h3>
-        <p *ngIf="searchTerm">Tente ajustar os termos de pesquisa</p>
-        <p *ngIf="!searchTerm">Comece adicionando seu primeiro Atendido</p>
-        <button class="btn-add-first" (click)="addPatient()">
-          <i class="fas fa-plus"></i> Adicionar Primeiro Atendido
-        </button>
-      </div>
-    </ng-template>
-
-    <!-- Paginação -->
-    <div class="pagination-container" *ngIf="totalPages > 1 && !loading">
-      <div class="pagination-info">
-        <span>{{ getPaginationInfo() }}</span>
-      </div>
-      
-      <div class="pagination-controls">
-        <button 
-          class="btn-page" 
-          [disabled]="currentPage === 1"
-          (click)="previousPage()">
-          <i class="fas fa-chevron-left"></i>
-          Anterior
-        </button>
-        
-        <div class="page-numbers">
-          <button 
-            *ngFor="let page of getVisiblePages()"
-            class="btn-page-number"
-            [class.active]="page === currentPage"
-            (click)="goToPage(page)">
-            {{ page }}
-          </button>
-        </div>
-        
-        <button 
-          class="btn-page" 
-          [disabled]="currentPage === totalPages"
-          (click)="nextPage()">
-          Próxima
-          <i class="fas fa-chevron-right"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Loading state -->
-  <div class="loading-container" *ngIf="loading">
-    <div class="loading-spinner"></div>
-    <p>Carregando Atendidos...</p>
-  </div>
+  <!-- Content with Shared Table -->
+  <app-shared-table [data]="filteredPatients" [columns]="columns" [loading]="loading" [paginationMeta]="paginationMeta"
+    [searchTerm]="searchTerm" [sortColumn]="sortColumn || ''" [sortDirection]="sortDirection || 'asc'"
+    emptyMessage="Nenhum atendido encontrado." (search)="onSearch($event)" (sort)="onSort($event)"
+    (pageChange)="onPageChange($event)" (rowClick)="onRowClick($event)">
+  </app-shared-table>
 </div>
+
+<!-- Templates for Custom Columns -->
+<ng-template #patientTpl let-item>
+  <div class="patient-cell">
+    <div class="avatar-mini">
+      <img *ngIf="item.photo" [src]="item.photo" [alt]="item.full_name">
+      <span *ngIf="!item.photo">{{ item.full_name.charAt(0) }}</span>
+    </div>
+    <div class="patient-info-cell">
+      <span class="name">{{ item.full_name }}</span>
+      <span class="sub-id">#{{ item.id }}</span>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #cpfTpl let-item>
+  {{ formatCPF(item.cpf) }}
+</ng-template>
+
+<ng-template #ageTpl let-item>
+  {{ getPatientAge(item.birth_date) }} anos
+  <span class="birth-year">({{ item.birth_date | date:'yyyy' }})</span>
+</ng-template>
+
+<ng-template #genderTpl let-item>
+  <span class="gender-badge" [class.male]="item.gender === 'M'" [class.female]="item.gender === 'F'">
+    {{ item.gender === 'M' ? 'M' : 'F' }}
+  </span>
+</ng-template>
+
+<ng-template #actionsTpl let-item>
+  <div class="actions-cell">
+    <button class="btn-icon edit" (click)="openModal(item); $event.stopPropagation()" title="Editar">
+      <i class="fas fa-pencil"></i>
+    </button>
+    <button class="btn-icon delete" (click)="deletePatient(item.id!); $event.stopPropagation()" title="Excluir">
+      <i class="fas fa-trash-can"></i>
+    </button>
+  </div>
+</ng-template>
+
+<!-- Create/Edit Patient Modal -->
+<app-patient-form-modal [visible]="showCreateModal" [patient]="currentPatient" (close)="closeCreateModal()"
+  (success)="onModalSuccess()"></app-patient-form-modal>

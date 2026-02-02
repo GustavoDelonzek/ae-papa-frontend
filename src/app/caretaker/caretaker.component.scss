@@ -1,0 +1,640 @@
+// Variables
+$primary-color: #009ca6;
+$text-color: #333;
+$text-muted: #6b7280;
+$border-color: #e5e7eb;
+$danger-color: #ef4444;
+$success-color: #10b981;
+$bg-color: #f3f4f6;
+
+// Loading & Error States
+.loading-state,
+.error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    gap: 1rem;
+    color: $text-muted;
+
+    i {
+        font-size: 2.5rem;
+        color: $primary-color;
+    }
+
+    span {
+        font-size: 1rem;
+    }
+
+    .btn-back {
+        margin-top: 1rem;
+        padding: 0.5rem 1rem;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            background: $bg-color;
+        }
+    }
+}
+
+.error-state i {
+    color: $danger-color;
+}
+
+// Page Header
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+
+    .header-left {
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: $text-muted;
+            font-size: 0.85rem;
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+            transition: color 0.2s;
+
+            &:hover {
+                color: $primary-color;
+            }
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: $text-color;
+            margin: 0;
+        }
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 0.75rem;
+
+        button {
+            padding: 0.625rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+
+            i {
+                font-size: 0.85rem;
+            }
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid $border-color;
+            color: $text-color;
+
+            &:hover {
+                background: $bg-color;
+                border-color: $primary-color;
+                color: $primary-color;
+            }
+        }
+
+        .btn-danger {
+            background: white;
+            border: 1px solid $border-color;
+            color: $danger-color;
+
+            &:hover {
+                background: rgba($danger-color, 0.05);
+                border-color: $danger-color;
+            }
+        }
+    }
+}
+
+// Profile Card
+.profile-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+    .profile-header {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+    }
+
+    .avatar {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba($primary-color, 0.15) 0%, rgba($primary-color, 0.25) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        i {
+            font-size: 2rem;
+            color: $primary-color;
+        }
+    }
+
+    .profile-info {
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: $text-color;
+            margin: 0 0 0.75rem 0;
+        }
+
+        .profile-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+    }
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+
+    i {
+        font-size: 0.75rem;
+    }
+
+    &.badge-primary {
+        background: rgba($primary-color, 0.1);
+        color: $primary-color;
+    }
+
+    &.badge-male {
+        background: #e0f2fe;
+        color: #0284c7;
+    }
+
+    &.badge-female {
+        background: #fce7f3;
+        color: #db2777;
+    }
+
+    &.badge-kinship {
+        background: #ecfdf5;
+        color: #059669;
+    }
+}
+
+// Info Section
+.info-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: $text-color;
+    margin: 0 0 1.25rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid $border-color;
+
+    i {
+        color: $primary-color;
+        font-size: 1rem;
+    }
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    .info-label {
+        font-size: 0.8rem;
+        color: $text-muted;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .info-value {
+        font-size: 1rem;
+        color: $text-color;
+        font-weight: 500;
+
+        &.font-mono {
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            letter-spacing: -0.3px;
+        }
+    }
+}
+
+// Patient Section
+.patient-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.patient-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 2rem;
+    color: $text-muted;
+
+    i {
+        color: $primary-color;
+    }
+}
+
+.patient-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: $bg-color;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+
+    &:hover {
+        background: rgba($primary-color, 0.05);
+        border-color: rgba($primary-color, 0.2);
+
+        .patient-action i {
+            transform: translateX(3px);
+            color: $primary-color;
+        }
+    }
+
+    .patient-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: $primary-color;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        font-weight: 600;
+        flex-shrink: 0;
+    }
+
+    .patient-info {
+        flex: 1;
+
+        .patient-name {
+            display: block;
+            font-weight: 600;
+            color: $text-color;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .patient-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+
+            .detail-item {
+                display: flex;
+                align-items: center;
+                gap: 0.375rem;
+                font-size: 0.85rem;
+                color: $text-muted;
+
+                i {
+                    font-size: 0.75rem;
+                    color: $primary-color;
+                }
+            }
+        }
+    }
+
+    .patient-action {
+        i {
+            color: $text-muted;
+            transition: all 0.2s;
+        }
+    }
+}
+
+.no-patient {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 2rem;
+    color: $text-muted;
+
+    i {
+        font-size: 2rem;
+        opacity: 0.5;
+    }
+}
+
+// Timestamps
+.timestamps-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding: 1rem;
+    color: $text-muted;
+    font-size: 0.85rem;
+
+    .timestamp-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        i {
+            color: rgba($text-muted, 0.6);
+        }
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        gap: 1rem;
+
+        .header-actions {
+            width: 100%;
+
+            button {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+    }
+
+    .profile-card .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .profile-card .profile-info .profile-badges {
+        justify-content: center;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .patient-card {
+        flex-direction: column;
+        text-align: center;
+
+        .patient-info .patient-details {
+            justify-content: center;
+        }
+
+        .patient-action {
+            display: none;
+        }
+    }
+}
+
+// -- New Styles for N:N Relationships --
+
+.relationships-section {
+    @extend .patient-section;
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.25rem;
+        border-bottom: 1px solid $border-color;
+        padding-bottom: 0.75rem;
+
+        .section-title {
+            margin: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .btn-primary-sm {
+            background-color: $primary-color;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+            transition: background 0.2s;
+
+            &:hover {
+                background-color: darken($primary-color, 10%);
+            }
+        }
+    }
+}
+
+.patients-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+// Adjust patient card for grid presence
+.patient-card {
+    height: 100%; // Fill grid height
+
+    .btn-icon.delete {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 50%;
+        transition: background 0.2s;
+
+        i {
+            color: $text-muted;
+            font-size: 1rem;
+        }
+
+        &:hover {
+            background-color: rgba($danger-color, 0.1);
+
+            i {
+                color: $danger-color;
+            }
+        }
+    }
+}
+
+// Modal Overlay (local implementation)
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050; // Above everything
+
+    .modal-content {
+        background: white;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 450px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        animation: slideUp 0.3s ease-out;
+
+        h3 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            color: $text-color;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            i {
+                color: $primary-color;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+
+            label {
+                display: block;
+                margin-bottom: 0.5rem;
+                color: $text-muted;
+                font-size: 0.9rem;
+                font-weight: 500;
+            }
+
+            .form-control {
+                width: 100%;
+                padding: 0.75rem;
+                border: 1px solid $border-color;
+                border-radius: 8px;
+                font-size: 1rem;
+                background-color: white;
+
+                &:focus {
+                    outline: none;
+                    border-color: $primary-color;
+                    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+                }
+            }
+
+            .loading-inline {
+                color: $primary-color;
+                font-size: 0.9rem;
+            }
+
+            .text-hint {
+                font-size: 0.85rem;
+                color: $text-muted;
+                margin-top: 0.25rem;
+                font-style: italic;
+            }
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid $bg-color;
+
+            button {
+                padding: 0.6rem 1.2rem;
+                border-radius: 6px;
+                cursor: pointer;
+                font-weight: 500;
+                font-size: 0.95rem;
+                transition: all 0.2s;
+                border: none;
+
+                &.btn-cancel {
+                    background: transparent;
+                    color: $text-muted;
+
+                    &:hover {
+                        background: $bg-color;
+                        color: $text-color;
+                    }
+                }
+
+                &.btn-save {
+                    background: $primary-color;
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+
+                    &:hover {
+                        filter: brightness(90%);
+                    }
+
+                    &:disabled {
+                        opacity: 0.6;
+                        cursor: not-allowed;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

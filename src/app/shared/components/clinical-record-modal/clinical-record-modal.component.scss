@@ -1,0 +1,339 @@
+// Variables
+$primary-color: #6b21a8; // Purple consistent
+$primary-light: #f3e8ff;
+$text-dark: #1f2937;
+$text-sub: #6b7280;
+$border-color: #e5e7eb;
+$success-color: #10b981;
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1rem;
+    backdrop-filter: blur(2px);
+    overflow-y: auto;
+}
+
+.modal-content {
+    background-color: #f9fafb; // Light gray bg
+    border-radius: 16px;
+    width: 100%;
+    max-width: 1000px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    margin: auto;
+}
+
+.modal-header {
+    background: white;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid $border-color;
+    border-radius: 16px 16px 0 0;
+
+    .header-content {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .icon-box {
+        width: 48px;
+        height: 48px;
+        background: #f3e8ff;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $primary-color;
+        font-size: 1.25rem;
+    }
+
+    .title-group {
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: $text-dark;
+            margin: 0 0 0.25rem 0;
+        }
+
+        .patient-pill {
+            background: #f3f4f6;
+            color: $text-sub;
+            font-size: 0.85rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            display: inline-block;
+            font-weight: 500;
+        }
+    }
+
+    .btn-close {
+        background: none;
+        border: none;
+        font-size: 1.25rem;
+        color: #9ca3af;
+        cursor: pointer;
+        padding: 0.25rem;
+
+        &:hover {
+            color: #ef4444;
+        }
+    }
+}
+
+.modal-body {
+    padding: 2rem;
+    overflow-y: auto;
+    flex: 1; // Ensure it takes available space
+}
+
+// Sections
+.section-container {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid $border-color; // Added for visibility
+
+    .section-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: $text-dark;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        i {
+            color: $primary-color;
+            font-size: 1rem;
+            padding: 0.35rem;
+            background: $primary-light;
+            border-radius: 6px;
+        }
+    }
+
+    .section-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+
+        .section-title {
+            margin-bottom: 0;
+        }
+
+        .badge-hint {
+            background: #f3f4f6;
+            color: $text-sub;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+    }
+}
+
+// Form Grid - Layout Structure Only
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+// Global Form Group/Control Styles
+// These apply to both the Grid and the Therapeutic Plan textarea
+.form-group {
+    margin-bottom: 1rem; // Ensure spacing if not in grid
+
+    label {
+        display: block; // Ensures label sits ABOVE input
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #4b5563;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.6rem 0.75rem;
+        border: 1px solid $border-color;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        background: #fff;
+        box-sizing: border-box;
+        font-family: inherit; // Vital for Textarea to inherit font
+        transition: all 0.2s;
+
+        &:focus {
+            outline: none;
+            border-color: $primary-color;
+            box-shadow: 0 0 0 3px rgba(107, 33, 168, 0.1);
+        }
+    }
+
+    // Specific Overrides for Textarea
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+        line-height: 1.5;
+        display: block; // Defensively ensure block
+    }
+}
+
+// Toggles Grid
+.toggles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem 2rem;
+}
+
+.toggle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .toggle-labels {
+        display: flex;
+        flex-direction: column;
+
+        .toggle-title {
+            font-weight: 600;
+            color: $text-dark;
+            font-size: 0.95rem;
+        }
+
+        .toggle-subtitle {
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+    }
+
+    // Switch styles
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 24px;
+
+        input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e5e7eb;
+            transition: .4s;
+            border-radius: 24px;
+
+            &:before {
+                position: absolute;
+                content: "";
+                height: 18px;
+                width: 18px;
+                left: 3px;
+                bottom: 3px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        input:checked+.slider {
+            background-color: $primary-color;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(20px);
+        }
+    }
+}
+
+// Footer
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-top: 1rem;
+    gap: 1rem;
+
+    .spacer {
+        flex: 1;
+    }
+
+    .last-update {
+        font-size: 0.8rem;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .btn-cancel {
+        background: transparent;
+        border: none;
+        color: #6b7280;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 0.75rem 1rem;
+
+        &:hover {
+            color: $text-dark;
+        }
+    }
+
+    .btn-submit {
+        background: $primary-color;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba($primary-color, 0.2);
+
+        &:hover {
+            background-color: darken($primary-color, 5%);
+        }
+
+        &:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+    }
+}
+
+.alert-error {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #fef2f2;
+    color: #b91c1c;
+    border-radius: 8px;
+    text-align: center;
+}

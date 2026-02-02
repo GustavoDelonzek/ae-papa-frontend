@@ -4,17 +4,14 @@
     <div class="filters-section">
       <div class="search-box">
         <i class="fas fa-search"></i>
-        <input 
-          type="text" 
-          [(ngModel)]="searchTerm" 
-          placeholder="Buscar por nome do arquivo..."
+        <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar por nome do arquivo..."
           (keyup.enter)="applyFilters()">
       </div>
 
       <div class="filter-group">
         <select [(ngModel)]="statusFilter" (change)="applyFilters()">
           <option value="">Todos os status</option>
-          <option value="uploaded">Enviado</option>
+          <option value="completed">Enviado</option>
           <option value="pending">Pendente</option>
           <option value="failed">Falhou</option>
         </select>
@@ -80,24 +77,12 @@
       </div>
 
       <div class="document-actions">
-        <button 
-          class="btn-action" 
-          (click)="openDocument(doc)" 
-          title="Visualizar"
-          [disabled]="doc.status !== 'uploaded'">
+        <button class="btn-action" (click)="openDocument(doc)" title="Visualizar"
+          [disabled]="doc.status !== 'completed'">
           <i class="fas fa-eye"></i>
         </button>
-        <button 
-          class="btn-action" 
-          (click)="downloadDocument(doc)" 
-          title="Baixar"
-          [disabled]="doc.status !== 'uploaded'">
-          <i class="fas fa-download"></i>
-        </button>
-        <button 
-          class="btn-action btn-delete" 
-          (click)="deleteDocument(doc)" 
-          title="Excluir">
+
+        <button class="btn-action btn-delete" (click)="deleteDocument(doc)" title="Excluir">
           <i class="fas fa-trash"></i>
         </button>
       </div>
@@ -110,9 +95,6 @@
     <h3>Nenhum documento encontrado</h3>
     <p *ngIf="statusFilter || searchTerm">Tente ajustar os filtros ou fazer uma nova busca</p>
     <p *ngIf="!statusFilter && !searchTerm">Ainda não há documentos para este paciente</p>
-    <button class="btn-upload-large" (click)="uploadNewDocument()">
-      <i class="fas fa-upload"></i> Fazer primeiro upload
-    </button>
   </div>
 
   <!-- Pagination -->
@@ -121,16 +103,11 @@
       Mostrando {{ documents.length }} de {{ total }} documentos
     </div>
     <div class="pagination-controls">
-      <button 
-        class="btn-page" 
-        (click)="currentPage > 1 && loadDocuments()" 
-        [disabled]="currentPage === 1">
+      <button class="btn-page" (click)="currentPage > 1 && loadDocuments()" [disabled]="currentPage === 1">
         <i class="fas fa-chevron-left"></i>
       </button>
       <span class="page-info">Página {{ currentPage }} de {{ lastPage }}</span>
-      <button 
-        class="btn-page" 
-        (click)="currentPage < lastPage && loadDocuments()" 
+      <button class="btn-page" (click)="currentPage < lastPage && loadDocuments()"
         [disabled]="currentPage === lastPage">
         <i class="fas fa-chevron-right"></i>
       </button>

@@ -1,4 +1,4 @@
-*{
+* {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -54,7 +54,7 @@
   max-width: 320px;
 }
 
-.logo-image{
+.logo-image {
   height: 80px;
   width: auto;
   margin-bottom: 15px;
@@ -66,7 +66,7 @@
 .logo-container {
   text-align: center;
   margin-bottom: 40px;
-  
+
   .logo-text {
     img {
       height: 250px;
@@ -108,16 +108,46 @@
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
   background-color: #f8f9fa;
   box-sizing: border-box;
-  
+
   &:focus {
     outline: none;
     border-color: #4fd1c7;
     box-shadow: 0 0 0 3px rgba(79, 209, 199, 0.1);
     background-color: white;
   }
-  
+
   &.ng-invalid.ng-touched {
     border-color: #dc3545;
+  }
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .form-control {
+    padding-right: 45px;
+  }
+
+  .password-toggle {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: #888;
+    font-size: 16px;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #4fd1c7;
+    }
+
+    &:focus {
+      outline: none;
+    }
   }
 }
 
@@ -133,13 +163,13 @@
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: 10px;
-  
+
   &:hover:not(:disabled) {
     background: linear-gradient(135deg, #3ba99c 0%, #2e8b7d 100%);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(79, 209, 199, 0.3);
   }
-  
+
   &:disabled {
     background: #ccc;
     cursor: not-allowed;
@@ -153,20 +183,20 @@
   .login-container {
     flex-direction: column;
   }
-  
+
   .login-left {
     flex: 0 0 200px;
   }
-  
+
   .login-right {
     flex: 1;
     padding: 20px;
   }
-  
+
   .login-form-container {
     max-width: none;
   }
-  
+
   .logo-container .logo-text img {
     height: 180px;
   }
@@ -176,21 +206,21 @@
   .login-right {
     padding: 15px;
   }
-  
+
   .login-title {
     font-size: 20px;
     margin-bottom: 25px;
   }
-  
+
   .form-control {
     padding: 10px 14px;
   }
-  
+
   .btn-entrar {
     padding: 10px;
     font-size: 15px;
   }
-  
+
   .logo-container .logo-text img {
     height: 150px;
   }

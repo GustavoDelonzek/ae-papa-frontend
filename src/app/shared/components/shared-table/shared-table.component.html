@@ -1,0 +1,107 @@
+<!-- Toolbar -->
+<div class="table-container">
+    <div class="table-toolbar">
+        <div class="search-container integrated" [class.active-search]="searchTerm">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" placeholder="Buscar..." class="search-input" [ngModel]="searchTerm"
+                (ngModelChange)="onSearch($event)" aria-label="Pesquisar">
+
+            <button *ngIf="searchTerm" class="clear-btn" (click)="clearSearch()" title="Limpar pesquisa">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div *ngIf="loading" class="search-spinner">
+                <i class="fas fa-circle-notch fa-spin"></i>
+            </div>
+        </div>
+
+        <div class="toolbar-stats" *ngIf="paginationMeta">
+            <span class="total-badge">{{ paginationMeta.total }} registros</span>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading && !data.length" class="loading-state">
+        <div class="spinner"></div> <!-- Or skeleton layout -->
+    </div>
+
+    <!-- Table -->
+    <table class="shared-table" *ngIf="!loading || data.length > 0">
+        <thead>
+            <tr>
+                <th *ngFor="let col of columns" [class.sortable]="col.sortable"
+                    (click)="col.sortable ? onSort(col.key) : null" [ngClass]="col.headerClass">
+                    {{ col.label }}
+                    <span class="sort-icon" *ngIf="col.sortable">
+                        <i class="fas" [ngClass]="{
+                  'fa-sort': sortColumn !== col.key,
+                  'fa-sort-up': sortColumn === col.key && sortDirection === 'asc',
+                  'fa-sort-down': sortColumn === col.key && sortDirection === 'desc',
+                  'active': sortColumn === col.key,
+                  'placeholder': sortColumn !== col.key
+                }"></i>
+                    </span>
+                </th>
+            </tr>
+        </thead>
+        <tbody *ngIf="data.length > 0; else emptyState">
+            <tr *ngFor="let item of data" (click)="onRowClick(item)" class="clickable-row">
+                <td *ngFor="let col of columns" [ngClass]="col.cellClass">
+
+                    <!-- Template Column -->
+                    <ng-container *ngIf="col.type === 'template'">
+                        <ng-container *ngTemplateOutlet="col.cellTemplate; context: { $implicit: item }"></ng-container>
+                    </ng-container>
+
+                    <!-- Standard Text Column -->
+                    <span *ngIf="!col.type || col.type === 'text'">
+                        {{ getProperty(item, col.key) }}
+                    </span>
+
+                    <!-- Date Column -->
+                    <span *ngIf="col.type === 'date'">
+                        {{ getProperty(item, col.key) | date:'dd/MM/yyyy' }}
+                    </span>
+
+                </td>
+            </tr>
+        </tbody>
+        <ng-template #emptyState>
+            <tbody>
+                <tr>
+                    <td [attr.colspan]="columns.length" class="empty-state-cell">
+                        <div class="no-items-simple">
+                            <i class="fas fa-search"></i>
+                            <p>{{ emptyMessage }}</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </ng-template>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination-wrapper" *ngIf="totalPages > 1 && !loading">
+        <div class="pagination-summary">
+            {{ getPaginationInfo() }}
+        </div>
+
+        <div class="pagination-nav">
+            <button class="page-control prev" [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+
+            <div class="page-list">
+                <button *ngFor="let page of getVisiblePages()" class="page-num" [class.active]="page === currentPage"
+                    (click)="onPageChange(page)">
+                    {{ page }}
+                </button>
+            </div>
+
+            <button class="page-control next" [disabled]="currentPage === totalPages"
+                (click)="onPageChange(currentPage + 1)">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</div>

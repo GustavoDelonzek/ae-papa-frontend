@@ -3,22 +3,39 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_URL } from '../../consts';
 
+export interface PatientRelation {
+  id: number;
+  full_name: string;
+  kinship: string;
+}
+
 export interface Caretaker {
   id?: number;
-  patient_id: number | null;
   full_name: string;
   cpf: string;
   rg?: string;
   birth_date: string;
   gender: string;
-  kinship?: string;
   education_level?: string;
+  patients?: PatientRelation[];
+  // Optional for creation payload
+  patient_id?: number;
+  kinship?: string;
+  // Pivot data from N:N relationship
+  pivot?: {
+    patient_id: number;
+    caregiver_id: number;
+    kinship: string;
+    created_at?: string;
+    updated_at?: string;
+  };
   created_at?: string;
   updated_at?: string;
 }
 
 export interface CaretakerResponse {
   data: Caretaker;
+  message?: string;
 }
 
 export interface CaretakersListResponse {
@@ -45,7 +62,7 @@ export interface CaretakersListResponse {
 })
 export class CaretakerService {
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
    * Criar novo cuidador
@@ -78,7 +95,7 @@ export class CaretakerService {
   }
 
   /**
-   * Atualizar cuidador
+   * Atualizar cuidador (Dados pessoais apenas)
    */
   updateCaretaker(id: number, caretakerData: Partial<Caretaker>): Observable<CaretakerResponse> {
     return this.http.patch<CaretakerResponse>(`${API_URL}/caregivers/${id}`, caretakerData);
@@ -89,5 +106,26 @@ export class CaretakerService {
    */
   deleteCaretaker(id: number): Observable<any> {
     return this.http.delete(`${API_URL}/caregivers/${id}`);
+  }
+
+  /**
+   * Associar cuidador a paciente
+   */
+  linkPatient(caretakerId: number, patientId: number, kinship: string): Observable<any> {
+    return this.http.post(`${API_URL}/caregivers/${caretakerId}/patients/${patientId}`, { kinship });
+  }
+
+  /**
+   * Atualizar relacionamento (Kinship)
+   */
+  updatePatientRelation(caretakerId: number, patientId: number, kinship: string): Observable<any> {
+    return this.http.patch(`${API_URL}/caregivers/${caretakerId}/patients/${patientId}`, { kinship });
+  }
+
+  /**
+   * Remover associação com paciente
+   */
+  unlinkPatient(caretakerId: number, patientId: number): Observable<any> {
+    return this.http.delete(`${API_URL}/caregivers/${caretakerId}/patients/${patientId}`);
   }
 }

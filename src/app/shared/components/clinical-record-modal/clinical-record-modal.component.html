@@ -1,0 +1,245 @@
+<div class="modal-overlay" *ngIf="visible" (click)="onClose()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+            <div class="header-content">
+                <div class="icon-box">
+                    <i class="fas fa-file-medical"></i>
+                </div>
+                <div class="title-group">
+                    <h2>Registros Clínicos</h2>
+                    <div class="patient-pill" *ngIf="patientName">
+                        {{ patientName }}
+                    </div>
+                </div>
+            </div>
+            <button class="btn-close" (click)="onClose()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <form (ngSubmit)="save()" #recordForm="ngForm">
+
+                <!-- Section 1: Diagnóstico -->
+                <div class="section-container">
+                    <h3 class="section-title">
+                        <i class="fas fa-user-md"></i> INFORMAÇÕES DO DIAGNÓSTICO
+                    </h3>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Data do Diagnóstico</label>
+                            <input type="date" name="diagnosis_date" class="form-control"
+                                [(ngModel)]="currentRecord.diagnosis_date" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Estágio da Doença</label>
+                            <select name="disease_stage" class="form-control" [(ngModel)]="currentRecord.disease_stage">
+                                <option value="" disabled selected>Selecione o estágio</option>
+                                <option *ngFor="let stage of stageOptions" [value]="stage">{{ stage }}</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Médico Responsável</label>
+                            <input type="text" name="responsible_doctor" class="form-control"
+                                placeholder="Dr. Nome Sobrenome" [(ngModel)]="currentRecord.responsible_doctor">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Unidade de Saúde</label>
+                            <input type="text" name="health_unit_location" class="form-control"
+                                placeholder="Nome da Unidade" [(ngModel)]="currentRecord.health_unit_location">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Avaliação (Splits into 2/3 cols) -->
+                <div class="section-container">
+                    <div class="section-header-row">
+                        <h3 class="section-title">
+                            <i class="fas fa-tasks"></i> AVALIAÇÃO DO PACIENTE
+                        </h3>
+                        <span class="badge-hint">Marque o que se aplica</span>
+                    </div>
+
+                    <div class="toggles-grid">
+                        <!-- Toggle Item -->
+                        <div class="toggle-item">
+                            <div class="toggle-labels">
+                                <span class="toggle-title">Reconhece Familiares</span>
+                                <span class="toggle-subtitle">Cognitivo</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="recognizes_family" [(ngModel)]="recognizesFamilyBool">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-labels">
+                                <span class="toggle-title">Instabilidade Emocional</span>
+                                <span class="toggle-subtitle">Comportamental</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="emotional_state" [(ngModel)]="emotionalStateBool">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-labels">
+                                <span class="toggle-title">Risco de Fuga</span>
+                                <span class="toggle-subtitle">Segurança</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="wandering_risk" [(ngModel)]="currentRecord.wandering_risk">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-labels">
+                                <span class="toggle-title">Comunicação Verbal</span>
+                                <span class="toggle-subtitle">Cognitivo</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="verbal_communication"
+                                    [(ngModel)]="currentRecord.verbal_communication">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-labels">
+                                <span class="toggle-title">Desorientação Frequente</span>
+                                <span class="toggle-subtitle">Cognitivo</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="disorientation_frequency"
+                                    [(ngModel)]="currentRecord.disorientation_frequency">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-labels">
+                                <span class="toggle-title">Histórico de Quedas</span>
+                                <span class="toggle-subtitle">Segurança</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="has_falls_history"
+                                    [(ngModel)]="currentRecord.has_falls_history">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-labels">
+                                <span class="toggle-title">Auxilio Alimentação</span>
+                                <span class="toggle-subtitle">Funcional</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="needs_feeding_help"
+                                    [(ngModel)]="currentRecord.needs_feeding_help">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-labels">
+                                <span class="toggle-title">Auxilio Higiene</span>
+                                <span class="toggle-subtitle">Funcional</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="needs_hygiene_help"
+                                    [(ngModel)]="currentRecord.needs_hygiene_help">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-labels">
+                                <span class="toggle-title">Distúrbios do Sono</span>
+                                <span class="toggle-subtitle">Fisiológico</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="has_sleep_issues"
+                                    [(ngModel)]="currentRecord.has_sleep_issues">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-labels">
+                                <span class="toggle-title">Alucinações</span>
+                                <span class="toggle-subtitle">Comportamental</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="has_hallucinations"
+                                    [(ngModel)]="currentRecord.has_hallucinations">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-labels">
+                                <span class="toggle-title">Reduzida Mobilidade</span>
+                                <span class="toggle-subtitle">Funcional</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="reduced_mobility"
+                                    [(ngModel)]="currentRecord.reduced_mobility">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-labels">
+                                <span class="toggle-title">Agressividade</span>
+                                <span class="toggle-subtitle">Comportamental</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="is_aggressive" [(ngModel)]="currentRecord.is_aggressive">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-container">
+                    <h3 class="section-title">
+                        <i class="fas fa-notes-medical"></i> PLANO TERAPÊUTICO
+                    </h3>
+                    <div class="form-group">
+                        <label>Descrição e Observações</label>
+                        <textarea class="form-control" rows="5" name="medications_usage"
+                            placeholder="Liste os medicamentos atuais, dosagens e horários de administração..."
+                            [(ngModel)]="currentRecord.medications_usage"></textarea>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer">
+                    <span class="last-update" *ngIf="currentRecord.updated_at">
+                        <i class="far fa-clock"></i> Última atualização: {{ currentRecord.updated_at | date:'dd/MM/yyyy
+                        HH:mm' }}
+                    </span>
+                    <span class="spacer"></span>
+
+                    <button type="button" class="btn-cancel" (click)="onClose()">Cancelar</button>
+                    <button type="submit" class="btn-submit" [disabled]="isSaving">
+                        <span *ngIf="!isSaving"><i class="fas fa-save"></i> Salvar Registros</span>
+                        <span *ngIf="isSaving"><i class="fas fa-spinner fa-spin"></i></span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="alert-error" *ngIf="errorMessage">
+                {{ errorMessage }}
+            </div>
+        </div>
+    </div>
+</div>
