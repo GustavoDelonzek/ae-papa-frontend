@@ -49,13 +49,24 @@
     &:nth-child(1) { // Nome completo
       grid-column: 1 / -1; // Ocupa toda a largura
     }
-    
-    &:nth-child(7) { // Botões
-      grid-column: 1 / -1; // Ocupa toda a largura
+
+    &.full-width {
+      grid-column: 1 / -1;
     }
-    
-    &:nth-child(8), &:nth-child(9) { // Alertas
-      grid-column: 1 / -1; // Ocupa toda a largura
+  }
+
+  .section-title {
+    grid-column: 1 / -1;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #4fd1c7;
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin: 0;
     }
   }
 }
@@ -71,8 +82,9 @@
     color: #dc3545;
   }
   
-  &[for="rg"]::after {
-    display: none; // Remove asterisco do RG
+  &[for="rg"]::after,
+  &.optional-field::after {
+    display: none; // Remove asterisco dos campos opcionais
   }
 }
 
@@ -100,6 +112,23 @@
     border-color: #28a745;
     background-color: #f8fff9;
   }
+
+  &.loading {
+    padding-right: 40px;
+  }
+}
+
+.input-with-loader {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .cep-loader {
+    position: absolute;
+    right: 12px;
+    color: #4fd1c7;
+    font-size: 16px;
+  }
 }
 
 select.form-control {
@@ -122,6 +151,7 @@ select.form-control {
 }
 
 .form-actions {
+  grid-column: 1 / -1;
   display: flex;
   gap: 15px;
   justify-content: flex-end;

@@ -1,6 +1,26 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
-import { PatientService, Patient } from '../services';
+import { HttpClient } from '@angular/common/http';
+import { PatientService, Patient, PatientAddress, AddressService, Address } from '../services';
+
+interface AddressFormData {
+  street: string;
+  number: string;
+  neighborhood: string;
+  city: string;
+  cep: string;
+  reference_point: string;
+}
+
+interface ViaCepResponse {
+  cep: string;
+  logradouro: string;
+  complemento: string;
+  bairro: string;
+  localidade: string;
+  uf: string;
+  erro?: boolean;
+}
 
 @Component({
   selector: 'app-patient-register',
@@ -21,14 +41,29 @@ export class PatientRegister implements OnInit {
     rg: ''
   };
 
+  addressData: AddressFormData = {
+    street: '',
+    number: '',
+    neighborhood: '',
+    city: '',
+    cep: '',
+    reference_point: ''
+  };
+
   isLoading: boolean = false;
   successMessage: string = '';
   errorMessage: string = '';
 
+  // Controle de busca de CEP
+  isLoadingCep: boolean = false;
+  cepError: string = '';
+
   constructor(
     private router: Router,
     private patientService: PatientService,
-    private route: ActivatedRoute
+    private addressService: AddressService,
+    private route: ActivatedRoute,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -163,13 +198,20 @@ export class PatientRegister implements OnInit {
     this.patientService.createPatient(payload).subscribe({
       next: (response: any) => {
         console.log('Paciente cadastrado com sucesso:', response);
-        this.isLoading = false;
-        this.successMessage = 'Paciente cadastrado com sucesso!';
         
-        // Redirecionar para lista de pacientes após sucesso
-        setTimeout(() => {
-          this.router.navigate(['/lista-pacientes']);
-        }, 1200);
+        // Salvar endereço se houver dados preenchidos
+        const patientId = response.data.id;
+        if (this.hasAddressData()) {
+          this.saveAddress(patientId);
+        } else {
+          this.isLoading = false;
+          this.successMessage = 'Paciente cadastrado com sucesso!';
+          
+          // Redirecionar para lista de pacientes após sucesso
+          setTimeout(() => {
+            this.router.navigate(['/lista-pacientes']);
+          }, 1200);
+        }
       },
   error: (error: any) => {
         console.error('Erro ao cadastrar paciente:', error);
@@ -280,9 +322,106 @@ export class PatientRegister implements OnInit {
       cpf: '',
       rg: ''
     };
+
+    this.addressData = {
+      street: '',
+      number: '',
+      neighborhood: '',
+      city: '',
+      cep: '',
+      reference_point: ''
+    };
     
     this.errorMessage = '';
     this.successMessage = '';
+  }
+
+  private hasAddressData(): boolean {
+    return !!(
+      this.addressData.street ||
+      this.addressData.number ||
+      this.addressData.neighborhood ||
+      this.addressData.city ||
+      this.addressData.cep
+    );
+  }
+
+  /**
+   * Busca endereço pelo CEP usando a API ViaCEP
+   */
+  onCepChange(): void {
+    // Remover máscara do CEP
+    const cepClean = this.addressData.cep.replace(/\D/g, '');
+    
+    // Só buscar se tiver 8 dígitos
+    if (cepClean.length === 8) {
+      this.searchCep(cepClean);
+    } else {
+      this.cepError = '';
+    }
+  }
+
+  private searchCep(cep: string): void {
+    this.isLoadingCep = true;
+    this.cepError = '';
+
+    this.http.get<ViaCepResponse>(`https://viacep.com.br/ws/${cep}/json/`).subscribe({
+      next: (response) => {
+        this.isLoadingCep = false;
+        
+        if (response.erro) {
+          this.cepError = 'CEP não encontrado';
+          return;
+        }
+
+        // Preencher campos automaticamente
+        this.addressData.street = response.logradouro || '';
+        this.addressData.neighborhood = response.bairro || '';
+        this.addressData.city = response.localidade ? `${response.localidade} - ${response.uf}` : '';
+      },
+      error: (error) => {
+        console.error('Erro ao buscar CEP:', error);
+        this.isLoadingCep = false;
+        this.cepError = 'Erro ao buscar CEP. Tente novamente.';
+      }
+    });
+  }
+
+  private saveAddress(patientId: number): void {
+    // Remover máscara do CEP
+    const cepClean = this.addressData.cep.replace(/\D/g, '');
+
+    const addressPayload: Address = {
+      patient_id: patientId,
+      street: this.addressData.street,
+      number: this.addressData.number,
+      neighborhood: this.addressData.neighborhood,
+      city: this.addressData.city,
+      cep: cepClean,
+      reference_point: this.addressData.reference_point || undefined
+    };
+
+    this.addressService.createAddress(addressPayload).subscribe({
+      next: (response: any) => {
+        console.log('Endereço salvo com sucesso:', response);
+        this.isLoading = false;
+        this.successMessage = 'Paciente cadastrado com sucesso!';
+        
+        setTimeout(() => {
+          this.router.navigate(['/lista-pacientes']);
+        }, 1200);
+      },
+      error: (error: any) => {
+        console.error('Erro ao salvar endereço:', error);
+        this.isLoading = false;
+        // Mesmo com erro no endereço, o paciente foi criado
+        this.successMessage = 'Paciente cadastrado! (Erro ao salvar endereço)';
+        
+        setTimeout(() => {
+          this.router.navigate(['/lista-pacientes']);
+        }, 1500);
+      }
+    });
   }
 
   onCancel(): void {
