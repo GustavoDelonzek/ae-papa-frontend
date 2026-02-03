@@ -3,6 +3,15 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_URL } from '../../consts';
 
+export interface PatientAddress {
+  street: string;
+  number: string;
+  neighborhood: string;
+  city: string;
+  cep: string;
+  reference_point?: string;
+}
+
 export interface Patient {
   id?: number;
   full_name: string;
@@ -12,6 +21,7 @@ export interface Patient {
   cpf: string;
   rg?: string;
   photo?: string;
+  address?: PatientAddress;
   created_at?: string;
   updated_at?: string;
 }
