@@ -135,4 +135,18 @@ export class AuthService {
     this.logout();
     this.router.navigate(['/login']);
   }
+
+  /**
+   * Solicitar recuperação de senha
+   */
+  requestPasswordReset(email: string): Observable<any> {
+    return this.http.post<any>(`${API_URL}/forgot-password`, { email });
+  }
+
+  /**
+   * Confirmar resetar senha com token
+   */
+  resetPassword(token: string, password: string, password_confirmation: string): Observable<any> {
+    return this.http.post<any>(`${API_URL}/reset-password`, { token, password, password_confirmation });
+  }
 }

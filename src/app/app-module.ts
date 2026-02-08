@@ -14,6 +14,7 @@ import { PatientComponent } from './patient/patient.component';
 import { PatientListComponent } from './patient-list/patient-list.component';
 import { DocumentListComponent } from './document-list/document-list.component';
 import { DocumentUploadComponent } from './document-upload/document-upload.component';
+import { PasswordRecovery } from './password-recovery/password-recovery';
 
 // Services e Guards
 import { AuthService } from './services';
@@ -40,6 +41,7 @@ import { UserRegister } from './user-register/user-register';
     ApointmentCreate,
     ApointmentList,
     UserRegister,
+    PasswordRecovery,
   ],
   imports: [
     BrowserModule,
