@@ -11,9 +11,11 @@ import { AuthGuard } from './guards/auth.guard';
 import { ApointmentCreate } from './apointment-create/apointment-create';
 import { ApointmentList } from './apointment-list/apointment-list';
 import { UserRegister } from './user-register/user-register';
+import { PasswordRecovery } from './password-recovery/password-recovery';
 
 const routes: Routes = [
   { path: 'login', component: Login },
+  { path: 'recuperar-senha', component: PasswordRecovery },
   { 
     path: '', 
     component: Home, 
