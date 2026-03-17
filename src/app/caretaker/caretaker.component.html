@@ -1,0 +1,200 @@
+<app-sidebar></app-sidebar>
+
+<div class="caretaker-page-container">
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="loading">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span>Carregando dados do cuidador...</span>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-state" *ngIf="errorMessage && !loading">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>{{ errorMessage }}</span>
+        <button class="btn-back" (click)="goBack()">Voltar à lista</button>
+    </div>
+
+    <!-- Content -->
+    <ng-container *ngIf="caretakerData && !loading">
+        <header class="page-header">
+            <div class="header-breadcrumb" (click)="goBack()">
+                <i class="fas fa-arrow-left"></i> Voltar à lista
+            </div>
+            <div class="header-main">
+                <h1>Detalhes do Cuidador</h1>
+                <div class="header-actions">
+                    <button class="btn-outline-danger" (click)="deleteCaretaker()">
+                        <i class="far fa-trash-alt"></i> Excluir
+                    </button>
+                    <button class="btn-primary" (click)="openEditModal()">
+                        <i class="fas fa-pen"></i> Editar
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="caretaker-grid">
+            <!-- Left Column: Profile & Personal Info -->
+            <div class="left-column">
+                <!-- Profile Card -->
+                <section class="card profile-card">
+                    <div class="profile-content">
+                        <div class="avatar-large">
+                            <i class="fas fa-user"></i>
+                            <div class="status-dot"></div>
+                        </div>
+                        <div class="profile-details">
+                            <h2>{{ caretakerData.full_name }}</h2>
+                            <p class="role-text">Cuidador Certificado</p>
+
+                            <div class="badges-row">
+                                <span class="badge-soft-purple">
+                                    <i class="fas fa-id-badge"></i> ID: {{ caretakerData.id }}
+                                </span>
+                                <span class="badge-outline">
+                                    <i class="fas"
+                                        [ngClass]="caretakerData.gender === 'M' ? 'fa-mars' : 'fa-venus'"></i>
+                                    {{ getGenderText() }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Personal Info Card -->
+                <section class="card info-card">
+                    <div class="card-header">
+                        <div class="icon-wrapper">
+                            <i class="fas fa-info"></i>
+                        </div>
+                        <h3>Informações Pessoais</h3>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label><i class="far fa-calendar"></i> NASCIMENTO</label>
+                            <span>{{ formatDate(caretakerData.birth_date) }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="fas fa-birthday-cake"></i> IDADE</label>
+                            <span>{{ getCaretakerAge() }} anos</span>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="fas fa-fingerprint"></i> CPF</label>
+                            <span>{{ formatCPF(caretakerData.cpf) }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="far fa-id-card"></i> RG</label>
+                            <span class="italic">{{ caretakerData.rg || 'Não informado' }}</span>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="timestamps">
+                    <span><i class="far fa-calendar-check"></i> Cadastrado em: {{ formatDate(caretakerData.created_at!)
+                        }}</span>
+                    <span *ngIf="caretakerData.updated_at"><i class="fas fa-sync-alt"></i> Atualizado em: {{
+                        formatDate(caretakerData.updated_at) }}</span>
+                </div>
+            </div>
+
+            <!-- Right Column: Patients -->
+            <div class="right-column">
+                <section class="card patients-card">
+                    <div class="card-header-row">
+                        <div class="header-title">
+                            <i class="fas fa-users"></i>
+                            <h3>Atendidos</h3>
+                        </div>
+                        <button class="btn-sm-primary" (click)="openRelationModal()">
+                            <i class="fas fa-plus"></i> Vincular
+                        </button>
+                    </div>
+
+                    <div class="patients-list" *ngIf="caretakerData.patients && caretakerData.patients.length > 0">
+                        <div class="patient-item-card" *ngFor="let p of caretakerData.patients"
+                            (click)="goToPatient(p.id)">
+                            <div class="patient-avatar" [ngClass]="getPatientColorClass(p.id)">
+                                {{ p.full_name.charAt(0) }}
+                            </div>
+                            <div class="patient-details">
+                                <h4>{{ p.full_name }}</h4>
+                                <div class="sub-details">
+                                    <span class="badget-id">ID: {{ p.id }}</span>
+                                    <span class="separator">•</span>
+                                    <span class="kinship-text"><i class="fas fa-heart"></i> {{ getKinshipText(p.kinship)
+                                        }}</span>
+                                </div>
+                            </div>
+                            <button class="btn-icon-unlink" (click)="unlinkPatient(p.id); $event.stopPropagation()"
+                                title="Desvincular">
+                                <i class="fas fa-unlink"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="empty-state" *ngIf="!caretakerData.patients?.length">
+                        <p>Nenhum paciente vinculado.</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </ng-container>
+</div>
+
+<!-- Edit Modal -->
+<app-caretaker-form-modal [visible]="showEditModal" [caretaker]="caretakerData" (close)="closeEditModal()"
+    (success)="onEditSuccess()">
+</app-caretaker-form-modal>
+
+<!-- Relation Modal -->
+<div class="modal-overlay" *ngIf="showRelationModal" (click)="closeRelationModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <h3><i class="fas fa-link"></i> Vincular Atendido</h3>
+
+        <div class="form-group">
+            <label>Selecione o Atendido</label>
+            <div *ngIf="loadingPatients" class="loading-inline"><i class="fas fa-spinner fa-spin"></i> Carregando...
+            </div>
+            <select *ngIf="!loadingPatients" [(ngModel)]="newRelationPatientId" class="form-control">
+                <option [ngValue]="null" disabled selected>Selecione...</option>
+                <option *ngFor="let p of allPatients" [ngValue]="p.id">
+                    {{ p.full_name }} (CPF: {{ p.cpf }})
+                </option>
+            </select>
+            <div *ngIf="!loadingPatients && allPatients.length === 0" class="text-hint">
+                Todos os atendidos disponíveis já estão vinculados.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Grau de Parentesco / Relação</label>
+            <select [(ngModel)]="newRelationKinship" class="form-control">
+                <option value="" disabled selected>Selecione...</option>
+                <option value="son">Filho</option>
+                <option value="daughter">Filha</option>
+                <option value="spouse">Cônjuge</option>
+                <option value="partner">Companheiro(a)</option>
+                <option value="father">Pai</option>
+                <option value="mother">Mãe</option>
+                <option value="brother">Irmão</option>
+                <option value="sister">Irmã</option>
+                <option value="grand_son">Neto</option>
+                <option value="grand_daughter">Neta</option>
+                <option value="nephew">Sobrinho</option>
+                <option value="niece">Sobrinha</option>
+                <option value="friend">Amigo(a)</option>
+                <option value="professional_caregiver">Cuidador Profissional</option>
+                <option value="other">Outro</option>
+            </select>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-cancel" (click)="closeRelationModal()">Cancelar</button>
+            <button class="btn-save" (click)="saveRelation()"
+                [disabled]="!newRelationPatientId || !newRelationKinship || savingRelation">
+                <span *ngIf="savingRelation"><i class="fas fa-spinner fa-spin"></i></span>
+                <span *ngIf="!savingRelation">Salvar</span>
+            </button>
+        </div>
+    </div>
+</div>

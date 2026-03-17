@@ -1,11 +1,82 @@
 <div>
     <app-sidebar></app-sidebar>
-    <div class="main-content container">
-        <div class="header-section">
-            <h2>Lista de Consultas</h2>
-            <button class="btn-primary" (click)="createAppointment()">
-                <i class="fas fa-plus"></i> Nova Consulta
-            </button>
+    <div class="appointment-list-container">
+        <!-- Header -->
+        <header class="patient-list-header">
+            <div class="header-top">
+                <div class="back-link" (click)="goHome()">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Voltar ao início</span>
+                </div>
+            </div>
+
+            <div class="header-main-row">
+                <div class="title-section">
+                    <h1>Gerenciamento de Consultas</h1>
+                    <p class="subtitle">Acompanhe e organize os atendimentos da clínica.</p>
+                </div>
+                <button class="btn-primary" (click)="createAppointment()">
+                    <i class="fas fa-plus"></i> Novo Atendimento
+                </button>
+            </div>
+        </header>
+
+        <!-- Filters Bar -->
+        <div class="filters-container">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Buscar por paciente..." [(ngModel)]="searchTerm"
+                    (input)="onSearch($any($event.target).value)">
+                <span class="count-badge" *ngIf="paginationMeta?.total > 0">{{ paginationMeta.total }} registros
+                    encontrados</span>
+            </div>
+
+            <div class="filters-row">
+                <div class="filter-group">
+
+                    <!-- Status Filter (Select) -->
+                    <div class="select-wrapper">
+                        <i class="fas fa-info-circle input-icon"></i>
+                        <select [(ngModel)]="statusFilter" (change)="onFilterChange()"
+                            [class.active-select]="statusFilter">
+                            <option value="" disabled selected>Status</option>
+                            <option value="">Todos</option>
+                            <option value="scheduled">Agendado</option>
+                            <option value="confirmed">Confirmado</option>
+                            <option value="completed">Concluído</option>
+                            <option value="cancelled">Cancelado</option>
+                        </select>
+                        <i class="fas fa-chevron-down select-arrow"></i>
+                    </div>
+
+                    <!-- Objective Filter (Select) -->
+                    <div class="select-wrapper">
+                        <i class="fas fa-bullseye input-icon"></i>
+                        <select [(ngModel)]="objectiveFilter" (change)="onFilterChange()"
+                            [class.active-select]="objectiveFilter">
+                            <option value="" disabled selected>Objetivo</option>
+                            <option value="">Todos</option>
+                            <option value="donation">Doação</option>
+                            <option value="project">Projeto</option>
+                            <option value="treatment">Tratamento</option>
+                            <option value="research">Pesquisa</option>
+                            <option value="other">Outro</option>
+                        </select>
+                        <i class="fas fa-chevron-down select-arrow"></i>
+                    </div>
+
+                    <!-- Date Filter (Date Input) -->
+                    <div class="date-input-wrapper" [class.active-date]="!!dateFilter">
+                        <i class="far fa-calendar input-icon"></i>
+                        <input type="date" [(ngModel)]="dateFilter" (change)="onFilterChange()" placeholder="Data">
+                    </div>
+
+                </div>
+
+                <button class="btn-clear" (click)="clearFilters()" *ngIf="hasActiveFilters()">
+                    <i class="fas fa-times"></i> Limpar Filtros
+                </button>
+            </div>
         </div>
 
         <!-- Mensagem de erro -->
@@ -14,114 +85,227 @@
             {{ errorMessage }}
         </div>
 
-        <!-- Filtros -->
-        <div class="filters-section">
-            <div class="filter-group">
-                <label for="filterStatus">Status:</label>
-                <select id="filterStatus" [(ngModel)]="filterStatus" (change)="applyFilters()">
-                    <option value="">Todos</option>
-                    <option value="pending">Pendente</option>
-                    <option value="confirmed">Confirmado</option>
-                    <option value="completed">Concluído</option>
-                    <option value="cancelled">Cancelado</option>
-                </select>
+        <!-- Content Table -->
+        <div class="table-card">
+            <div class="loading-state" *ngIf="loading">
+                <div class="spinner"></div>
             </div>
-            
-            <button class="btn-secondary" (click)="clearFilters()" *ngIf="filterStatus">
-                <i class="fas fa-times"></i> Limpar Filtros
-            </button>
-        </div>
 
-        <!-- Loading -->
-        <div class="loading-container" *ngIf="loading">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>Carregando consultas...</p>
-        </div>
-
-        <!-- Lista de consultas -->
-        <div class="appointment-list" *ngIf="!loading && appointments.length > 0">
-            <table class="table">
+            <table class="custom-table" *ngIf="!loading">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Atendido</th>
-                        <th>Data da Consulta</th>
-                        <th>Objetivo</th>
-                        <th>Status</th>
-                        <th>Observações</th>
-                        <th>Ações</th>
+                        <th (click)="onSort('id')">ID <i class="fas fa-sort" *ngIf="sortColumn !== 'id'"></i><i
+                                class="fas" [ngClass]="sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down'"
+                                *ngIf="sortColumn === 'id'"></i></th>
+                        <th>ATENDIDO</th>
+                        <th (click)="onSort('date')">DATA <i class="fas fa-sort" *ngIf="sortColumn !== 'date'"></i><i
+                                class="fas" [ngClass]="sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down'"
+                                *ngIf="sortColumn === 'date'"></i></th>
+                        <th>OBJETIVO</th>
+                        <th (click)="onSort('status')">STATUS <i class="fas fa-sort"
+                                *ngIf="sortColumn !== 'status'"></i><i class="fas"
+                                [ngClass]="sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down'"
+                                *ngIf="sortColumn === 'status'"></i></th>
+                        <th>OBSERVAÇÕES</th>
+                        <th class="text-right">AÇÕES</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let appointment of appointments" (click)="viewAppointment(appointment.id!)" class="clickable-row">
-                        <td>{{ appointment.id }}</td>
+                    <tr *ngFor="let item of appointments" (click)="viewAppointment(item.id!)">
+                        <td>#{{ item.id }}</td>
                         <td>
-                            <div class="patient-info">
-                                <i class="fas fa-user-circle"></i>
-                                {{ appointment.patient?.full_name || 'N/A' }}
+                            <div class="patient-cell">
+                                <div class="avatar-circle bg-purple">
+                                    {{ getInitials(item.patient?.full_name || '') }}
+                                </div>
+                                <div class="info">
+                                    <span class="name">{{ item.patient?.full_name || 'Atendido não identificado'
+                                        }}</span>
+                                    <span class="id">CPF: {{ formatCPF(item.patient?.cpf || '') }}</span>
+                                </div>
                             </div>
                         </td>
-                        <td>{{ formatDate(appointment.date) }}</td>
                         <td>
-                            <span class="badge badge-objective">
-                                {{ getObjectiveText(appointment.objective) }}
+                            <div class="date-cell">
+                                <i class="far fa-calendar-alt"></i>
+                                <span>{{ formatDate(item.date) }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge badge-objective" [ngClass]="getObjectiveClass(item.objective)">
+                                {{ getObjectiveText(item.objective) }}
                             </span>
                         </td>
                         <td>
-                            <span class="badge" [ngClass]="'badge-' + getStatusClass(appointment.status || '')">
-                                {{ getStatusText(appointment.status || 'pending') }}
+                            <span class="status-dot-badge" [ngClass]="getStatusClass(item.status || '')">
+                                <i class="fas fa-circle"></i>
+                                {{ getStatusText(item.status || 'pending') }}
                             </span>
                         </td>
-                        <td class="observations">{{ appointment.observations || '-' }}</td>
-                        <td class="actions">
-                            <button class="btn-icon" (click)="viewAppointment(appointment.id!); $event.stopPropagation()" title="Ver detalhes">
-                                <i class="fas fa-eye"></i>
+                        <td class="text-truncate" style="max-width: 200px;" title="{{ item.observations }}">
+                            {{ item.observations || '-' }}
+                        </td>
+                        <td class="actions-cell">
+                            <button class="btn-icon edit" (click)="onEditAppointment(item); $event.stopPropagation()">
+                                <i class="fas fa-pencil-alt"></i>
                             </button>
                         </td>
                     </tr>
                 </tbody>
             </table>
 
-            <!-- Paginação -->
-            <div class="pagination-container" *ngIf="totalPages > 1">
-                <div class="pagination-info">
-                    {{ getPaginationInfo() }}
-                </div>
-                
-                <div class="pagination">
-                    <button 
-                        class="pagination-btn" 
-                        (click)="previousPage()" 
-                        [disabled]="currentPage === 1">
+            <div class="empty-state" *ngIf="!loading && appointments.length === 0">
+                <i class="fas fa-calendar-times"></i>
+                <p>Nenhum atendimento encontrado com os filtros selecionados.</p>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-footer" *ngIf="paginationMeta && paginationMeta.last_page > 1">
+                <span class="showing-text">Mostrando {{ paginationMeta.from }}-{{ paginationMeta.to }} de {{
+                    paginationMeta.total }} registros</span>
+                <div class="pagination-controls">
+                    <button [disabled]="paginationMeta.current_page === 1"
+                        (click)="onPageChange(paginationMeta.current_page - 1)">
                         <i class="fas fa-chevron-left"></i>
                     </button>
-                    
-                    <button 
-                        *ngFor="let page of getVisiblePages()"
-                        class="pagination-btn"
-                        [class.active]="page === currentPage"
-                        (click)="goToPage(page)">
-                        {{ page }}
-                    </button>
-                    
-                    <button 
-                        class="pagination-btn" 
-                        (click)="nextPage()" 
-                        [disabled]="currentPage === totalPages">
+                    <button [disabled]="paginationMeta.current_page === paginationMeta.last_page"
+                        (click)="onPageChange(paginationMeta.current_page + 1)">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Estado vazio -->
-        <div class="empty-state" *ngIf="!loading && appointments.length === 0">
-            <i class="fas fa-calendar-times"></i>
-            <h3>Nenhuma consulta encontrada</h3>
-            <p>Não há consultas cadastradas no momento.</p>
-            <button class="btn-primary" (click)="createAppointment()">
-                <i class="fas fa-plus"></i> Criar primeira consulta
-            </button>
+    <app-appointment-details-modal [visible]="showDetailsModal" [appointment]="selectedAppointment"
+        (close)="closeDetailsModal()" (edit)="onEditAppointment($event)">
+    </app-appointment-details-modal>
+
+    <!-- ================================================== -->
+    <!-- Modal de Criação de Atendimento -->
+    <!-- ================================================== -->
+    <div class="modal-backdrop" *ngIf="showCreateModal" (click)="closeCreateModal()">
+        <div class="modal-content create-modal" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <div>
+                    <h2>Novo Atendimento</h2>
+                    <p class="modal-subtitle">Preencha os dados para registrar uma nova consulta</p>
+                </div>
+                <button class="btn-close" (click)="closeCreateModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form (ngSubmit)="submitAppointment()">
+                    <!-- Campo Atendido -->
+                    <div class="form-group">
+                        <label class="form-label">Atendido <span class="required">*</span></label>
+                        <div class="patient-selector" (click)="openPatientSearch()">
+                            <i class="fas fa-search"></i>
+                            <span *ngIf="!selectedPatient" class="placeholder">Clique para buscar um atendido</span>
+                            <span *ngIf="selectedPatient" class="selected-patient">{{ selectedPatient.full_name
+                                }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Data do Atendimento -->
+                    <div class="form-group">
+                        <label for="appointmentDate" class="form-label">Data do Atendimento <span
+                                class="required">*</span></label>
+                        <input type="date" id="appointmentDate" name="appointmentDate" class="form-control"
+                            [(ngModel)]="appointmentDate" [disabled]="submitting" required>
+                    </div>
+
+                    <!-- Objetivo -->
+                    <div class="form-group">
+                        <label for="appointmentObjective" class="form-label">Objetivo <span
+                                class="required">*</span></label>
+                        <select id="appointmentObjective" name="appointmentObjective" class="form-control"
+                            [(ngModel)]="appointmentObjective" [disabled]="submitting" required>
+                            <option value="">Selecione o objetivo</option>
+                            <option value="donation">Doação</option>
+                            <option value="project">Projeto</option>
+                            <option value="treatment">Tratamento</option>
+                            <option value="research">Pesquisa</option>
+                            <option value="other">Outro</option>
+                        </select>
+                    </div>
+
+                    <!-- Observações -->
+                    <div class="form-group">
+                        <label for="observations" class="form-label">Observações</label>
+                        <textarea id="observations" name="observations" class="form-control textarea"
+                            [(ngModel)]="observations" placeholder="Adicione observações relevantes sobre a consulta..."
+                            rows="3" [disabled]="submitting"></textarea>
+                    </div>
+
+                    <!-- Footer / Actions -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" (click)="resetForm()" [disabled]="submitting">
+                            Limpar
+                        </button>
+                        <button type="submit" class="btn-primary"
+                            [disabled]="!selectedPatient || !appointmentDate || !appointmentObjective || submitting">
+                            <i class="fas" [ngClass]="submitting ? 'fa-spinner fa-spin' : 'fa-check'"></i>
+                            {{ submitting ? 'Criando...' : 'Criar Atendimento' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
+
+    <!-- ================================================== -->
+    <!-- Modal de Busca de Atendido -->
+    <!-- ================================================== -->
+    <div class="modal-backdrop" *ngIf="showPatientSearch" (click)="closePatientSearch()">
+        <div class="modal-content search-modal" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Buscar Atendido</h2>
+                <button class="btn-close" (click)="closePatientSearch()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="search-section">
+                    <div class="search-input-group">
+                        <i class="fas fa-id-card"></i>
+                        <input type="text" [(ngModel)]="searchCpf" [ngModelOptions]="{standalone: true}"
+                            placeholder="Digite o CPF do atendido" (input)="onSearchCpfChange()"
+                            (keyup.enter)="searchPatientByCpf()" maxlength="14">
+                        <button type="button" class="btn-search-action" (click)="searchPatientByCpf()"
+                            [disabled]="searching || !searchCpf">
+                            <i class="fas" [ngClass]="searching ? 'fa-spinner fa-spin' : 'fa-search'"></i>
+                        </button>
+                    </div>
+                    <small class="hint">Formato: 000.000.000-00</small>
+                </div>
+
+                <!-- Resultado da busca -->
+                <div class="search-result" *ngIf="searchResult">
+                    <div class="patient-card" (click)="selectPatient(searchResult)">
+                        <div class="patient-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="patient-info">
+                            <h3>{{ searchResult.full_name }}</h3>
+                            <p><strong>CPF:</strong> {{ formatCPF(searchResult.cpf) }}</p>
+                            <p *ngIf="searchResult.birth_date"><strong>Data de Nascimento:</strong> {{
+                                formatDate(searchResult.birth_date) }}</p>
+                        </div>
+                        <div class="select-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estado vazio -->
+                <div class="empty-state" *ngIf="!searchResult && !searching">
+                    <i class="fas fa-search"></i>
+                    <p>Digite o CPF do atendido para iniciar a busca</p>
+                </div>
+            </div>
+        </div>
+    </div>

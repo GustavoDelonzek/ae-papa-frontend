@@ -50,4 +50,6 @@ export interface AppointmentFilters {
   date?: string;
   status?: string;
   per_page?: number;
+  search?: string;
+  objective?: string;
 }

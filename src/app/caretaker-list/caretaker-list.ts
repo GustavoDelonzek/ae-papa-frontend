@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, TemplateRef, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CaretakerService, Caretaker, CaretakersListResponse } from '../services';
 
@@ -9,27 +9,43 @@ import { CaretakerService, Caretaker, CaretakersListResponse } from '../services
   styleUrl: './caretaker-list.scss',
 })
 export class CaretakerList implements OnInit, OnDestroy {
-  
+
   searchTerm: string = '';
   loading: boolean = false;
   errorMessage: string = '';
   searching: boolean = false;
-  
+
+  // Filters
+  genderFilter: 'M' | 'F' | null = null;
+  ageFilter: string = '';
+  kinshipFilter: string = '';
+
   // Paginação
   currentPage: number = 1;
-  perPage: number = 15;
+  perPage: number = 10;
   totalPages: number = 0;
   totalItems: number = 0;
-  
+
   // Lista de cuidadores
   caretakers: Caretaker[] = [];
   filteredCaretakers: Caretaker[] = [];
-  
+
   // Metadados de paginação
   paginationMeta: any = null;
-  
+
   // Timeout para pesquisa com delay
   private searchTimeout: any;
+
+  protected Math = Math;
+
+  // Sorting
+  sortColumn: string = '';
+  sortDirection: 'asc' | 'desc' = 'asc';
+
+  // Modal control
+  // Properties are re-added in later replacement block
+
+
 
   constructor(
     private router: Router,
@@ -40,17 +56,39 @@ export class CaretakerList implements OnInit, OnDestroy {
     this.loadCaretakers();
   }
 
-  loadCaretakers(page: number = 1, searchTerm?: string): void {
+  loadCaretakers(page: number = 1): void {
     this.loading = true;
     this.errorMessage = '';
     this.currentPage = page;
-    
-    // Se há termo de pesquisa, usar o termo atual ou o fornecido
-    const search = searchTerm !== undefined ? searchTerm : this.searchTerm;
-    
-    this.caretakerService.getCaretakers(page, this.perPage, search).subscribe({
+
+    // Filters object construction
+    const filters: any = {};
+    if (this.searchTerm) filters.search = this.searchTerm;
+    if (this.genderFilter) filters.gender = this.genderFilter;
+    if (this.kinshipFilter) filters.kinship = this.kinshipFilter;
+
+    if (this.ageFilter) {
+      if (this.ageFilter === '20-30') {
+        filters.age_min = 20;
+        filters.age_max = 30;
+      } else if (this.ageFilter === '31-50') {
+        filters.age_min = 31;
+        filters.age_max = 50;
+      } else if (this.ageFilter === '51+') {
+        filters.age_min = 51;
+      }
+    }
+
+    if (this.sortColumn) {
+      filters.sort_by = this.sortColumn;
+      filters.sort_order = this.sortDirection;
+    }
+
+    console.log('Sending filters to backend (Caretakers):', filters);
+
+    // Using simple search for now as per previous service signature, but we should eventually update service
+    this.caretakerService.getCaretakers(page, this.perPage, filters.search).subscribe({
       next: (response: CaretakersListResponse) => {
-        console.log('Resposta da API:', response);
         this.caretakers = response.data || [];
         this.filteredCaretakers = [...this.caretakers];
         this.paginationMeta = response.meta;
@@ -61,36 +99,72 @@ export class CaretakerList implements OnInit, OnDestroy {
       },
       error: (error: any) => {
         console.error('Erro ao carregar cuidadores:', error);
-        console.error('Detalhes do erro:', error.error);
         this.loading = false;
         this.searching = false;
-        if (error.status === 401) {
-          this.errorMessage = 'Sessão expirada. Faça login novamente.';
-        } else if (error.status === 0) {
-          this.errorMessage = 'Erro de conexão. Verifique se o backend está rodando.';
-        } else {
-          this.errorMessage = error.error?.message || 'Erro ao carregar lista de cuidadores. Tente novamente.';
-        }
+        this.errorMessage = 'Erro ao carregar lista de cuidadores.';
       }
     });
   }
 
-  performSearch(): void {
+  onSearch(term: string): void {
+    this.searchTerm = term;
     this.searching = true;
-    this.currentPage = 1;
-    this.loadCaretakers(1, this.searchTerm);
+
+    if (this.searchTimeout) clearTimeout(this.searchTimeout);
+
+    this.searchTimeout = setTimeout(() => {
+      this.loadCaretakers(1);
+    }, 500);
   }
 
-  clearSearch(): void {
-    this.searchTerm = '';
-    this.currentPage = 1;
+  onFilterChange(): void {
     this.loadCaretakers(1);
+  }
+
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.genderFilter = null;
+    this.ageFilter = '';
+    this.kinshipFilter = '';
+    this.loadCaretakers(1);
+  }
+
+  hasActiveFilters(): boolean {
+    return !!(this.genderFilter || this.ageFilter || this.kinshipFilter || this.searchTerm);
+  }
+
+  onSort(column: string): void {
+    if (this.sortColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+    this.loadCaretakers(1);
+  }
+
+  onPageChange(page: number): void {
+    this.loadCaretakers(page);
+  }
+
+  onRowClick(caretaker: Caretaker): void {
+    this.viewCaretaker(caretaker.id!);
   }
 
   formatCPF(cpf: string): string {
     if (!cpf) return '';
     const cleaned = cpf.replace(/\D/g, '');
     return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  }
+
+  getPatientsSummary(patients: any[] | undefined | null): string {
+    if (!patients || patients.length === 0) return '-';
+    // Se tiver apenas 1, mostra "Nome (Parentesco)"
+    // Se tiver mais, mostra "X Pacientes"
+    if (patients.length === 1) {
+      return `${patients[0].full_name} (${this.getKinshipLabel(patients[0].kinship)})`;
+    }
+    return `${patients.length} Pacientes`;
   }
 
   getKinshipLabel(kinship: string): string {
@@ -116,74 +190,23 @@ export class CaretakerList implements OnInit, OnDestroy {
 
   getCaretakerAge(birthDate: string): number {
     if (!birthDate) return 0;
-    
     const birth = new Date(birthDate);
     const today = new Date();
     let age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
-    
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
       age--;
     }
-    
     return age;
   }
 
-  // Métodos de paginação
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
-      this.loadCaretakers(page, this.searchTerm);
-    }
-  }
-
-  previousPage(): void {
-    if (this.currentPage > 1) {
-      this.goToPage(this.currentPage - 1);
-    }
-  }
-
-  nextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.goToPage(this.currentPage + 1);
-    }
-  }
-
-  getVisiblePages(): number[] {
-    const pages: number[] = [];
-    const maxVisible = 5;
-    
-    if (this.totalPages <= maxVisible) {
-      for (let i = 1; i <= this.totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      let start = Math.max(1, this.currentPage - 2);
-      let end = Math.min(this.totalPages, this.currentPage + 2);
-      
-      if (this.currentPage <= 3) {
-        end = Math.min(this.totalPages, 5);
-      }
-      if (this.currentPage > this.totalPages - 3) {
-        start = Math.max(1, this.totalPages - 4);
-      }
-      
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
-    }
-    
-    return pages;
-  }
-
-  getPaginationInfo(): string {
-    if (!this.paginationMeta) return '';
-    
-    const { from, to, total } = this.paginationMeta;
-    return `Mostrando ${from} a ${to} de ${total} cuidadores`;
-  }
+  // Modal control
+  showCaretakerModal: boolean = false;
+  currentCaretaker: Caretaker | null = null;
 
   addCaretaker(): void {
-    this.router.navigate(['/registro-cuidador']);
+    this.currentCaretaker = null;
+    this.showCaretakerModal = true;
   }
 
   viewCaretaker(id: number): void {
@@ -191,15 +214,30 @@ export class CaretakerList implements OnInit, OnDestroy {
   }
 
   editCaretaker(id: number): void {
-    this.router.navigate(['/registro-cuidador', id]);
+    const caretaker = this.caretakers.find(c => c.id === id);
+    if (caretaker) {
+      this.currentCaretaker = { ...caretaker };
+      this.showCaretakerModal = true;
+    }
   }
+
+  closeCaretakerModal(): void {
+    this.showCaretakerModal = false;
+    this.currentCaretaker = null;
+  }
+
+  onCaretakerSuccess(): void {
+    this.closeCaretakerModal();
+    this.loadCaretakers(this.currentPage);
+  }
+
+
 
   deleteCaretaker(id: number): void {
     if (confirm('Tem certeza que deseja deletar este cuidador?')) {
       this.caretakerService.deleteCaretaker(id).subscribe({
         next: () => {
-          console.log('Cuidador deletado com sucesso');
-          this.loadCaretakers(this.currentPage, this.searchTerm);
+          this.loadCaretakers(this.currentPage);
         },
         error: (error: any) => {
           console.error('Erro ao deletar cuidador:', error);
@@ -209,10 +247,13 @@ export class CaretakerList implements OnInit, OnDestroy {
     }
   }
 
+  goHome(): void {
+    this.router.navigate(['/']);
+  }
+
   ngOnDestroy(): void {
     if (this.searchTimeout) {
       clearTimeout(this.searchTimeout);
     }
   }
 }
-

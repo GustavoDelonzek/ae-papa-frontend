@@ -1,0 +1,228 @@
+<div class="modal-overlay" *ngIf="visible" (click)="onClose()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+
+        <div class="modal-body-container">
+            <!-- Left Sidebar -->
+            <div class="modal-sidebar">
+                <div class="sidebar-header">
+                    <div class="header-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3>Registro</h3>
+                    <p>{{ isEditing ? 'Edição de atendido' : 'Novo cadastro de paciente' }}</p>
+                </div>
+
+                <div class="stepper">
+                    <div class="step-item" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <span class="step-title">Identificação</span>
+                            <span class="step-desc">Dados pessoais</span>
+                        </div>
+                    </div>
+
+                    <div class="step-item" [class.active]="currentStep === 2" [class.completed]="currentStep > 2">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <span class="step-title">Contato</span>
+                            <span class="step-desc">Telefone e E-mail</span>
+                        </div>
+                    </div>
+
+                    <div class="step-item" [class.active]="currentStep === 3">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <span class="step-title">Endereço</span>
+                            <span class="step-desc">Localização</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="system-tip">
+                    <h4>Dica do Sistema</h4>
+                    <p>Mantenha o CPF em mãos para validação automática com a base de dados.</p>
+                </div>
+            </div>
+
+            <!-- Right Content -->
+            <div class="modal-main">
+                <div class="main-header">
+                    <h2>{{ isEditing ? 'Editar Atendido' : 'Novo Atendido' }}</h2>
+                    <button class="btn-close" (click)="onClose()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="main-body">
+                    <form #createForm="ngForm">
+
+                        <!-- STEP 1: Identification -->
+                        <div class="step-content-container" *ngIf="currentStep === 1">
+                            <div class="form-group">
+                                <label>Nome Completo <span class="required">*</span></label>
+                                <input type="text" name="full_name" class="form-control"
+                                    [(ngModel)]="currentPatient.full_name" required placeholder="Nome do atendido">
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Data de Nascimento <span class="required">*</span></label>
+                                    <input type="date" name="birth_date" class="form-control"
+                                        [(ngModel)]="currentPatient.birth_date" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Gênero <span class="required">*</span></label>
+                                    <select name="gender" class="form-control" [(ngModel)]="currentPatient.gender"
+                                        required>
+                                        <option value="" disabled>Selecione...</option>
+                                        <option value="M">Masculino</option>
+                                        <option value="F">Feminino</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>CPF <span class="required">*</span></label>
+                                    <input type="text" name="cpf" class="form-control" [(ngModel)]="currentPatient.cpf"
+                                        required mask="000.000.000-00" placeholder="000.000.000-00">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>RG</label>
+                                    <input type="text" name="rg" class="form-control" [(ngModel)]="currentPatient.rg"
+                                        placeholder="Opcional">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Estado Civil <span class="required">*</span></label>
+                                <select name="marital_status" class="form-control"
+                                    [(ngModel)]="currentPatient.marital_status" required>
+                                    <option value="" disabled>Selecione...</option>
+                                    <option value="single">Solteiro(a)</option>
+                                    <option value="married">Casado(a)</option>
+                                    <option value="divorced">Divorciado(a)</option>
+                                    <option value="widowed">Viúvo(a)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- STEP 2: Contacts -->
+                        <div class="step-content-container" *ngIf="currentStep === 2">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Tipo <span class="required">*</span></label>
+                                    <select class="form-control" [(ngModel)]="newContact.type" name="contactType"
+                                        required>
+                                        <option value="phone">Telefone</option>
+                                        <option value="email">E-mail</option>
+                                        <option value="whatsapp">WhatsApp</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="flex: 2;">
+                                    <label>Contato <span class="required">*</span></label>
+                                    <input type="text" class="form-control" [(ngModel)]="newContact.value"
+                                        name="contactValue" placeholder="Ex: (00) 00000-0000" required>
+                                </div>
+                            </div>
+
+                            <div
+                                style="margin-top: 16px; padding: 12px; background-color: #f3f4f6; border-radius: 6px; font-size: 13px; color: #4b5563; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-info-circle" style="color: #5b2fa8;"></i>
+                                <span>Este contato será definido como <strong>Principal</strong>.</span>
+                            </div>
+                        </div>
+
+                        <!-- STEP 3: Addresses -->
+                        <div class="step-content-container" *ngIf="currentStep === 3">
+                            <div class="contact-actions">
+                                <h4>Adicionar Endereço</h4>
+                                <div class="form-row">
+                                    <div class="form-group" style="flex: 0 0 120px;">
+                                        <label>CEP</label>
+                                        <input type="text" class="form-control" [(ngModel)]="newAddress.cep"
+                                            name="addrCep" mask="00000-000">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Cidade</label>
+                                        <input type="text" class="form-control" [(ngModel)]="newAddress.city"
+                                            name="addrCity">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group" style="flex: 2;">
+                                        <label>Logradouro</label>
+                                        <input type="text" class="form-control" [(ngModel)]="newAddress.street"
+                                            name="addrStreet">
+                                    </div>
+                                    <div class="form-group" style="flex: 0 0 80px;">
+                                        <label>Número</label>
+                                        <input type="text" class="form-control" [(ngModel)]="newAddress.number"
+                                            name="addrNumber">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Bairro</label>
+                                        <input type="text" class="form-control" [(ngModel)]="newAddress.neighborhood"
+                                            name="addrNeighborhood">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Comp./Ref.</label>
+                                        <input type="text" class="form-control" [(ngModel)]="newAddress.reference_point"
+                                            name="addrRef">
+                                    </div>
+                                </div>
+                                <div style="display: flex; justify-content: flex-end;">
+                                    <button type="button" class="btn-add" (click)="addAddress()"
+                                        [disabled]="!newAddress.street">
+                                        Adicionar Endereço
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="contacts-list">
+                                <div class="contact-item" *ngFor="let addr of addressesList; let i = index">
+                                    <div class="contact-info"
+                                        style="flex-direction: column; align-items: flex-start; gap: 4px;">
+                                        <span class="contact-value" style="font-size: 0.95rem;">{{ addr.street }}, {{
+                                            addr.number }}</span>
+                                        <span style="font-size: 0.85rem; color: #6b7280;">{{ addr.neighborhood }} - {{
+                                            addr.city }} ({{ addr.cep }})</span>
+                                    </div>
+                                    <button type="button" class="btn-remove" (click)="removeAddress(i)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                <div class="empty-contacts" *ngIf="addressesList.length === 0">
+                                    Nenhum endereço adicionado.
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+
+                    <div class="alert-error" *ngIf="errorMessage">
+                        <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+                    </div>
+                </div>
+
+                <div class="main-footer">
+                    <button type="button" class="btn-cancel" (click)="onClose()">Cancelar</button>
+
+                    <button type="button" class="btn-submit" *ngIf="currentStep < 3" (click)="nextStep()">
+                        Próximo <i class="fas fa-arrow-right"></i>
+                    </button>
+
+                    <button type="button" class="btn-submit" *ngIf="currentStep === 3" (click)="save()"
+                        [disabled]="isSaving">
+                        <span *ngIf="!isSaving">{{ isEditing ? 'Atualizar' : 'Salvar' }}</span>
+                        <span *ngIf="isSaving"><i class="fas fa-spinner fa-spin"></i></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

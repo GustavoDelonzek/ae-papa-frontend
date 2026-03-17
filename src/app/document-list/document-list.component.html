@@ -1,139 +1,126 @@
 <div class="documents-container">
-  <!-- Header com filtros -->
-  <div class="documents-header">
-    <div class="filters-section">
-      <div class="search-box">
-        <i class="fas fa-search"></i>
-        <input 
-          type="text" 
-          [(ngModel)]="searchTerm" 
-          placeholder="Buscar por nome do arquivo..."
-          (keyup.enter)="applyFilters()">
-      </div>
 
-      <div class="filter-group">
-        <select [(ngModel)]="statusFilter" (change)="applyFilters()">
-          <option value="">Todos os status</option>
-          <option value="uploaded">Enviado</option>
-          <option value="pending">Pendente</option>
-          <option value="failed">Falhou</option>
-        </select>
-      </div>
+  <!-- Filter Bar -->
+  <div class="documents-filter-bar">
+    <div class="search-input-wrapper">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="Buscar documento..." [(ngModel)]="searchTerm" (keyup.enter)="applyFilters()">
+    </div>
 
-      <button class="btn-filter" (click)="applyFilters()">
-        <i class="fas fa-filter"></i> Filtrar
-      </button>
+    <div class="filter-dropdown">
+      <i class="far fa-file-alt"></i>
+      <select [(ngModel)]="selectedType" (change)="applyFilters()">
+        <option value="" disabled selected hidden>Tipo</option>
+        <option value="">Todos</option>
+        <option value="pdf">PDF</option>
+        <option value="docx">DOCX</option>
+        <option value="jpg">Imagem</option>
+      </select>
+      <i class="fas fa-chevron-down chevron"></i>
+    </div>
 
-      <button class="btn-clear" (click)="clearFilters()" *ngIf="statusFilter || searchTerm">
-        <i class="fas fa-times"></i> Limpar
-      </button>
+    <div class="filter-dropdown">
+      <i class="fas fa-filter"></i>
+      <select [(ngModel)]="statusFilter" (change)="applyFilters()">
+        <option value="" disabled selected hidden>Status</option>
+        <option value="">Todos</option>
+        <option value="completed">Enviado</option>
+        <option value="pending">Pendente</option>
+        <option value="failed">Falhou</option>
+      </select>
+      <i class="fas fa-chevron-down chevron"></i>
+    </div>
+
+    <div class="date-range-picker">
+      <i class="far fa-calendar"></i>
+      <span>De - Até</span>
     </div>
 
     <button class="btn-upload" (click)="uploadNewDocument()">
-      <i class="fas fa-upload"></i> Upload
+      <i class="fas fa-cloud-upload-alt"></i> Upload
     </button>
   </div>
 
-  <!-- Loading state -->
+  <!-- Loading State -->
   <div class="loading-container" *ngIf="loading">
     <div class="loading-spinner"></div>
     <p>Carregando documentos...</p>
   </div>
 
-  <!-- Error state -->
+  <!-- Error State -->
   <div class="error-container" *ngIf="errorMessage && !loading">
     <i class="fas fa-exclamation-circle"></i>
     <p>{{ errorMessage }}</p>
-    <button class="btn-retry" (click)="loadDocuments()">
-      <i class="fas fa-redo"></i> Tentar novamente
-    </button>
+    <button class="btn-retry" (click)="loadDocuments()">Tentar novamente</button>
   </div>
 
-  <!-- Documents list -->
-  <div class="documents-list" *ngIf="!loading && !errorMessage && documents.length > 0">
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading && !errorMessage && documents.length === 0">
+    <i class="far fa-folder-open"></i>
+    <p>Nenhum documento encontrado.</p>
+  </div>
+
+  <!-- Document List -->
+  <div class="document-list-container" *ngIf="!loading && !errorMessage && documents.length > 0">
     <div class="document-card" *ngFor="let doc of documents">
-      <div class="document-icon">
-        <i class="fas" [ngClass]="getFileIcon(doc.mime_type)"></i>
-      </div>
-
-      <div class="document-info">
-        <div class="document-name">{{ doc.file_name }}</div>
-        <div class="document-meta">
-          <span class="meta-item">
-            <i class="fas fa-calendar"></i>
-            {{ formatDate(doc.created_at) }}
-          </span>
-          <span class="meta-item" *ngIf="doc.document_type">
-            <i class="fas fa-tag"></i>
-            {{ doc.document_type }}
-          </span>
-        </div>
-        <div class="document-description" *ngIf="doc.description">
-          {{ doc.description }}
+      <!-- Icon -->
+      <div class="doc-icon-wrapper">
+        <div class="file-icon" [ngClass]="getFileTypeClass(doc.mime_type)">
+          <span class="ext">{{ getFileExtension(doc.file_name) }}</span>
+          <i class="fas" [ngClass]="getFileIcon(doc.mime_type)"></i>
         </div>
       </div>
 
-      <div class="document-status">
+      <!-- Info -->
+      <div class="doc-info">
+        <div class="doc-header">
+          <h3>{{ doc.file_name }}</h3>
+        </div>
+        <div class="doc-meta">
+          <span class="meta-item"><i class="far fa-calendar"></i> {{ formatDate(doc.created_at) }}</span>
+          <span class="meta-item" *ngIf="doc.document_type"><i class="fas fa-tag"></i> {{ doc.document_type }}</span>
+          <span class="meta-item author" *ngIf="doc.description">{{ doc.description }}</span>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="doc-status">
         <span class="status-badge" [ngClass]="getStatusClass(doc.status)">
-          {{ getStatusText(doc.status) }}
+          {{ getStatusText(doc.status) | uppercase }}
         </span>
       </div>
 
-      <div class="document-actions">
-        <button 
-          class="btn-action" 
-          (click)="openDocument(doc)" 
-          title="Visualizar"
-          [disabled]="doc.status !== 'uploaded'">
-          <i class="fas fa-eye"></i>
+      <!-- Actions -->
+      <div class="doc-actions">
+        <button class="action-btn view" (click)="openDocument(doc)" [disabled]="doc.status !== 'completed'">
+          <i class="far fa-eye"></i>
         </button>
-        <button 
-          class="btn-action" 
-          (click)="downloadDocument(doc)" 
-          title="Baixar"
-          [disabled]="doc.status !== 'uploaded'">
-          <i class="fas fa-download"></i>
-        </button>
-        <button 
-          class="btn-action btn-delete" 
-          (click)="deleteDocument(doc)" 
-          title="Excluir">
-          <i class="fas fa-trash"></i>
+        <button class="action-btn delete" (click)="deleteDocument(doc)">
+          <i class="far fa-trash-alt"></i>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Empty state -->
-  <div class="empty-state" *ngIf="!loading && !errorMessage && documents.length === 0">
-    <i class="fas fa-folder-open"></i>
-    <h3>Nenhum documento encontrado</h3>
-    <p *ngIf="statusFilter || searchTerm">Tente ajustar os filtros ou fazer uma nova busca</p>
-    <p *ngIf="!statusFilter && !searchTerm">Ainda não há documentos para este paciente</p>
-    <button class="btn-upload-large" (click)="uploadNewDocument()">
-      <i class="fas fa-upload"></i> Fazer primeiro upload
-    </button>
-  </div>
-
   <!-- Pagination -->
-  <div class="pagination" *ngIf="!loading && documents.length > 0 && lastPage > 1">
-    <div class="pagination-info">
-      Mostrando {{ documents.length }} de {{ total }} documentos
-    </div>
+  <div class="pagination-container" *ngIf="!loading && documents.length > 0 && lastPage > 1">
+    <span class="pagination-info">Mostrando {{ documents.length }} de {{ total }} documentos</span>
     <div class="pagination-controls">
-      <button 
-        class="btn-page" 
-        (click)="currentPage > 1 && loadDocuments()" 
-        [disabled]="currentPage === 1">
+      <button class="page-btn prev" [disabled]="currentPage === 1" (click)="loadDocuments(currentPage - 1)">
         <i class="fas fa-chevron-left"></i>
       </button>
-      <span class="page-info">Página {{ currentPage }} de {{ lastPage }}</span>
-      <button 
-        class="btn-page" 
-        (click)="currentPage < lastPage && loadDocuments()" 
-        [disabled]="currentPage === lastPage">
+
+      <div class="page-list">
+        <button *ngFor="let page of getVisiblePages()" class="page-num" [class.active]="page === currentPage"
+          (click)="loadDocuments(page)">
+          {{ page }}
+        </button>
+      </div>
+
+      <button class="page-btn next" [disabled]="currentPage === lastPage" (click)="loadDocuments(currentPage + 1)">
         <i class="fas fa-chevron-right"></i>
       </button>
     </div>
   </div>
+
 </div>
