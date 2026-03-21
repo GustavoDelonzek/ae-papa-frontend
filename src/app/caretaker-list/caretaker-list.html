@@ -173,6 +173,6 @@
 <!-- Modal logic typically would be here, assuming app-caretaker-register-modal exists or similar -->
 <!-- For now retaining existing logic structure but ensuring UI wrapper is correct -->
 
-<app-caretaker-register *ngIf="showCaretakerModal" [visible]="showCaretakerModal" [caretakerToEdit]="currentCaretaker"
-  (close)="closeCaretakerModal()" (save)="onCaretakerSuccess()">
-</app-caretaker-register>
+<app-caretaker-form-modal *ngIf="showCaretakerModal" [visible]="showCaretakerModal" [caretaker]="currentCaretaker"
+  (close)="closeCaretakerModal()" (success)="onCaretakerSuccess()">
+</app-caretaker-form-modal>

@@ -135,9 +135,24 @@ export class ApointmentCreate {
     this.errorMessage = '';
     this.successMessage = '';
 
-    // Converter data do formato YYYY-MM-DD para MM-DD-YYYY
-    const [year, month, day] = this.appointmentDate.split('-');
-    const formattedDate = `${month}-${day}-${year}`;
+    // Converter a data suportando string ou objeto Date do Material UI
+    let formattedDate = '';
+    const aptDate = this.appointmentDate as any;
+    if (aptDate instanceof Date) {
+        const year = aptDate.getFullYear();
+        const month = String(aptDate.getMonth() + 1).padStart(2, '0');
+        const day = String(aptDate.getDate()).padStart(2, '0');
+        formattedDate = `${month}-${day}-${year}`;
+    } else if (typeof aptDate === 'string') {
+        const dateParts = aptDate.split('T')[0].split('-');
+        if (dateParts.length === 3 && dateParts[0].length === 4) {
+            formattedDate = `${dateParts[1]}-${dateParts[2]}-${dateParts[0]}`;
+        } else {
+            formattedDate = aptDate;
+        }
+    } else {
+        formattedDate = String(aptDate);
+    }
 
     const appointmentData: AppointmentCreate = {
       patient_id: this.selectedPatient.id!,

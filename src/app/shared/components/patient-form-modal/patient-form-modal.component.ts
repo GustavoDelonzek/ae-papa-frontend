@@ -391,10 +391,22 @@ export class PatientFormModalComponent implements OnInit {
         return true;
     }
 
-    formatDateForAPI(date: string): string {
+    formatDateForAPI(date: any): string {
         if (!date) return '';
-        const [year, month, day] = date.split('-');
-        return `${month}-${day}-${year}`;
+        if (date instanceof Date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${month}-${day}-${year}`;
+        }
+        if (typeof date === 'string') {
+            const parts = date.split('T')[0].split('-');
+            if (parts.length === 3 && parts[0].length === 4) {
+                return `${parts[1]}-${parts[2]}-${parts[0]}`;
+            }
+            return date;
+        }
+        return String(date);
     }
 
     handleValidationErrors(errors: any): void {

@@ -1,8 +1,17 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { Router } from '@angular/router';
+
+// Angular Material Modules
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
 
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
@@ -21,7 +30,6 @@ import { AuthGuard } from './guards/auth.guard';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { appInitializerFactory } from './core/app-initializer';
 import { CaretakerList } from './caretaker-list/caretaker-list';
-import { CaretakerRegister } from './caretaker-register/caretaker-register';
 import { ApointmentCreate } from './apointment-create/apointment-create';
 import { ApointmentList } from './apointment-list/apointment-list';
 import { UserRegister } from './user-register/user-register';
@@ -44,7 +52,6 @@ import { ToastComponent } from './shared/components/toast/toast.component';
     PatientComponent,
     PatientListComponent,
     CaretakerList,
-    CaretakerRegister,
     ApointmentCreate,
     ApointmentList,
     UserRegister,
@@ -58,9 +65,15 @@ import { ToastComponent } from './shared/components/toast/toast.component';
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
     DocumentListComponent,
     DocumentUploadComponent,
     AppointmentDetailsModalComponent
@@ -78,7 +91,8 @@ import { ToastComponent } from './shared/components/toast/toast.component';
       useFactory: appInitializerFactory,
       deps: [AuthService, Router],
       multi: true
-    }
+    },
+    { provide: MAT_DATE_LOCALE, useValue: 'pt-BR' }
   ],
   bootstrap: [App]
 })

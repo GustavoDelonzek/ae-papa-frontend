@@ -85,6 +85,8 @@ export class PatientService {
 
     // Map frontend filters to standardized backend query params
     if (filters.search) params = params.set('search', filters.search.trim());
+    if (filters.cpf) params = params.set('cpf', filters.cpf.trim());
+    if (filters.full_name) params = params.set('full_name', filters.full_name.trim());
     if (filters.gender) params = params.set('gender', filters.gender);
     if (filters.ageFilter) {
       params = params.set('ageFilter', filters.ageFilter);

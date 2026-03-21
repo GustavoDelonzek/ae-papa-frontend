@@ -1744,3 +1744,108 @@ $danger-color: #ef4444;
     }
   }
 }
+
+// ==========================================
+// Ported Appointment Filters
+// ==========================================
+.filters-container {
+  background: white;
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+  margin-bottom: 1.5rem;
+
+  .filters-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    .filter-group {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+      flex: 1;
+    }
+
+    // Custom Select Wrapper
+    .select-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+
+      select {
+        appearance: none;
+        background: white;
+        border: 1px solid #e5e7eb;
+        padding: 0 2rem 0 2.2rem;
+        border-radius: 999px;
+        font-size: 0.9rem;
+        height: 40px;
+        color: #1f2937;
+        outline: none;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.2s;
+
+        &:hover {
+          background: #f9fafb;
+          border-color: #d1d5db;
+        }
+
+        &.active-select {
+          background: #f3e5f5;
+          border-color: #f3e5f5;
+          color: #6a307d;
+          font-weight: 500;
+        }
+      }
+
+      .input-icon {
+        position: absolute;
+        left: 1rem;
+        color: #6b7280;
+        font-size: 0.9rem;
+        pointer-events: none;
+      }
+
+      .select-arrow {
+        position: absolute;
+        right: 1rem;
+        color: #6b7280;
+        font-size: 0.8rem;
+        pointer-events: none;
+      }
+    }
+
+    .btn-clear {
+      background: none;
+      border: 1px solid #e5e7eb;
+      background-color: white;
+      padding: 0 1rem;
+      height: 40px;
+      border-radius: 8px;
+      color: #6b7280;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-left: auto;
+      font-weight: 500;
+      transition: all 0.2s;
+
+      &:hover {
+        color: #ef4444;
+        border-color: #ef4444;
+        background-color: #fef2f2;
+      }
+    }
+  }
+}

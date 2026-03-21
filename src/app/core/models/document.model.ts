@@ -21,6 +21,8 @@ export interface DocumentFilters {
   name?: string;
   per_page?: number;
   page?: number;
+  start_date?: string;
+  end_date?: string;
 }
 
 export interface DocumentUpload {

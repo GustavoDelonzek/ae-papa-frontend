@@ -122,7 +122,10 @@
                 </ng-container>
               </ng-container>
               <ng-template #noContacts>
-                <div class="empty-state-small">Nenhum contato.</div>
+                <div class="empty-state-box">
+                  <i class="fas fa-address-book"></i>
+                  <p>Nenhum contato registrado.</p>
+                </div>
               </ng-template>
             </div>
           </section>
@@ -143,7 +146,10 @@
                 </div>
               </ng-container>
               <ng-template #noAddresses>
-                <div class="empty-state-small">Nenhum endereço.</div>
+                <div class="empty-state-box">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <p>Nenhum endereço registrado.</p>
+                </div>
               </ng-template>
             </div>
           </section>
@@ -203,9 +209,9 @@
               </div>
             </div>
           </div>
-          <div class="empty-state-small" *ngIf="!patientData?.socioeconomic_profile"
-            style="background: #F3F4F6; padding: 1.5rem; text-align: center; border-radius: 8px;">
-            <p style="color: #6B7280; font-style: italic;">Nenhum dado socioeconômico registrado.</p>
+          <div class="empty-state-box" *ngIf="!patientData?.socioeconomic_profile">
+            <i class="fas fa-hand-holding-usd"></i>
+            <p>Nenhum dado socioeconômico registrado.</p>
           </div>
         </section>
 
@@ -216,7 +222,7 @@
 
       <!-- DOCUMENTOS TAB -->
       <div *ngIf="activeTab === 'documentos'" class="documents-tab fade-in">
-        <app-document-list [patientId]="patientId" (onUploadClick)="addDocument()">
+        <app-document-list #docList [patientId]="patientId" (onUploadClick)="addDocument()">
         </app-document-list>
       </div>
 
@@ -229,17 +235,70 @@
           </button>
         </div>
 
+        <!-- Caretaker Filters Bar -->
+        <div class="filters-container">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <!-- Gender Filter -->
+                    <div class="select-wrapper">
+                        <i class="far fa-user-circle input-icon"></i>
+                        <select [(ngModel)]="caretakerGenderFilter" (change)="onCaretakerFilterChange()"
+                            [class.active-select]="caretakerGenderFilter">
+                            <option value="" disabled selected>Gênero</option>
+                            <option value="">Todos</option>
+                            <option value="M">Masculino</option>
+                            <option value="F">Feminino</option>
+                        </select>
+                        <i class="fas fa-chevron-down select-arrow"></i>
+                    </div>
+
+                    <!-- Age Filter -->
+                    <div class="select-wrapper">
+                        <i class="fas fa-birthday-cake input-icon"></i>
+                        <select [(ngModel)]="caretakerAgeFilter" (change)="onCaretakerFilterChange()"
+                            [class.active-select]="caretakerAgeFilter">
+                            <option value="" disabled selected>Faixa Etária</option>
+                            <option value="">Todas</option>
+                            <option value="20-30">20 - 30 anos</option>
+                            <option value="31-50">31 - 50 anos</option>
+                            <option value="51+">51+ anos</option>
+                        </select>
+                        <i class="fas fa-chevron-down select-arrow"></i>
+                    </div>
+
+                    <!-- Kinship Filter -->
+                    <div class="select-wrapper">
+                        <i class="fas fa-users input-icon"></i>
+                        <select [(ngModel)]="caretakerKinshipFilter" (change)="onCaretakerFilterChange()"
+                            [class.active-select]="caretakerKinshipFilter">
+                            <option value="" disabled selected>Parentesco</option>
+                            <option value="">Todos</option>
+                            <option value="son">Filho(a)</option>
+                            <option value="spouse">Cônjuge</option>
+                            <option value="professional_caregiver">Profissional</option>
+                            <option value="other">Outro</option>
+                        </select>
+                        <i class="fas fa-chevron-down select-arrow"></i>
+                    </div>
+                </div>
+
+                <button class="btn-clear" (click)="clearCaretakerFilters()" *ngIf="hasActiveCaretakerFilters()">
+                    <i class="fas fa-times"></i> Limpar Filtros
+                </button>
+            </div>
+        </div>
+
         <div class="loading-state" *ngIf="loadingCaretakers">
           <div class="spinner"></div>
         </div>
 
-        <div class="empty-state" *ngIf="!loadingCaretakers && caretakers.length === 0">
+        <div class="empty-state-box" *ngIf="!loadingCaretakers && filteredCaretakers.length === 0">
           <i class="fas fa-user-nurse"></i>
           <p>Nenhum cuidador vinculado.</p>
         </div>
 
-        <div class="caretaker-grid" *ngIf="!loadingCaretakers && caretakers.length > 0">
-          <div class="caretaker-card-new" *ngFor="let caretaker of caretakers" (click)="viewCaretaker(caretaker.id!)">
+        <div class="caretaker-grid" *ngIf="!loadingCaretakers && filteredCaretakers.length > 0">
+          <div class="caretaker-card-new" *ngFor="let caretaker of filteredCaretakers" (click)="viewCaretaker(caretaker.id!)">
             <div class="card-header">
               <div class="avatar-circle"
                 [ngClass]="{'familiar': caretaker.kinship !== 'professional_caregiver', 'prof': caretaker.kinship === 'professional_caregiver'}">
@@ -289,11 +348,62 @@
           </button>
         </div>
 
+        <!-- Filters Bar -->
+        <div class="filters-container">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <!-- Status Filter -->
+                    <div class="select-wrapper">
+                        <i class="fas fa-info-circle input-icon"></i>
+                        <select [(ngModel)]="statusFilter" (change)="onFilterChange()"
+                            [class.active-select]="statusFilter">
+                            <option value="" disabled selected>Status</option>
+                            <option value="">Todos</option>
+                            <option value="scheduled">Agendado</option>
+                            <option value="confirmed">Confirmado</option>
+                            <option value="completed">Concluído</option>
+                            <option value="cancelled">Cancelado</option>
+                        </select>
+                        <i class="fas fa-chevron-down select-arrow"></i>
+                    </div>
+
+                    <!-- Objective Filter -->
+                    <div class="select-wrapper">
+                        <i class="fas fa-bullseye input-icon"></i>
+                        <select [(ngModel)]="objectiveFilter" (change)="onFilterChange()"
+                            [class.active-select]="objectiveFilter">
+                            <option value="" disabled selected>Objetivo</option>
+                            <option value="">Todos</option>
+                            <option value="donation">Doação</option>
+                            <option value="project">Projeto</option>
+                            <option value="treatment">Tratamento</option>
+                            <option value="research">Pesquisa</option>
+                            <option value="other">Outro</option>
+                        </select>
+                        <i class="fas fa-chevron-down select-arrow"></i>
+                    </div>
+
+                    <!-- Date Filter -->
+                    <div class="date-input-wrapper custom-date-picker-wrapper" [class.active-date]="!!dateFilter">
+                        <mat-form-field class="custom-mat-form-field">
+                            <input matInput [matDatepicker]="pickerPatientApptFilter" [(ngModel)]="dateFilter" (dateChange)="onFilterChange()" placeholder="Data">
+                            <mat-datepicker-toggle matIconSuffix [for]="pickerPatientApptFilter"></mat-datepicker-toggle>
+                            <mat-datepicker #pickerPatientApptFilter></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <button class="btn-clear" (click)="clearFilters()" *ngIf="hasActiveFilters()">
+                    <i class="fas fa-times"></i> Limpar Filtros
+                </button>
+            </div>
+        </div>
+
         <div class="loading-state" *ngIf="loadingAppointments">
           <div class="spinner"></div>
         </div>
 
-        <div class="empty-state" *ngIf="!loadingAppointments && appointments.length === 0">
+        <div class="empty-state-box" *ngIf="!loadingAppointments && appointments.length === 0">
           <i class="fas fa-calendar-check"></i>
           <p>Nenhuma consulta registrada.</p>
         </div>

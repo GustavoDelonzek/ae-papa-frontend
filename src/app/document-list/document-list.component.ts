@@ -1,29 +1,52 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subject, Subscription, timer } from 'rxjs';
+import { switchMap, takeUntil } from 'rxjs/operators';
 import { Document } from '../core/models/document.model';
 import { DocumentService } from '../services/document.service';
+
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-document-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule, 
+    FormsModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatNativeDateModule,
+    MatInputModule,
+    MatIconModule
+  ],
   templateUrl: './document-list.component.html',
   styleUrls: ['./document-list.component.scss']
 })
-export class DocumentListComponent implements OnInit {
+export class DocumentListComponent implements OnInit, OnDestroy {
   @Input() patientId!: number;
   @Output() onUploadClick = new EventEmitter<void>();
 
   documents: Document[] = [];
   loading = false;
   errorMessage = '';
+  
+  // Smart Polling
+  private destroy$ = new Subject<void>();
+  private pollingSubscription?: Subscription;
+  private isPollingActive = false;
 
   // Filtros
   statusFilter: '' | 'pending' | 'completed' | 'failed' = '';
 
   selectedType: string = '';
   searchTerm = '';
+  startDate: string = '';
+  endDate: string = '';
 
   // Paginação
   currentPage = 1;
@@ -37,35 +60,73 @@ export class DocumentListComponent implements OnInit {
     this.loadDocuments();
   }
 
-  loadDocuments(page: number = 1): void {
-    this.loading = true;
-    this.errorMessage = '';
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.stopPolling();
+  }
 
-    const filters = {
+  trackById(index: number, doc: Document): number | undefined {
+    return doc.id;
+  }
+
+  private formatDateForApi(date: any): string {
+    if (!date) return '';
+    if (typeof date === 'string') return date;
+    if (date instanceof Date) {
+      const d = new Date(date);
+      let month = '' + (d.getMonth() + 1);
+      let day = '' + d.getDate();
+      const year = d.getFullYear();
+
+      if (month.length < 2) month = '0' + month;
+      if (day.length < 2) day = '0' + day;
+
+      return [year, month, day].join('-');
+    }
+    return '';
+  }
+
+  private getFilters(page: number) {
+    const formattedStartDate = this.formatDateForApi(this.startDate);
+    const formattedEndDate = this.formatDateForApi(this.endDate);
+
+    return {
       patient_id: this.patientId,
       per_page: this.perPage,
       page: page,
       ...(this.statusFilter && { status: this.statusFilter }),
-      ...(this.searchTerm && { name: this.searchTerm })
+      ...(this.searchTerm && { name: this.searchTerm }),
+      ...(this.selectedType && { document_type: this.selectedType }),
+      ...(formattedStartDate && { start_date: formattedStartDate }),
+      ...(formattedEndDate && { end_date: formattedEndDate })
     };
+  }
 
-    this.documentService.listDocuments(filters).subscribe({
+  private processResponse(response: any): void {
+    this.documents = response.data;
+    if (response.meta) {
+      this.currentPage = response.meta.current_page;
+      this.lastPage = response.meta.last_page;
+      this.perPage = response.meta.per_page;
+      this.total = response.meta.total;
+    } else {
+      this.currentPage = response.current_page;
+      this.lastPage = response.last_page;
+      this.perPage = response.per_page;
+      this.total = response.total;
+    }
+  }
+
+  loadDocuments(page: number = 1): void {
+    this.loading = true;
+    this.errorMessage = '';
+
+    this.documentService.listDocuments(this.getFilters(page)).subscribe({
       next: (response: any) => {
-        this.documents = response.data;
-        // Check if meta exists (standard Laravel pagination) or if properties are at root
-        if (response.meta) {
-          this.currentPage = response.meta.current_page;
-          this.lastPage = response.meta.last_page;
-          this.perPage = response.meta.per_page;
-          this.total = response.meta.total;
-        } else {
-          // Fallback for flat structure or if backend changes
-          this.currentPage = response.current_page;
-          this.lastPage = response.last_page;
-          this.perPage = response.per_page;
-          this.total = response.total;
-        }
+        this.processResponse(response);
         this.loading = false;
+        this.checkAndStartSmartPolling(page);
       },
       error: (error: any) => {
         console.error('Erro ao carregar documentos:', error);
@@ -75,7 +136,40 @@ export class DocumentListComponent implements OnInit {
     });
   }
 
+  private checkAndStartSmartPolling(page: number): void {
+    const hasPending = this.documents.some(doc => doc.status === 'pending');
+    
+    if (hasPending && !this.isPollingActive) {
+      this.isPollingActive = true;
+      
+      this.pollingSubscription = timer(2500, 2500).pipe(
+        takeUntil(this.destroy$),
+        switchMap(() => this.documentService.listDocuments(this.getFilters(page)))
+      ).subscribe({
+        next: (response: any) => {
+          this.processResponse(response);
+          
+          const stillHasPending = this.documents.some(doc => doc.status === 'pending');
+          if (!stillHasPending) {
+            this.stopPolling();
+          }
+        },
+        error: () => this.stopPolling()
+      });
+    } else if (!hasPending && this.isPollingActive) {
+      this.stopPolling();
+    }
+  }
+
+  private stopPolling(): void {
+    this.isPollingActive = false;
+    if (this.pollingSubscription) {
+      this.pollingSubscription.unsubscribe();
+    }
+  }
+
   applyFilters(): void {
+    this.stopPolling();
     this.currentPage = 1;
     this.loadDocuments();
   }
@@ -83,6 +177,15 @@ export class DocumentListComponent implements OnInit {
   clearFilters(): void {
     this.statusFilter = '';
     this.searchTerm = '';
+    this.selectedType = '';
+    this.startDate = '';
+    this.endDate = '';
+    this.applyFilters();
+  }
+
+  clearDates(): void {
+    this.startDate = '';
+    this.endDate = '';
     this.applyFilters();
   }
 
@@ -93,6 +196,19 @@ export class DocumentListComponent implements OnInit {
       'failed': 'Falhou'
     };
     return statusMap[status] || status;
+  }
+
+  getDocumentTypeText(type: string): string {
+    if (!type) return '';
+    const typeMap: { [key: string]: string } = {
+      'exam': 'Exame',
+      'medical_report': 'Laudo',
+      'prescription': 'Receita',
+      'report': 'Relatório',
+      'referral': 'Referenciamento',
+      'others': 'Outros'
+    };
+    return typeMap[type] || type;
   }
 
   getStatusClass(status: string): string {
