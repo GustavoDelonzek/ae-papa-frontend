@@ -32,14 +32,15 @@ $success-color: #10b981;
     animation: slideUp 0.3s ease-out;
     display: flex;
     flex-direction: column;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
 
     .modal-header {
-        padding: 1.25rem;
+        padding: 1.5rem 1.5rem 1rem 1.5rem;
         border-bottom: 1px solid $border-color;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: #f9fafb;
+        background: transparent;
         flex-shrink: 0;
 
         h2 {
@@ -99,9 +100,11 @@ $success-color: #10b981;
     .form-row {
         display: flex;
         gap: 1rem;
+        flex-wrap: wrap;
 
         .form-group {
-            flex: 1;
+            flex: 1 1 200px;
+            min-width: 200px;
         }
     }
 

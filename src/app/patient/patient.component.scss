@@ -1334,12 +1334,8 @@ $danger-color: #ef4444;
 
 .patient-appt-objective-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   gap: 8px;
-
-  @media (max-width: 540px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
 }
 
 .patient-appt-obj-card {

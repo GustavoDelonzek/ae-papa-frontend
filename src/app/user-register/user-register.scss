@@ -82,9 +82,11 @@
     display: flex;
     gap: 20px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
 
     .form-group {
-      flex: 1;
+      flex: 1 1 200px;
+      min-width: 200px;
     }
   }
 
