@@ -17,8 +17,11 @@ export class PatientListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // Filters
   genderFilter: 'M' | 'F' | null = null;
-  ageFilter: string = ''; // '20-30', '31-50', '51+'
-  dateFilter: string | null = null;
+  ageFilter: '20-30' | '31-50' | '51+' | '' = ''; // '20-30', '31-50', '51+'
+  birthYearFilter: string = ''; // year as string for select
+
+  // Birth year options
+  birthYearOptions: number[] = [];
 
   // Paginação
   currentPage: number = 1;
@@ -62,7 +65,16 @@ export class PatientListComponent implements OnInit, OnDestroy, AfterViewInit {
   ) { }
 
   ngOnInit(): void {
+    this.generateBirthYearOptions();
     this.loadPatients();
+  }
+
+  generateBirthYearOptions(): void {
+    const currentYear = new Date().getFullYear();
+    this.birthYearOptions = [];
+    for (let year = currentYear; year >= 1900; year--) {
+      this.birthYearOptions.push(year);
+    }
   }
 
   ngAfterViewInit(): void {
@@ -86,22 +98,12 @@ export class PatientListComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.searchTerm) filters.search = this.searchTerm;
     if (this.genderFilter) filters.gender = this.genderFilter;
 
-    // Parse Age Filter
     if (this.ageFilter) {
-      if (this.ageFilter === '20-30') {
-        filters.age_min = 20;
-        filters.age_max = 30;
-      } else if (this.ageFilter === '31-50') {
-        filters.age_min = 31;
-        filters.age_max = 50;
-      } else if (this.ageFilter === '51+') {
-        filters.age_min = 51;
-      }
+      filters.ageFilter = this.ageFilter;
     }
 
-    if (this.dateFilter) {
-      // Ensure date is YYYY-MM-DD
-      filters.created_at = this.dateFilter;
+    if (this.birthYearFilter) {
+      filters.birthYear = parseInt(this.birthYearFilter, 10);
     }
 
     if (this.sortColumn) {
@@ -142,12 +144,12 @@ export class PatientListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.searchTerm = '';
     this.genderFilter = null;
     this.ageFilter = '';
-    this.dateFilter = null;
+    this.birthYearFilter = '';
     this.loadPatients(1);
   }
 
   hasActiveFilters(): boolean {
-    return !!(this.genderFilter || this.ageFilter || this.dateFilter || this.searchTerm);
+    return !!(this.genderFilter || this.ageFilter || this.birthYearFilter || this.searchTerm);
   }
 
   onSort(column: string): void {

@@ -19,6 +19,29 @@ export class CaretakerList implements OnInit, OnDestroy {
   genderFilter: 'M' | 'F' | null = null;
   ageFilter: string = '';
   kinshipFilter: string = '';
+  birthYearFilter: string = ''; // year as string for select
+
+  // Birth year options
+  birthYearOptions: number[] = [];
+
+  // Kinship options
+  kinshipOptions: { value: string; label: string }[] = [
+    { value: 'son', label: 'Filho' },
+    { value: 'daughter', label: 'Filha' },
+    { value: 'spouse', label: 'Cônjuge' },
+    { value: 'partner', label: 'Companheiro(a)' },
+    { value: 'father', label: 'Pai' },
+    { value: 'mother', label: 'Mãe' },
+    { value: 'brother', label: 'Irmão' },
+    { value: 'sister', label: 'Irmã' },
+    { value: 'grand_son', label: 'Neto' },
+    { value: 'grand_daughter', label: 'Neta' },
+    { value: 'nephew', label: 'Sobrinho' },
+    { value: 'niece', label: 'Sobrinha' },
+    { value: 'friend', label: 'Amigo(a)' },
+    { value: 'professional_caregiver', label: 'Cuidador Profissional' },
+    { value: 'other', label: 'Outro' }
+  ];
 
   // Paginação
   currentPage: number = 1;
@@ -53,7 +76,16 @@ export class CaretakerList implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    this.generateBirthYearOptions();
     this.loadCaretakers();
+  }
+
+  generateBirthYearOptions(): void {
+    const currentYear = new Date().getFullYear();
+    this.birthYearOptions = [];
+    for (let year = currentYear; year >= 1900; year--) {
+      this.birthYearOptions.push(year);
+    }
   }
 
   loadCaretakers(page: number = 1): void {
@@ -67,17 +99,8 @@ export class CaretakerList implements OnInit, OnDestroy {
     if (this.genderFilter) filters.gender = this.genderFilter;
     if (this.kinshipFilter) filters.kinship = this.kinshipFilter;
 
-    if (this.ageFilter) {
-      if (this.ageFilter === '20-30') {
-        filters.age_min = 20;
-        filters.age_max = 30;
-      } else if (this.ageFilter === '31-50') {
-        filters.age_min = 31;
-        filters.age_max = 50;
-      } else if (this.ageFilter === '51+') {
-        filters.age_min = 51;
-      }
-    }
+    if (this.ageFilter) filters.ageFilter = this.ageFilter;
+    if (this.birthYearFilter) filters.birthYear = parseInt(this.birthYearFilter, 10);
 
     if (this.sortColumn) {
       filters.sort_by = this.sortColumn;
@@ -86,8 +109,7 @@ export class CaretakerList implements OnInit, OnDestroy {
 
     console.log('Sending filters to backend (Caretakers):', filters);
 
-    // Using simple search for now as per previous service signature, but we should eventually update service
-    this.caretakerService.getCaretakers(page, this.perPage, filters.search).subscribe({
+    this.caretakerService.getCaretakers(page, this.perPage, filters).subscribe({
       next: (response: CaretakersListResponse) => {
         this.caretakers = response.data || [];
         this.filteredCaretakers = [...this.caretakers];
@@ -126,11 +148,12 @@ export class CaretakerList implements OnInit, OnDestroy {
     this.genderFilter = null;
     this.ageFilter = '';
     this.kinshipFilter = '';
+    this.birthYearFilter = '';
     this.loadCaretakers(1);
   }
 
   hasActiveFilters(): boolean {
-    return !!(this.genderFilter || this.ageFilter || this.kinshipFilter || this.searchTerm);
+    return !!(this.genderFilter || this.ageFilter || this.kinshipFilter || this.birthYearFilter || this.searchTerm);
   }
 
   onSort(column: string): void {

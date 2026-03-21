@@ -13,7 +13,8 @@
                 </div>
 
                 <div class="stepper">
-                    <div class="step-item" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">
+                    <div class="step-item" [class.active]="currentStep === 1" [class.completed]="currentStep > 1"
+                        (click)="goToStep(1)">
                         <div class="step-number">1</div>
                         <div class="step-content">
                             <span class="step-title">Identificação</span>
@@ -21,7 +22,8 @@
                         </div>
                     </div>
 
-                    <div class="step-item" [class.active]="currentStep === 2" [class.completed]="currentStep > 2">
+                    <div class="step-item" [class.active]="currentStep === 2" [class.completed]="currentStep > 2"
+                        (click)="goToStep(2)">
                         <div class="step-number">2</div>
                         <div class="step-content">
                             <span class="step-title">Contato</span>
@@ -29,7 +31,7 @@
                         </div>
                     </div>
 
-                    <div class="step-item" [class.active]="currentStep === 3">
+                    <div class="step-item" [class.active]="currentStep === 3" (click)="goToStep(3)">
                         <div class="step-number">3</div>
                         <div class="step-content">
                             <span class="step-title">Endereço</span>
@@ -212,12 +214,15 @@
                 <div class="main-footer">
                     <button type="button" class="btn-cancel" (click)="onClose()">Cancelar</button>
 
+                    <button type="button" class="btn-cancel" *ngIf="currentStep > 1" (click)="prevStep()">
+                        <i class="fas fa-arrow-left"></i> Anterior
+                    </button>
+
                     <button type="button" class="btn-submit" *ngIf="currentStep < 3" (click)="nextStep()">
                         Próximo <i class="fas fa-arrow-right"></i>
                     </button>
 
-                    <button type="button" class="btn-submit" *ngIf="currentStep === 3" (click)="save()"
-                        [disabled]="isSaving">
+                    <button type="button" class="btn-submit" (click)="save()" [disabled]="isSaving">
                         <span *ngIf="!isSaving">{{ isEditing ? 'Atualizar' : 'Salvar' }}</span>
                         <span *ngIf="isSaving"><i class="fas fa-spinner fa-spin"></i></span>
                     </button>

@@ -58,10 +58,15 @@
           <i class="fas fa-chevron-down select-arrow"></i>
         </div>
 
-        <!-- Date Filter (Date Input) -->
-        <div class="date-input-wrapper" [class.active-date]="!!dateFilter">
-          <i class="far fa-calendar input-icon"></i>
-          <input type="date" [(ngModel)]="dateFilter" (change)="onFilterChange()" placeholder="Data de Cadastro">
+        <!-- Birth Year Filter (Select) -->
+        <div class="select-wrapper">
+          <i class="fas fa-calendar input-icon"></i>
+          <select [(ngModel)]="birthYearFilter" (change)="onFilterChange()" [class.active-select]="birthYearFilter">
+            <option value="" disabled selected>Ano de Nascimento</option>
+            <option value="">Todos</option>
+            <option *ngFor="let year of birthYearOptions" [value]="year.toString()">{{ year }}</option>
+          </select>
+          <i class="fas fa-chevron-down select-arrow"></i>
         </div>
 
       </div>

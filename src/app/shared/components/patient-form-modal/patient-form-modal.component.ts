@@ -110,15 +110,8 @@ export class PatientFormModalComponent implements OnInit {
 
     nextStep(): void {
         this.errorMessage = '';
-
-        if (this.currentStep === 1) {
-            if (this.validateStep1()) {
-                this.handleStep1();
-            }
-        } else if (this.currentStep === 2) {
-            if (this.validateStep2()) {
-                this.handleStep2();
-            }
+        if (this.currentStep < 3) {
+            this.currentStep++;
         }
     }
 
@@ -126,6 +119,13 @@ export class PatientFormModalComponent implements OnInit {
         this.errorMessage = '';
         if (this.currentStep > 1) {
             this.currentStep--;
+        }
+    }
+
+    goToStep(step: number): void {
+        this.errorMessage = '';
+        if (step >= 1 && step <= 3) {
+            this.currentStep = step;
         }
     }
 
@@ -228,18 +228,106 @@ export class PatientFormModalComponent implements OnInit {
     removeContact(index: number): void { }
 
     save(): void {
-        if (!this.currentPatient.id) {
-            this.errorMessage = 'Erro: Atendido não identificado.';
+        this.errorMessage = '';
+        if (!this.validateStep1()) {
+            this.currentStep = 1;
+            return;
+        }
+
+        if (!this.validateStep2()) {
+            this.currentStep = 2;
             return;
         }
 
         this.isSaving = true;
-        const patientId = this.currentPatient.id;
+        this.upsertPatient().pipe(
+            switchMap((patientId) => {
+                if (!patientId) {
+                    this.errorMessage = 'Erro: Atendido não identificado.';
+                    return of(null);
+                }
+
+                this.currentPatient.id = patientId;
+                this.isEditing = true;
+
+                return this.upsertContact(patientId).pipe(
+                    switchMap(() => this.upsertAddresses(patientId))
+                );
+            })
+        ).subscribe({
+            next: (result) => {
+                if (result === null) {
+                    this.isSaving = false;
+                    return;
+                }
+
+                this.isSaving = false;
+                this.success.emit();
+                this.onClose();
+            },
+            error: (error) => this.handleError(error)
+        });
+    }
+
+    private upsertPatient(): Observable<number | null> {
+        const patientPayload: any = {
+            ...this.currentPatient,
+            birth_date: this.formatDateForAPI(this.currentPatient.birth_date)
+        };
+
+        if (!patientPayload.rg) delete patientPayload.rg;
+        delete patientPayload.contacts;
+        delete patientPayload.addresses;
+        delete patientPayload.caregivers;
+        delete patientPayload.clinical_records;
+        delete patientPayload.socioeconomic_profile;
+
+        const request = this.currentPatient.id
+            ? this.patientService.updatePatient(this.currentPatient.id, patientPayload)
+            : this.patientService.createPatient(patientPayload);
+
+        return request.pipe(
+            switchMap((response: any) => {
+                const patientId = this.currentPatient.id || response?.data?.id || response?.id || null;
+                return of(patientId);
+            })
+        );
+    }
+
+    private upsertContact(patientId: number): Observable<any> {
+        const contact = {
+            ...this.newContact,
+            patient_id: patientId,
+            is_primary: true
+        };
+
+        if (contact.id) {
+            const payload: any = { ...contact };
+            delete payload.id;
+            delete payload.pivot;
+            delete payload.patient_id;
+            delete payload.created_at;
+            delete payload.updated_at;
+            return this.patientService.updateContact(contact.id, payload);
+        }
+
+        return this.patientService.createContact(contact).pipe(
+            switchMap((response: any) => {
+                if (response?.data?.id) {
+                    this.newContact.id = response.data.id;
+                } else if (response?.id) {
+                    this.newContact.id = response.id;
+                }
+                return of(response);
+            })
+        );
+    }
+
+    private upsertAddresses(patientId: number): Observable<any> {
         const addressRequests: Observable<any>[] = [];
 
         this.addressesList.forEach(a => {
             if (a.id) {
-                // Update
                 const payload: any = { ...a };
                 delete payload.id;
                 delete payload.patient_id;
@@ -247,25 +335,11 @@ export class PatientFormModalComponent implements OnInit {
                 delete payload.updated_at;
                 addressRequests.push(this.patientService.updateAddress(a.id, payload));
             } else {
-                // Create
                 addressRequests.push(this.patientService.createAddress({ ...a, patient_id: patientId }));
             }
         });
 
-        if (addressRequests.length > 0) {
-            forkJoin(addressRequests).subscribe({
-                next: () => {
-                    this.isSaving = false;
-                    this.success.emit();
-                    this.onClose();
-                },
-                error: (error) => this.handleError(error)
-            });
-        } else {
-            this.isSaving = false;
-            this.success.emit();
-            this.onClose();
-        }
+        return addressRequests.length > 0 ? forkJoin(addressRequests) : of([]);
     }
 
     handleError(error: any) {

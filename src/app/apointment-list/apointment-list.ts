@@ -53,6 +53,7 @@ export class ApointmentList implements OnInit {
   appointmentObjective: string = '';
   observations: string = '';
   submitting: boolean = false;
+  editingAppointmentId: number | null = null;
   currentUserId: number = 0;
 
   // Timeout para pesquisa com delay
@@ -171,7 +172,22 @@ export class ApointmentList implements OnInit {
 
   formatDate(date: string): string {
     if (!date) return '';
+
+    // Avoid timezone shift for date-only strings (YYYY-MM-DD).
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      const [year, month, day] = date.split('-');
+      return `${day}/${month}/${year}`;
+    }
+
+    // Keep compatibility if backend returns MM-DD-YYYY.
+    if (/^\d{2}-\d{2}-\d{4}$/.test(date)) {
+      const [month, day, year] = date.split('-');
+      return `${day}/${month}/${year}`;
+    }
+
     const d = new Date(date);
+    if (isNaN(d.getTime())) return date;
+
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const year = d.getFullYear();
@@ -223,11 +239,13 @@ export class ApointmentList implements OnInit {
 
   openCreateModal(): void {
     this.showCreateModal = true;
+    this.editingAppointmentId = null;
     this.resetForm();
   }
 
   closeCreateModal(): void {
     this.showCreateModal = false;
+    this.editingAppointmentId = null;
     this.resetForm();
   }
 
@@ -269,14 +287,39 @@ export class ApointmentList implements OnInit {
 
     const cpfOnly = this.searchCpf.replace(/\D/g, '');
 
-    this.patientService.getPatientByCpf(cpfOnly).subscribe({
+    if (cpfOnly.length !== 11) {
+      this.toastService.warning('Informe um CPF valido com 11 digitos.');
+      this.searching = false;
+      return;
+    }
+
+    const maskedCpf = this.formatCPF(cpfOnly);
+
+    // First try with digits only, then fallback to masked format used in patient list search.
+    this.patientService.getPatients(1, 200, { search: cpfOnly }).subscribe({
       next: (response) => {
-        if (response.data && response.data.length > 0) {
-          this.searchResult = response.data[0];
-        } else {
-          this.toastService.error('Atendido não encontrado');
+        const exactByDigits = this.findPatientByExactCpf(response.data || [], cpfOnly);
+        if (exactByDigits) {
+          this.searchResult = exactByDigits;
+          this.searching = false;
+          return;
         }
-        this.searching = false;
+
+        this.patientService.getPatients(1, 200, { search: maskedCpf }).subscribe({
+          next: (fallbackResponse) => {
+            this.searchResult = this.findPatientByExactCpf(fallbackResponse.data || [], cpfOnly);
+
+            if (!this.searchResult) {
+              this.toastService.error('Atendido nao encontrado');
+            }
+            this.searching = false;
+          },
+          error: (fallbackError) => {
+            console.error('Erro ao buscar paciente (fallback):', fallbackError);
+            this.toastService.error('Erro ao buscar atendido. Tente novamente.');
+            this.searching = false;
+          }
+        });
       },
       error: (error) => {
         console.error('Erro ao buscar paciente:', error);
@@ -284,6 +327,14 @@ export class ApointmentList implements OnInit {
         this.searching = false;
       }
     });
+  }
+
+  private normalizeCpf(cpf: string): string {
+    return (cpf || '').replace(/\D/g, '');
+  }
+
+  private findPatientByExactCpf(patients: Patient[], cpfOnly: string): Patient | null {
+    return patients.find((patient) => this.normalizeCpf(patient.cpf) === cpfOnly) || null;
   }
 
   selectPatient(patient: Patient): void {
@@ -317,8 +368,25 @@ export class ApointmentList implements OnInit {
       observations: this.observations.trim() || undefined
     };
 
+    if (this.editingAppointmentId) {
+      this.appointmentService.updateAppointment(this.editingAppointmentId, appointmentData).subscribe({
+        next: () => {
+          this.toastService.success('Atendimento atualizado com sucesso!');
+          this.submitting = false;
+          this.closeCreateModal();
+          this.loadAppointments();
+        },
+        error: (error) => {
+          console.error('Erro ao atualizar consulta:', error);
+          this.toastService.error(error.error?.message || 'Erro ao atualizar atendimento. Tente novamente.');
+          this.submitting = false;
+        }
+      });
+      return;
+    }
+
     this.appointmentService.createAppointment(appointmentData).subscribe({
-      next: (response) => {
+      next: () => {
         this.toastService.success('Atendimento criado com sucesso!');
         this.submitting = false;
         this.closeCreateModal();
@@ -360,8 +428,59 @@ export class ApointmentList implements OnInit {
   }
 
   onEditAppointment(appointment: Appointment): void {
-    console.log('Edit appointment:', appointment);
+    if (!appointment.id) {
+      this.toastService.error('Não foi possível editar: ID do atendimento ausente.');
+      return;
+    }
+
+    this.editingAppointmentId = appointment.id;
+    this.selectedPatient = appointment.patient || {
+      id: appointment.patient_id,
+      full_name: `Atendido #${appointment.patient_id}`,
+      birth_date: '',
+      gender: '',
+      marital_status: '',
+      cpf: ''
+    };
+    this.appointmentDate = this.toInputDate(appointment.date);
+    this.appointmentObjective = appointment.objective || '';
+    this.observations = appointment.observations || '';
+    this.searchCpf = '';
+    this.searchResult = null;
+    this.showCreateModal = true;
+
     this.closeDetailsModal();
+  }
+
+  isEditMode(): boolean {
+    return this.editingAppointmentId !== null;
+  }
+
+  private toInputDate(date: string): string {
+    if (!date) return '';
+
+    if (date.includes('T')) {
+      return date.split('T')[0];
+    }
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return date;
+    }
+
+    if (/^\d{2}-\d{2}-\d{4}$/.test(date)) {
+      const [month, day, year] = date.split('-');
+      return `${year}-${month}-${day}`;
+    }
+
+    const parsedDate = new Date(date);
+    if (!isNaN(parsedDate.getTime())) {
+      const year = parsedDate.getFullYear();
+      const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+      const day = String(parsedDate.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    return '';
   }
 
   applyFilters(): void {

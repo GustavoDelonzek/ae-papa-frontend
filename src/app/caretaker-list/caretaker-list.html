@@ -64,10 +64,18 @@
           <select [(ngModel)]="kinshipFilter" (change)="onFilterChange()" [class.active-select]="kinshipFilter">
             <option value="" disabled selected>Parentesco</option>
             <option value="">Todos</option>
-            <option value="son">Filho(a)</option>
-            <option value="spouse">Cônjuge</option>
-            <option value="professional_caregiver">Profissional</option>
-            <option value="other">Outro</option>
+            <option *ngFor="let kinship of kinshipOptions" [value]="kinship.value">{{ kinship.label }}</option>
+          </select>
+          <i class="fas fa-chevron-down select-arrow"></i>
+        </div>
+
+        <!-- Birth Year Filter (Select) -->
+        <div class="select-wrapper">
+          <i class="fas fa-calendar input-icon"></i>
+          <select [(ngModel)]="birthYearFilter" (change)="onFilterChange()" [class.active-select]="birthYearFilter">
+            <option value="" disabled selected>Ano de Nascimento</option>
+            <option value="">Todos</option>
+            <option *ngFor="let year of birthYearOptions" [value]="year.toString()">{{ year }}</option>
           </select>
           <i class="fas fa-chevron-down select-arrow"></i>
         </div>
