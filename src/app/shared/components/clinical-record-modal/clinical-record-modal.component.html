@@ -30,8 +30,12 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Data do Diagnóstico</label>
-                            <input type="date" name="diagnosis_date" class="form-control"
-                                [(ngModel)]="currentRecord.diagnosis_date" required>
+                            <mat-form-field class="custom-mat-form-field">
+                                <input matInput [matDatepicker]="pickerDiag" name="diagnosis_date"
+                                    [(ngModel)]="currentRecord.diagnosis_date" required placeholder="DD/MM/AAAA">
+                                <mat-datepicker-toggle matIconSuffix [for]="pickerDiag"></mat-datepicker-toggle>
+                                <mat-datepicker #pickerDiag></mat-datepicker>
+                            </mat-form-field>
                         </div>
 
                         <div class="form-group">

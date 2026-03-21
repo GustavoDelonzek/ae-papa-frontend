@@ -71,11 +71,12 @@
           <div class="select-wrapper">
             <select id="documentType" [(ngModel)]="documentType" [disabled]="uploading">
               <option value="" disabled selected>Selecione um tipo...</option>
-              <option value="Exame">Exame</option>
-              <option value="Laudo">Laudo</option>
-              <option value="Receita">Receita</option>
-              <option value="Relatório">Relatório</option>
-              <option value="Outros">Outros</option>
+              <option value="exam">Exame</option>
+              <option value="medical_report">Laudo</option>
+              <option value="prescription">Receita</option>
+              <option value="report">Relatório</option>
+              <option value="referral">Referenciamento</option>
+              <option value="others">Outros</option>
             </select>
             <i class="fas fa-chevron-down select-icon"></i>
           </div>

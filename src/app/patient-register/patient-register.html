@@ -30,8 +30,12 @@
         <!-- Data de Nascimento -->
         <div class="form-group">
           <label for="birth_date" class="form-label">Data de Nascimento *</label>
-          <input type="date" id="birth_date" name="birth_date" class="form-control" [(ngModel)]="patientData.birth_date"
-            required #birthDate="ngModel">
+          <mat-form-field class="custom-mat-form-field">
+              <input matInput [matDatepicker]="pickerBirth" id="birth_date" name="birth_date" 
+                  [(ngModel)]="patientData.birth_date" required #birthDate="ngModel" placeholder="DD/MM/AAAA">
+              <mat-datepicker-toggle matIconSuffix [for]="pickerBirth"></mat-datepicker-toggle>
+              <mat-datepicker #pickerBirth startView="multi-year"></mat-datepicker>
+          </mat-form-field>
 
           <div *ngIf="birthDate.invalid && birthDate.touched" class="error-message">
             <small *ngIf="birthDate.errors?.['required']" class="text-danger">

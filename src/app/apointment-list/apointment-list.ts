@@ -45,8 +45,9 @@ export class ApointmentList implements OnInit {
   showPatientSearch: boolean = false;
   searchCpf: string = '';
   searching: boolean = false;
-  searchResult: Patient | null = null;
+  searchResults: Patient[] = [];
   selectedPatient: Patient | null = null;
+  private patientSearchTimeout: any;
 
   // Form Fields
   appointmentDate: string = '';
@@ -253,88 +254,81 @@ export class ApointmentList implements OnInit {
   openPatientSearch(): void {
     this.showPatientSearch = true;
     this.searchCpf = '';
-    this.searchResult = null;
+    this.searchResults = [];
   }
 
   closePatientSearch(): void {
     this.showPatientSearch = false;
     this.searchCpf = '';
-    this.searchResult = null;
+    this.searchResults = [];
   }
 
   onSearchCpfChange(): void {
-    let cpf = this.searchCpf.replace(/\D/g, '');
-    if (cpf.length > 11) {
-      cpf = cpf.substring(0, 11);
+    const isOnlyNumbersAndFormatting = /^[0-9.\- ]*$/.test(this.searchCpf);
+    if (this.searchCpf && isOnlyNumbersAndFormatting) {
+      let cpf = this.searchCpf.replace(/\D/g, '');
+      if (cpf.length > 11) {
+        cpf = cpf.substring(0, 11);
+      }
+
+      if (cpf.length > 9) {
+        this.searchCpf = cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4');
+      } else if (cpf.length > 6) {
+        this.searchCpf = cpf.replace(/(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
+      } else if (cpf.length > 3) {
+        this.searchCpf = cpf.replace(/(\d{3})(\d{0,3})/, '$1.$2');
+      } else {
+        this.searchCpf = cpf;
+      }
     }
 
-    if (cpf.length > 9) {
-      this.searchCpf = cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4');
-    } else if (cpf.length > 6) {
-      this.searchCpf = cpf.replace(/(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
-    } else if (cpf.length > 3) {
-      this.searchCpf = cpf.replace(/(\d{3})(\d{0,3})/, '$1.$2');
-    } else {
-      this.searchCpf = cpf;
+    if (this.patientSearchTimeout) {
+      clearTimeout(this.patientSearchTimeout);
     }
+
+    this.patientSearchTimeout = setTimeout(() => {
+      this.performSearch(false);
+    }, 500);
   }
 
-  searchPatientByCpf(): void {
-    if (!this.searchCpf) return;
-
-    this.searching = true;
-    this.searchResult = null;
-
-    const cpfOnly = this.searchCpf.replace(/\D/g, '');
-
-    if (cpfOnly.length !== 11) {
-      this.toastService.warning('Informe um CPF valido com 11 digitos.');
+  performSearch(showErrorIfEmpty: boolean = true): void {
+    if (!this.searchCpf || this.searchCpf.trim().length < 3) {
+      this.searchResults = [];
       this.searching = false;
       return;
     }
 
-    const maskedCpf = this.formatCPF(cpfOnly);
+    const term = this.searchCpf.trim();
+    const cpfOnly = term.replace(/\D/g, '');
+    const isCpf = /^[0-9.\- ]*$/.test(term) && cpfOnly.length > 0;
 
-    // First try with digits only, then fallback to masked format used in patient list search.
-    this.patientService.getPatients(1, 200, { search: cpfOnly }).subscribe({
+    const filters: any = isCpf ? { cpf: cpfOnly } : { full_name: term };
+
+    this.searching = true;
+    this.searchResults = [];
+
+    this.patientService.getPatients(1, 15, filters).subscribe({
       next: (response) => {
-        const exactByDigits = this.findPatientByExactCpf(response.data || [], cpfOnly);
-        if (exactByDigits) {
-          this.searchResult = exactByDigits;
-          this.searching = false;
-          return;
+        this.searchResults = response.data || [];
+        
+        if (showErrorIfEmpty && this.searchResults.length === 0) {
+          this.toastService.error('Nenhum atendido encontrado');
         }
-
-        this.patientService.getPatients(1, 200, { search: maskedCpf }).subscribe({
-          next: (fallbackResponse) => {
-            this.searchResult = this.findPatientByExactCpf(fallbackResponse.data || [], cpfOnly);
-
-            if (!this.searchResult) {
-              this.toastService.error('Atendido nao encontrado');
-            }
-            this.searching = false;
-          },
-          error: (fallbackError) => {
-            console.error('Erro ao buscar paciente (fallback):', fallbackError);
-            this.toastService.error('Erro ao buscar atendido. Tente novamente.');
-            this.searching = false;
-          }
-        });
+        this.searching = false;
       },
       error: (error) => {
         console.error('Erro ao buscar paciente:', error);
-        this.toastService.error('Erro ao buscar atendido. Tente novamente.');
+        if (showErrorIfEmpty) {
+          this.toastService.error('Erro ao buscar atendido. Tente novamente.');
+        }
         this.searching = false;
       }
     });
   }
 
-  private normalizeCpf(cpf: string): string {
-    return (cpf || '').replace(/\D/g, '');
-  }
-
-  private findPatientByExactCpf(patients: Patient[], cpfOnly: string): Patient | null {
-    return patients.find((patient) => this.normalizeCpf(patient.cpf) === cpfOnly) || null;
+  searchPatientByCpf(): void {
+    if (this.patientSearchTimeout) clearTimeout(this.patientSearchTimeout);
+    this.performSearch(true);
   }
 
   selectPatient(patient: Patient): void {
@@ -356,9 +350,24 @@ export class ApointmentList implements OnInit {
 
     this.submitting = true;
 
-    // Converter data do formato YYYY-MM-DD para MM-DD-YYYY
-    const [year, month, day] = this.appointmentDate.split('-');
-    const formattedDate = `${month}-${day}-${year}`;
+    // Converter a data suportando string ou objeto Date do Material UI
+    let formattedDate = '';
+    const aptDate = this.appointmentDate as any;
+    if (aptDate instanceof Date) {
+        const year = aptDate.getFullYear();
+        const month = String(aptDate.getMonth() + 1).padStart(2, '0');
+        const day = String(aptDate.getDate()).padStart(2, '0');
+        formattedDate = `${month}-${day}-${year}`;
+    } else if (typeof aptDate === 'string') {
+        const dateParts = aptDate.split('T')[0].split('-');
+        if (dateParts.length === 3 && dateParts[0].length === 4) {
+            formattedDate = `${dateParts[1]}-${dateParts[2]}-${dateParts[0]}`;
+        } else {
+            formattedDate = aptDate;
+        }
+    } else {
+        formattedDate = String(aptDate);
+    }
 
     const appointmentData: AppointmentCreate = {
       patient_id: this.selectedPatient.id!,
@@ -406,7 +415,7 @@ export class ApointmentList implements OnInit {
     this.appointmentObjective = '';
     this.observations = '';
     this.searchCpf = '';
-    this.searchResult = null;
+    this.searchResults = [];
     this.showPatientSearch = false;
   }
 
@@ -446,7 +455,7 @@ export class ApointmentList implements OnInit {
     this.appointmentObjective = appointment.objective || '';
     this.observations = appointment.observations || '';
     this.searchCpf = '';
-    this.searchResult = null;
+    this.searchResults = [];
     this.showCreateModal = true;
 
     this.closeDetailsModal();

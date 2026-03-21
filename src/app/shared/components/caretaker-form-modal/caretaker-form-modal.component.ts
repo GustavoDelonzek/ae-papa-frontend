@@ -19,12 +19,12 @@ export class CaretakerFormModalComponent implements OnChanges {
     errorMessage: string = '';
 
     // Patient search
-    patients: Patient[] = [];
-    filteredPatients: Patient[] = [];
-    patientSearchTerm: string = '';
+    showPatientSearch: boolean = false;
+    searchCpf: string = '';
+    searching: boolean = false;
+    searchResults: Patient[] = [];
     selectedPatient: Patient | null = null;
-    showPatientDropdown: boolean = false;
-    loadingPatients: boolean = false;
+    private patientSearchTimeout: any;
 
     currentCaretaker: Caretaker = {
         full_name: '',
@@ -63,51 +63,97 @@ export class CaretakerFormModalComponent implements OnChanges {
     }
 
     onOpen(): void {
-        // Load patients if we need to show the patient selector
-        if (!this.patientId && !this.isEditing) {
-            this.loadPatients();
-        }
+        // Nada necessário no onOpen para buscar massiva de pacientes.
     }
 
-    loadPatients(): void {
-        this.loadingPatients = true;
-        this.patientService.getPatients(1, 100).subscribe({
+    openPatientSearch(): void {
+        this.showPatientSearch = true;
+        this.searchCpf = '';
+        this.searchResults = [];
+    }
+
+    closePatientSearch(): void {
+        this.showPatientSearch = false;
+        this.searchCpf = '';
+        this.searchResults = [];
+    }
+
+    onSearchCpfChange(): void {
+        const isOnlyNumbersAndFormatting = /^[0-9.\- ]*$/.test(this.searchCpf);
+        if (this.searchCpf && isOnlyNumbersAndFormatting) {
+            let cpf = this.searchCpf.replace(/\D/g, '');
+            if (cpf.length > 11) {
+                cpf = cpf.substring(0, 11);
+            }
+            if (cpf.length > 9) {
+                this.searchCpf = cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4');
+            } else if (cpf.length > 6) {
+                this.searchCpf = cpf.replace(/(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
+            } else if (cpf.length > 3) {
+                this.searchCpf = cpf.replace(/(\d{3})(\d{0,3})/, '$1.$2');
+            } else {
+                this.searchCpf = cpf;
+            }
+        }
+
+        if (this.patientSearchTimeout) {
+            clearTimeout(this.patientSearchTimeout);
+        }
+        this.patientSearchTimeout = setTimeout(() => {
+            this.performSearch(false);
+        }, 500);
+    }
+
+    performSearch(showErrorIfEmpty: boolean = true): void {
+        if (!this.searchCpf || this.searchCpf.trim().length < 3) {
+            this.searchResults = [];
+            this.searching = false;
+            return;
+        }
+
+        const term = this.searchCpf.trim();
+        const cpfOnly = term.replace(/\D/g, '');
+        const isCpf = /^[0-9.\- ]*$/.test(term) && cpfOnly.length > 0;
+
+        const filters: any = isCpf ? { cpf: cpfOnly } : { full_name: term };
+
+        this.searching = true;
+        this.searchResults = [];
+
+        this.patientService.getPatients(1, 15, filters).subscribe({
             next: (response: any) => {
-                this.patients = response.data || [];
-                this.filteredPatients = [...this.patients];
-                this.loadingPatients = false;
+                this.searchResults = response.data || [];
+                if (showErrorIfEmpty && this.searchResults.length === 0) {
+                    this.errorMessage = 'Nenhum atendido encontrado';
+                    setTimeout(() => this.errorMessage = '', 3000);
+                }
+                this.searching = false;
             },
             error: (error: any) => {
-                console.error('Erro ao carregar pacientes:', error);
-                this.loadingPatients = false;
+                console.error('Erro ao buscar paciente:', error);
+                if (showErrorIfEmpty) {
+                    this.errorMessage = 'Erro ao buscar atendido. Tente novamente.';
+                    setTimeout(() => this.errorMessage = '', 3000);
+                }
+                this.searching = false;
             }
         });
     }
 
-    onPatientSearch(): void {
-        const term = this.patientSearchTerm.toLowerCase().trim();
-        if (!term) {
-            this.filteredPatients = [...this.patients];
-        } else {
-            this.filteredPatients = this.patients.filter(p =>
-                p.full_name.toLowerCase().includes(term) ||
-                (p.cpf && p.cpf.replace(/\D/g, '').includes(term.replace(/\D/g, '')))
-            );
-        }
-        this.showPatientDropdown = true;
+    searchPatientByCpf(): void {
+        if (this.patientSearchTimeout) clearTimeout(this.patientSearchTimeout);
+        this.performSearch(true);
     }
 
     selectPatient(patient: Patient): void {
         this.selectedPatient = patient;
         this.currentCaretaker.patient_id = patient.id!;
-        this.patientSearchTerm = patient.full_name;
-        this.showPatientDropdown = false;
+        this.closePatientSearch();
     }
 
     clearPatientSelection(): void {
         this.selectedPatient = null;
         this.currentCaretaker.patient_id = undefined;
-        this.patientSearchTerm = '';
     }
 
     get needsPatientSelection(): boolean {
@@ -126,8 +172,9 @@ export class CaretakerFormModalComponent implements OnChanges {
         };
         this.errorMessage = '';
         this.selectedPatient = null;
-        this.patientSearchTerm = '';
-        this.showPatientDropdown = false;
+        this.searchCpf = '';
+        this.showPatientSearch = false;
+        this.searchResults = [];
     }
 
     onClose(): void {
@@ -213,10 +260,22 @@ export class CaretakerFormModalComponent implements OnChanges {
         return true;
     }
 
-    formatDateForAPI(date: string): string {
+    formatDateForAPI(date: any): string {
         if (!date) return '';
-        const [year, month, day] = date.split('-');
-        return `${month}-${day}-${year}`;
+        if (date instanceof Date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${month}-${day}-${year}`;
+        }
+        if (typeof date === 'string') {
+            const parts = date.split('T')[0].split('-');
+            if (parts.length === 3 && parts[0].length === 4) {
+                return `${parts[1]}-${parts[2]}-${parts[0]}`;
+            }
+            return date;
+        }
+        return String(date);
     }
 
     handleValidationErrors(errors: any): void {
@@ -246,5 +305,12 @@ export class CaretakerFormModalComponent implements OnChanges {
         if (!cpf) return '';
         const cleaned = cpf.replace(/\D/g, '');
         return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    }
+
+    getInitials(name: string): string {
+        if (!name) return '??';
+        const parts = name.split(' ');
+        if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
 }

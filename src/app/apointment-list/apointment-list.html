@@ -374,11 +374,11 @@
             <div class="appt-search-header">
                 <div class="appt-search-title">
                     <div class="appt-search-icon-box">
-                        <i class="fas fa-user-search"></i>
+                        <i class="fas fa-search"></i>
                     </div>
                     <div>
                         <h2>Buscar Atendido</h2>
-                        <p>Pesquise pelo CPF do atendido</p>
+                        <p>Pesquise pelo nome ou CPF do atendido</p>
                     </div>
                 </div>
                 <button class="appt-close-btn" (click)="closePatientSearch()">
@@ -389,13 +389,13 @@
             <div class="appt-search-body">
                 <div class="appt-cpf-search-box">
                     <div class="appt-cpf-input-wrapper">
-                        <i class="fas fa-id-card appt-cpf-icon"></i>
+                        <i class="fas fa-search appt-cpf-icon"></i>
                         <input type="text" class="appt-cpf-input" [(ngModel)]="searchCpf"
                             [ngModelOptions]="{standalone: true}"
-                            placeholder="000.000.000-00"
+                            placeholder="Nome ou 000.000.000-00"
                             (input)="onSearchCpfChange()"
                             (keyup.enter)="searchPatientByCpf()"
-                            maxlength="14">
+                            autocomplete="off">
                         <button type="button" class="appt-cpf-search-btn" (click)="searchPatientByCpf()"
                             [disabled]="searching || !searchCpf">
                             <i class="fas" [ngClass]="searching ? 'fa-spinner fa-spin' : 'fa-search'"></i>
@@ -404,32 +404,42 @@
                     </div>
                     <span class="appt-cpf-hint">
                         <i class="fas fa-info-circle"></i>
-                        Digite o CPF no formato 000.000.000-00 e pressione Buscar
+                        Digite o nome ou CPF para buscar
                     </span>
                 </div>
 
-                <!-- Resultado -->
-                <div class="appt-search-result" *ngIf="searchResult" (click)="selectPatient(searchResult)">
-                    <div class="appt-result-avatar">
-                        {{ getInitials(searchResult.full_name) }}
-                    </div>
-                    <div class="appt-result-info">
-                        <h3>{{ searchResult.full_name }}</h3>
-                        <p><i class="fas fa-id-card"></i> CPF: {{ formatCPF(searchResult.cpf) }}</p>
-                        <p *ngIf="searchResult.birth_date"><i class="far fa-calendar"></i> Nascimento: {{ formatDate(searchResult.birth_date) }}</p>
-                    </div>
-                    <div class="appt-result-select">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Selecionar</span>
+                <!-- Resultados -->
+                <div class="appt-search-results-list" *ngIf="searchResults.length > 0" style="max-height: 350px; overflow-y: auto; padding-right: 5px;">
+                    <div class="appt-search-result" *ngFor="let result of searchResults" (click)="selectPatient(result)" style="margin-bottom: 8px;">
+                        <div class="appt-result-avatar">
+                            {{ getInitials(result.full_name) }}
+                        </div>
+                        <div class="appt-result-info">
+                            <h3>{{ result.full_name }}</h3>
+                            <p><i class="fas fa-id-card"></i> CPF: {{ formatCPF(result.cpf) }}</p>
+                            <p *ngIf="result.birth_date"><i class="far fa-calendar"></i> Nascimento: {{ formatDate(result.birth_date) }}</p>
+                        </div>
+                        <div class="appt-result-select">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Selecionar</span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Empty state -->
-                <div class="appt-search-empty" *ngIf="!searchResult && !searching">
+                <div class="appt-search-empty" *ngIf="searchResults.length === 0 && !searching && searchCpf.length >= 3">
                     <div class="appt-empty-icon">
-                        <i class="fas fa-user-search"></i>
+                        <i class="fas fa-user-slash"></i>
                     </div>
-                    <p>Digite o CPF do atendido para iniciar a busca</p>
+                    <p>Nenhum atendido encontrado para sua busca</p>
+                </div>
+
+                <!-- Initial state -->
+                <div class="appt-search-empty" *ngIf="searchResults.length === 0 && !searching && searchCpf.length < 3">
+                    <div class="appt-empty-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <p>Digite o nome ou CPF do atendido para iniciar a busca</p>
                 </div>
             </div>
         </div>

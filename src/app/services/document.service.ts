@@ -57,6 +57,12 @@ export class DocumentService {
       if (filters.page) {
         params = params.set('page', filters.page.toString());
       }
+      if (filters.start_date) {
+        params = params.set('start_date', filters.start_date);
+      }
+      if (filters.end_date) {
+        params = params.set('end_date', filters.end_date);
+      }
     }
 
     return this.http.get<DocumentsResponse>(this.apiUrl, { params });

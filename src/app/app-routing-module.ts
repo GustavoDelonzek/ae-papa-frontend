@@ -6,7 +6,6 @@ import { PatientRegister } from './patient-register/patient-register';
 import { PatientComponent } from './patient/patient.component';
 import { PatientListComponent } from './patient-list/patient-list.component';
 import { CaretakerList } from './caretaker-list/caretaker-list';
-import { CaretakerRegister } from './caretaker-register/caretaker-register';
 import { CaretakerComponent } from './caretaker/caretaker.component';
 import { AuthGuard } from './guards/auth.guard';
 import { ApointmentCreate } from './apointment-create/apointment-create';

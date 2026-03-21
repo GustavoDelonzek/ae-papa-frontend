@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { PatientService, Patient, CaretakerService, Caretaker, SocioeconomicProfileService, SocioeconomicProfile } from '../services';
 import { Contact } from '../services/caretaker';
@@ -30,11 +30,18 @@ export class PatientComponent implements OnInit {
 
   // Dados dos cuidadores
   caretakers: Caretaker[] = [];
+  filteredCaretakers: Caretaker[] = [];
   loadingCaretakers: boolean = false;
+
+  // Filtros de Cuidador
+  caretakerGenderFilter: string = '';
+  caretakerAgeFilter: string = '';
+  caretakerKinshipFilter: string = '';
 
   // Controle do modal de upload de documentos
   showUploadModal = false;
   currentUserId: number = 0;
+  @ViewChild('docList') docList: any;
 
   // Controle do modal de cuidador
   showCaretakerModal = false;
@@ -59,6 +66,11 @@ export class PatientComponent implements OnInit {
   };
   savingAppointment = false;
   appointmentErrorMessage = '';
+
+  // Filtros de Consulta
+  statusFilter: string = '';
+  objectiveFilter: string = '';
+  dateFilter: any = '';
 
   // Appointment Details Modal
   showDetailsModal = false;
@@ -260,7 +272,9 @@ export class PatientComponent implements OnInit {
 
   onDocumentUploadSuccess(): void {
     this.showUploadModal = false;
-    // O componente filho (document-list) vai recarregar automaticamente
+    if (this.docList) {
+      this.docList.loadDocuments();
+    }
   }
 
   // Métodos para gerenciar cuidadores
@@ -273,6 +287,7 @@ export class PatientComponent implements OnInit {
         this.caretakers = (response.data || []).filter(
           (caretaker: Caretaker) => caretaker.patient_id === this.patientId
         );
+        this.applyCaretakerFilters();
         this.loadingCaretakers = false;
       },
       error: (error: any) => {
@@ -280,6 +295,51 @@ export class PatientComponent implements OnInit {
         this.loadingCaretakers = false;
       }
     });
+  }
+
+  applyCaretakerFilters(): void {
+    let result = [...this.caretakers];
+
+    if (this.caretakerGenderFilter) {
+      result = result.filter(c => c.gender === this.caretakerGenderFilter);
+    }
+
+    if (this.caretakerKinshipFilter) {
+      result = result.filter(c => c.kinship === this.caretakerKinshipFilter);
+    }
+
+    if (this.caretakerAgeFilter) {
+      result = result.filter(c => {
+        if (!c.birth_date) return false;
+        const birth = new Date(c.birth_date);
+        const today = new Date();
+        let age = today.getFullYear() - birth.getFullYear();
+        const m = today.getMonth() - birth.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+
+        if (this.caretakerAgeFilter === '20-30') return age >= 20 && age <= 30;
+        if (this.caretakerAgeFilter === '31-50') return age >= 31 && age <= 50;
+        if (this.caretakerAgeFilter === '51+') return age >= 51;
+        return true;
+      });
+    }
+
+    this.filteredCaretakers = result;
+  }
+
+  onCaretakerFilterChange(): void {
+    this.applyCaretakerFilters();
+  }
+
+  hasActiveCaretakerFilters(): boolean {
+    return !!(this.caretakerGenderFilter || this.caretakerAgeFilter || this.caretakerKinshipFilter);
+  }
+
+  clearCaretakerFilters(): void {
+    this.caretakerGenderFilter = '';
+    this.caretakerAgeFilter = '';
+    this.caretakerKinshipFilter = '';
+    this.applyCaretakerFilters();
   }
 
   addCaretaker(): void {
@@ -353,7 +413,22 @@ export class PatientComponent implements OnInit {
   loadAppointments(): void {
     this.loadingAppointments = true;
 
-    this.appointmentService.listAppointments(1, 100, { patient_id: this.patientId }).subscribe({
+    const filters: any = { patient_id: this.patientId };
+    if (this.statusFilter) filters.status = this.statusFilter;
+    if (this.objectiveFilter) filters.objective = this.objectiveFilter;
+    if (this.dateFilter) {
+      if (this.dateFilter instanceof Date) {
+        const d = this.dateFilter;
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        filters.date = `${year}-${month}-${day}`;
+      } else {
+        filters.date = this.dateFilter;
+      }
+    }
+
+    this.appointmentService.listAppointments(1, 100, filters).subscribe({
       next: (response: any) => {
         this.appointments = response.data || [];
         this.loadingAppointments = false;
@@ -363,6 +438,21 @@ export class PatientComponent implements OnInit {
         this.loadingAppointments = false;
       }
     });
+  }
+
+  onFilterChange(): void {
+    this.loadAppointments();
+  }
+
+  hasActiveFilters(): boolean {
+    return !!(this.statusFilter || this.dateFilter || this.objectiveFilter);
+  }
+
+  clearFilters(): void {
+    this.statusFilter = '';
+    this.dateFilter = '';
+    this.objectiveFilter = '';
+    this.loadAppointments();
   }
 
   openCreateAppointmentModal(): void {
@@ -391,13 +481,24 @@ export class PatientComponent implements OnInit {
     this.savingAppointment = true;
     this.appointmentErrorMessage = '';
 
-    // Converter data de YYYY-MM-DD para MM-DD-YYYY sem usar Date object
-    // para evitar problemas com timezone
-    const dateParts = this.newAppointment.date.split('-');
-    const year = dateParts[0];
-    const month = dateParts[1];
-    const day = dateParts[2];
-    const formattedDate = `${month}-${day}-${year}`;
+    // Converter a data suportando string ou objeto Date do Material UI
+    let formattedDate = '';
+    const aptDate = this.newAppointment.date as any;
+    if (aptDate instanceof Date) {
+        const year = aptDate.getFullYear();
+        const month = String(aptDate.getMonth() + 1).padStart(2, '0');
+        const day = String(aptDate.getDate()).padStart(2, '0');
+        formattedDate = `${month}-${day}-${year}`;
+    } else if (typeof aptDate === 'string') {
+        const dateParts = aptDate.split('T')[0].split('-');
+        if (dateParts.length === 3 && dateParts[0].length === 4) {
+            formattedDate = `${dateParts[1]}-${dateParts[2]}-${dateParts[0]}`;
+        } else {
+            formattedDate = aptDate;
+        }
+    } else {
+        formattedDate = String(aptDate);
+    }
 
     const appointmentData: AppointmentCreate = {
       ...this.newAppointment,

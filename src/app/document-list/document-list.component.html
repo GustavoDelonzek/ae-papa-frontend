@@ -10,11 +10,14 @@
     <div class="filter-dropdown">
       <i class="far fa-file-alt"></i>
       <select [(ngModel)]="selectedType" (change)="applyFilters()">
-        <option value="" disabled selected hidden>Tipo</option>
+        <option value="" disabled selected hidden>Tipo de Documento</option>
         <option value="">Todos</option>
-        <option value="pdf">PDF</option>
-        <option value="docx">DOCX</option>
-        <option value="jpg">Imagem</option>
+        <option value="exam">Exame</option>
+        <option value="medical_report">Laudo</option>
+        <option value="prescription">Receita</option>
+        <option value="report">Relatório</option>
+        <option value="referral">Referenciamento</option>
+        <option value="others">Outros</option>
       </select>
       <i class="fas fa-chevron-down chevron"></i>
     </div>
@@ -24,16 +27,27 @@
       <select [(ngModel)]="statusFilter" (change)="applyFilters()">
         <option value="" disabled selected hidden>Status</option>
         <option value="">Todos</option>
-        <option value="completed">Enviado</option>
         <option value="pending">Pendente</option>
+        <option value="completed">Enviado</option>
         <option value="failed">Falhou</option>
       </select>
       <i class="fas fa-chevron-down chevron"></i>
     </div>
 
-    <div class="date-range-picker">
-      <i class="far fa-calendar"></i>
-      <span>De - Até</span>
+    <div class="custom-date-picker-wrapper">
+      <mat-form-field appearance="outline" class="custom-mat-form-field" subscriptSizing="dynamic">
+        <mat-label>Período (Filtro)</mat-label>
+        <mat-date-range-input [rangePicker]="picker" class="custom-date-input">
+          <input matStartDate placeholder="Data inicial" [(ngModel)]="startDate" (dateChange)="applyFilters()">
+          <input matEndDate placeholder="Data final" [(ngModel)]="endDate" (dateChange)="applyFilters()">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
+      
+      <button class="btn-clear-date" *ngIf="startDate || endDate" (click)="clearDates()" title="Limpar Período">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
 
     <button class="btn-upload" (click)="uploadNewDocument()">
@@ -62,7 +76,7 @@
 
   <!-- Document List -->
   <div class="document-list-container" *ngIf="!loading && !errorMessage && documents.length > 0">
-    <div class="document-card" *ngFor="let doc of documents">
+    <div class="document-card" *ngFor="let doc of documents; trackBy: trackById">
       <!-- Icon -->
       <div class="doc-icon-wrapper">
         <div class="file-icon" [ngClass]="getFileTypeClass(doc.mime_type)">
@@ -78,7 +92,7 @@
         </div>
         <div class="doc-meta">
           <span class="meta-item"><i class="far fa-calendar"></i> {{ formatDate(doc.created_at) }}</span>
-          <span class="meta-item" *ngIf="doc.document_type"><i class="fas fa-tag"></i> {{ doc.document_type }}</span>
+          <span class="meta-item" *ngIf="doc.document_type"><i class="fas fa-tag"></i> {{ getDocumentTypeText(doc.document_type) }}</span>
           <span class="meta-item author" *ngIf="doc.description">{{ doc.description }}</span>
         </div>
       </div>
