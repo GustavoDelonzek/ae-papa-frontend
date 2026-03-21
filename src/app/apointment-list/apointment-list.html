@@ -68,7 +68,8 @@
                     <!-- Date Filter (Date Input) -->
                     <div class="date-input-wrapper" [class.active-date]="!!dateFilter">
                         <i class="far fa-calendar input-icon"></i>
-                        <input type="date" [(ngModel)]="dateFilter" (change)="onFilterChange()" placeholder="Data">
+                        <input type="date" [(ngModel)]="dateFilter" (change)="onFilterChange()" placeholder="Data"
+                            title="Data exata">
                     </div>
 
                 </div>
@@ -142,8 +143,8 @@
                                 {{ getStatusText(item.status || 'pending') }}
                             </span>
                         </td>
-                        <td class="text-truncate" style="max-width: 200px;" title="{{ item.observations }}">
-                            {{ item.observations || '-' }}
+                        <td class="observations-cell" [attr.title]="item.observations || '-'">
+                            <span class="observations-text">{{ item.observations || '-' }}</span>
                         </td>
                         <td class="actions-cell">
                             <button class="btn-icon edit" (click)="onEditAppointment(item); $event.stopPropagation()">
@@ -184,74 +185,183 @@
     <!-- ================================================== -->
     <!-- Modal de Criação de Atendimento -->
     <!-- ================================================== -->
-    <div class="modal-backdrop" *ngIf="showCreateModal" (click)="closeCreateModal()">
-        <div class="modal-content create-modal" (click)="$event.stopPropagation()">
-            <div class="modal-header">
-                <div>
-                    <h2>Novo Atendimento</h2>
-                    <p class="modal-subtitle">Preencha os dados para registrar uma nova consulta</p>
-                </div>
-                <button class="btn-close" (click)="closeCreateModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+    <div class="modal-backdrop appt-modal-backdrop" *ngIf="showCreateModal" (click)="closeCreateModal()">
+        <div class="appt-modal" (click)="$event.stopPropagation()">
 
-            <div class="modal-body">
-                <form (ngSubmit)="submitAppointment()">
-                    <!-- Campo Atendido -->
-                    <div class="form-group">
-                        <label class="form-label">Atendido <span class="required">*</span></label>
-                        <div class="patient-selector" (click)="openPatientSearch()">
-                            <i class="fas fa-search"></i>
-                            <span *ngIf="!selectedPatient" class="placeholder">Clique para buscar um atendido</span>
-                            <span *ngIf="selectedPatient" class="selected-patient">{{ selectedPatient.full_name
-                                }}</span>
+            <!-- Sidebar -->
+            <div class="appt-sidebar">
+                <div class="appt-sidebar-header">
+                    <div class="appt-icon-box">
+                        <i class="fas" [ngClass]="isEditMode() ? 'fa-pen-to-square' : 'fa-calendar-plus'"></i>
+                    </div>
+                    <h3>{{ isEditMode() ? 'Editar Atendimento' : 'Novo Atendimento' }}</h3>
+                    <p>{{ isEditMode() ? 'Atualize os dados da consulta' : 'Registre uma nova consulta no sistema' }}</p>
+                </div>
+
+                <div class="appt-sidebar-summary">
+                    <div class="summary-item" [class.summary-filled]="selectedPatient">
+                        <div class="summary-icon">
+                            <i class="fas" [ngClass]="selectedPatient ? 'fa-check-circle' : 'fa-user'"></i>
+                        </div>
+                        <div class="summary-text">
+                            <span class="summary-label">Atendido</span>
+                            <span class="summary-value">{{ selectedPatient?.full_name || 'Não selecionado' }}</span>
                         </div>
                     </div>
 
-                    <!-- Data do Atendimento -->
-                    <div class="form-group">
-                        <label for="appointmentDate" class="form-label">Data do Atendimento <span
-                                class="required">*</span></label>
-                        <input type="date" id="appointmentDate" name="appointmentDate" class="form-control"
-                            [(ngModel)]="appointmentDate" [disabled]="submitting" required>
+                    <div class="summary-item" [class.summary-filled]="appointmentDate">
+                        <div class="summary-icon">
+                            <i class="fas" [ngClass]="appointmentDate ? 'fa-check-circle' : 'fa-calendar-alt'"></i>
+                        </div>
+                        <div class="summary-text">
+                            <span class="summary-label">Data</span>
+                            <span class="summary-value">{{ appointmentDate ? formatDate(appointmentDate) : 'Não definida' }}</span>
+                        </div>
                     </div>
 
-                    <!-- Objetivo -->
-                    <div class="form-group">
-                        <label for="appointmentObjective" class="form-label">Objetivo <span
-                                class="required">*</span></label>
-                        <select id="appointmentObjective" name="appointmentObjective" class="form-control"
-                            [(ngModel)]="appointmentObjective" [disabled]="submitting" required>
-                            <option value="">Selecione o objetivo</option>
-                            <option value="donation">Doação</option>
-                            <option value="project">Projeto</option>
-                            <option value="treatment">Tratamento</option>
-                            <option value="research">Pesquisa</option>
-                            <option value="other">Outro</option>
-                        </select>
+                    <div class="summary-item" [class.summary-filled]="appointmentObjective">
+                        <div class="summary-icon">
+                            <i class="fas" [ngClass]="appointmentObjective ? 'fa-check-circle' : 'fa-bullseye'"></i>
+                        </div>
+                        <div class="summary-text">
+                            <span class="summary-label">Objetivo</span>
+                            <span class="summary-value">{{ appointmentObjective ? getObjectiveText(appointmentObjective) : 'Não definido' }}</span>
+                        </div>
                     </div>
+                </div>
 
-                    <!-- Observações -->
-                    <div class="form-group">
-                        <label for="observations" class="form-label">Observações</label>
-                        <textarea id="observations" name="observations" class="form-control textarea"
-                            [(ngModel)]="observations" placeholder="Adicione observações relevantes sobre a consulta..."
-                            rows="3" [disabled]="submitting"></textarea>
+                <div class="appt-tip-box">
+                    <i class="fas fa-lightbulb appt-tip-icon"></i>
+                    <div>
+                        <strong>Dica do Sistema</strong>
+                        <p>Use as observações para registrar informações importantes que facilitem o acompanhamento futuro do atendido.</p>
                     </div>
+                </div>
+            </div>
 
-                    <!-- Footer / Actions -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn-secondary" (click)="resetForm()" [disabled]="submitting">
-                            Limpar
-                        </button>
-                        <button type="submit" class="btn-primary"
-                            [disabled]="!selectedPatient || !appointmentDate || !appointmentObjective || submitting">
-                            <i class="fas" [ngClass]="submitting ? 'fa-spinner fa-spin' : 'fa-check'"></i>
-                            {{ submitting ? 'Criando...' : 'Criar Atendimento' }}
-                        </button>
+            <!-- Main Content -->
+            <div class="appt-main">
+                <div class="appt-main-header">
+                    <div class="appt-main-title">
+                        <i class="fas fa-file-medical-alt appt-title-icon"></i>
+                        <div>
+                            <h2>Dados do Atendimento</h2>
+                            <p>Preencha todos os campos obrigatórios</p>
+                        </div>
                     </div>
-                </form>
+                    <button class="appt-close-btn" (click)="closeCreateModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="appt-main-body">
+                    <form (ngSubmit)="submitAppointment()">
+
+                        <!-- Atendido -->
+                        <div class="appt-field-group">
+                            <label class="appt-field-label">
+                                Atendido <span class="appt-required">*</span>
+                            </label>
+                            <div class="appt-patient-selector" (click)="openPatientSearch()" [class.appt-selector-filled]="selectedPatient">
+                                <div class="appt-selector-left">
+                                    <div class="appt-selector-avatar" *ngIf="selectedPatient">
+                                        {{ getInitials(selectedPatient.full_name) }}
+                                    </div>
+                                    <i class="fas fa-search appt-selector-icon" *ngIf="!selectedPatient"></i>
+                                    <div class="appt-selector-info">
+                                        <span class="appt-selector-name" *ngIf="selectedPatient">{{ selectedPatient.full_name }}</span>
+                                        <span class="appt-selector-hint" *ngIf="!selectedPatient">Clique para buscar um atendido...</span>
+                                        <span class="appt-selector-cpf" *ngIf="selectedPatient">CPF: {{ formatCPF(selectedPatient.cpf) }}</span>
+                                    </div>
+                                </div>
+                                <span class="appt-selector-badge" *ngIf="selectedPatient">
+                                    <i class="fas fa-exchange-alt"></i> Trocar
+                                </span>
+                                <i class="fas fa-chevron-right appt-selector-arrow" *ngIf="!selectedPatient"></i>
+                            </div>
+                        </div>
+
+                        <!-- Data -->
+                        <div class="appt-field-group">
+                            <label class="appt-field-label">
+                                Data do Atendimento <span class="appt-required">*</span>
+                            </label>
+                            <div class="appt-input-wrapper">
+                                <i class="far fa-calendar-alt appt-input-icon"></i>
+                                <input type="date" name="appointmentDate" class="appt-input appt-input-padded"
+                                    [(ngModel)]="appointmentDate" [disabled]="submitting" required>
+                            </div>
+                        </div>
+
+                        <!-- Objetivo - Cards -->
+                        <div class="appt-field-group">
+                            <label class="appt-field-label">
+                                Objetivo <span class="appt-required">*</span>
+                            </label>
+                            <div class="appt-objective-grid">
+                                <button type="button" class="appt-obj-card"
+                                    [class.appt-obj-active]="appointmentObjective === 'donation'"
+                                    [class.appt-obj-donation]="true"
+                                    (click)="appointmentObjective = 'donation'">
+                                    <i class="fas fa-hand-holding-heart"></i>
+                                    <span>Doação</span>
+                                </button>
+                                <button type="button" class="appt-obj-card"
+                                    [class.appt-obj-active]="appointmentObjective === 'project'"
+                                    [class.appt-obj-project]="true"
+                                    (click)="appointmentObjective = 'project'">
+                                    <i class="fas fa-project-diagram"></i>
+                                    <span>Projeto</span>
+                                </button>
+                                <button type="button" class="appt-obj-card"
+                                    [class.appt-obj-active]="appointmentObjective === 'treatment'"
+                                    [class.appt-obj-treatment]="true"
+                                    (click)="appointmentObjective = 'treatment'">
+                                    <i class="fas fa-heartbeat"></i>
+                                    <span>Tratamento</span>
+                                </button>
+                                <button type="button" class="appt-obj-card"
+                                    [class.appt-obj-active]="appointmentObjective === 'research'"
+                                    [class.appt-obj-research]="true"
+                                    (click)="appointmentObjective = 'research'">
+                                    <i class="fas fa-flask"></i>
+                                    <span>Pesquisa</span>
+                                </button>
+                                <button type="button" class="appt-obj-card"
+                                    [class.appt-obj-active]="appointmentObjective === 'other'"
+                                    [class.appt-obj-other]="true"
+                                    (click)="appointmentObjective = 'other'">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                    <span>Outro</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Observações -->
+                        <div class="appt-field-group">
+                            <label class="appt-field-label">
+                                Observações <span class="appt-optional">(opcional)</span>
+                            </label>
+                            <textarea name="observations" class="appt-input appt-textarea"
+                                [(ngModel)]="observations"
+                                placeholder="Descreva informações relevantes sobre este atendimento..."
+                                rows="3" [disabled]="submitting"></textarea>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="appt-actions">
+                            <button type="button" class="appt-btn-ghost" (click)="resetForm()" [disabled]="submitting">
+                                <i class="fas fa-undo"></i> Limpar
+                            </button>
+                            <button type="submit" class="appt-btn-submit"
+                                [disabled]="!selectedPatient || !appointmentDate || !appointmentObjective || submitting">
+                                <i class="fas" [ngClass]="submitting ? 'fa-spinner fa-spin' : 'fa-check'"></i>
+                                {{ submitting ? (isEditMode() ? 'Atualizando...' : 'Registrando...') : (isEditMode() ? 'Salvar Alterações' : 'Criar Atendimento') }}
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -260,50 +370,65 @@
     <!-- Modal de Busca de Atendido -->
     <!-- ================================================== -->
     <div class="modal-backdrop" *ngIf="showPatientSearch" (click)="closePatientSearch()">
-        <div class="modal-content search-modal" (click)="$event.stopPropagation()">
-            <div class="modal-header">
-                <h2>Buscar Atendido</h2>
-                <button class="btn-close" (click)="closePatientSearch()">
+        <div class="appt-search-modal" (click)="$event.stopPropagation()">
+            <div class="appt-search-header">
+                <div class="appt-search-title">
+                    <div class="appt-search-icon-box">
+                        <i class="fas fa-user-search"></i>
+                    </div>
+                    <div>
+                        <h2>Buscar Atendido</h2>
+                        <p>Pesquise pelo CPF do atendido</p>
+                    </div>
+                </div>
+                <button class="appt-close-btn" (click)="closePatientSearch()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
 
-            <div class="modal-body">
-                <div class="search-section">
-                    <div class="search-input-group">
-                        <i class="fas fa-id-card"></i>
-                        <input type="text" [(ngModel)]="searchCpf" [ngModelOptions]="{standalone: true}"
-                            placeholder="Digite o CPF do atendido" (input)="onSearchCpfChange()"
-                            (keyup.enter)="searchPatientByCpf()" maxlength="14">
-                        <button type="button" class="btn-search-action" (click)="searchPatientByCpf()"
+            <div class="appt-search-body">
+                <div class="appt-cpf-search-box">
+                    <div class="appt-cpf-input-wrapper">
+                        <i class="fas fa-id-card appt-cpf-icon"></i>
+                        <input type="text" class="appt-cpf-input" [(ngModel)]="searchCpf"
+                            [ngModelOptions]="{standalone: true}"
+                            placeholder="000.000.000-00"
+                            (input)="onSearchCpfChange()"
+                            (keyup.enter)="searchPatientByCpf()"
+                            maxlength="14">
+                        <button type="button" class="appt-cpf-search-btn" (click)="searchPatientByCpf()"
                             [disabled]="searching || !searchCpf">
                             <i class="fas" [ngClass]="searching ? 'fa-spinner fa-spin' : 'fa-search'"></i>
+                            {{ searching ? 'Buscando...' : 'Buscar' }}
                         </button>
                     </div>
-                    <small class="hint">Formato: 000.000.000-00</small>
+                    <span class="appt-cpf-hint">
+                        <i class="fas fa-info-circle"></i>
+                        Digite o CPF no formato 000.000.000-00 e pressione Buscar
+                    </span>
                 </div>
 
-                <!-- Resultado da busca -->
-                <div class="search-result" *ngIf="searchResult">
-                    <div class="patient-card" (click)="selectPatient(searchResult)">
-                        <div class="patient-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="patient-info">
-                            <h3>{{ searchResult.full_name }}</h3>
-                            <p><strong>CPF:</strong> {{ formatCPF(searchResult.cpf) }}</p>
-                            <p *ngIf="searchResult.birth_date"><strong>Data de Nascimento:</strong> {{
-                                formatDate(searchResult.birth_date) }}</p>
-                        </div>
-                        <div class="select-icon">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
+                <!-- Resultado -->
+                <div class="appt-search-result" *ngIf="searchResult" (click)="selectPatient(searchResult)">
+                    <div class="appt-result-avatar">
+                        {{ getInitials(searchResult.full_name) }}
+                    </div>
+                    <div class="appt-result-info">
+                        <h3>{{ searchResult.full_name }}</h3>
+                        <p><i class="fas fa-id-card"></i> CPF: {{ formatCPF(searchResult.cpf) }}</p>
+                        <p *ngIf="searchResult.birth_date"><i class="far fa-calendar"></i> Nascimento: {{ formatDate(searchResult.birth_date) }}</p>
+                    </div>
+                    <div class="appt-result-select">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Selecionar</span>
                     </div>
                 </div>
 
-                <!-- Estado vazio -->
-                <div class="empty-state" *ngIf="!searchResult && !searching">
-                    <i class="fas fa-search"></i>
+                <!-- Empty state -->
+                <div class="appt-search-empty" *ngIf="!searchResult && !searching">
+                    <div class="appt-empty-icon">
+                        <i class="fas fa-user-search"></i>
+                    </div>
                     <p>Digite o CPF do atendido para iniciar a busca</p>
                 </div>
             </div>

@@ -86,8 +86,16 @@ export class PatientService {
     // Map frontend filters to standardized backend query params
     if (filters.search) params = params.set('search', filters.search.trim());
     if (filters.gender) params = params.set('gender', filters.gender);
+    if (filters.ageFilter) {
+      params = params.set('ageFilter', filters.ageFilter);
+      params = params.set('age_filter', filters.ageFilter);
+    }
     if (filters.age_min) params = params.set('age_min', filters.age_min.toString());
     if (filters.age_max) params = params.set('age_max', filters.age_max.toString());
+    if (filters.birthYear) {
+      params = params.set('birthYear', filters.birthYear.toString());
+      params = params.set('birth_year', filters.birthYear.toString());
+    }
     if (filters.created_at) params = params.set('created_at', filters.created_at);
     if (filters.sort_by) params = params.set('sort_by', filters.sort_by);
     if (filters.sort_order) params = params.set('sort_order', filters.sort_order);
@@ -97,8 +105,8 @@ export class PatientService {
 
   getPatientByCpf(cpf: string): Observable<PatientsListResponse> {
     const params = new HttpParams()
-      .set('cpf', cpf)
-      .set('per_page', '1');
+      .set('search', cpf)
+      .set('per_page', '5');
 
     return this.http.get<PatientsListResponse>(`${API_URL}/patients`, { params });
   }

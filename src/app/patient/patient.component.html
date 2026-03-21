@@ -333,55 +333,143 @@
   (onClose)="closeUploadModal()" (onSuccess)="onDocumentUploadSuccess()">
 </app-document-upload>
 
-<div class="modal-overlay" *ngIf="showAppointmentModal" (click)="closeAppointmentModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>Nova Consulta</h2>
-      <button class="btn-close" (click)="closeAppointmentModal()">
-        <i class="fas fa-times"></i>
-      </button>
+<div class="modal-overlay patient-appt-backdrop" *ngIf="showAppointmentModal" (click)="closeAppointmentModal()">
+  <div class="patient-appt-modal" (click)="$event.stopPropagation()">
+
+    <div class="patient-appt-sidebar">
+      <div class="patient-appt-sidebar-header">
+        <div class="patient-appt-icon-box">
+          <i class="fas fa-calendar-plus"></i>
+        </div>
+        <h3>Nova Consulta</h3>
+        <p>Registre um novo atendimento para este atendido</p>
+      </div>
+
+      <div class="patient-appt-summary">
+        <div class="patient-appt-summary-item patient-appt-summary-filled">
+          <div class="patient-appt-summary-icon">
+            <i class="fas fa-user-check"></i>
+          </div>
+          <div class="patient-appt-summary-text">
+            <span class="patient-appt-summary-label">Atendido</span>
+            <span class="patient-appt-summary-value">{{ patientData?.full_name || 'Nao informado' }}</span>
+          </div>
+        </div>
+
+        <div class="patient-appt-summary-item" [class.patient-appt-summary-filled]="newAppointment.date">
+          <div class="patient-appt-summary-icon">
+            <i class="fas" [ngClass]="newAppointment.date ? 'fa-check-circle' : 'fa-calendar-alt'"></i>
+          </div>
+          <div class="patient-appt-summary-text">
+            <span class="patient-appt-summary-label">Data</span>
+            <span class="patient-appt-summary-value">{{ newAppointment.date || 'Nao definida' }}</span>
+          </div>
+        </div>
+
+        <div class="patient-appt-summary-item" [class.patient-appt-summary-filled]="newAppointment.objective">
+          <div class="patient-appt-summary-icon">
+            <i class="fas" [ngClass]="newAppointment.objective ? 'fa-check-circle' : 'fa-bullseye'"></i>
+          </div>
+          <div class="patient-appt-summary-text">
+            <span class="patient-appt-summary-label">Objetivo</span>
+            <span class="patient-appt-summary-value">{{ newAppointment.objective ? getObjectiveText(newAppointment.objective) : 'Nao definido' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="patient-appt-tip-box">
+        <i class="fas fa-lightbulb patient-appt-tip-icon"></i>
+        <div>
+          <strong>Dica do Sistema</strong>
+          <p>Inclua observacoes curtas e objetivas para facilitar o acompanhamento no historico.</p>
+        </div>
+      </div>
     </div>
 
-    <div class="modal-body">
-      <form (ngSubmit)="createAppointment()" #appointmentForm="ngForm">
-        <div class="form-group">
-          <label>Atendido</label>
-          <input type="text" class="form-control" [value]="patientData?.full_name" disabled>
+    <div class="patient-appt-main">
+      <div class="patient-appt-main-header">
+        <div class="patient-appt-main-title">
+          <i class="fas fa-file-medical-alt patient-appt-title-icon"></i>
+          <div>
+            <h2>Dados da Consulta</h2>
+            <p>Preencha os campos obrigatorios para agendar</p>
+          </div>
         </div>
+        <button class="patient-appt-close-btn" (click)="closeAppointmentModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
 
-        <div class="form-group">
-          <label>Data da Consulta *</label>
-          <input type="date" name="date" class="form-control" [(ngModel)]="newAppointment.date" required>
-        </div>
+      <div class="patient-appt-main-body">
+        <form (ngSubmit)="createAppointment()" #appointmentForm="ngForm">
+          <div class="patient-appt-field-group">
+            <label class="patient-appt-field-label">Atendido</label>
+            <input type="text" class="patient-appt-input" [value]="patientData?.full_name" disabled>
+          </div>
 
-        <div class="form-group">
-          <label>Objetivo *</label>
-          <select name="objective" class="form-control" [(ngModel)]="newAppointment.objective" required>
-            <option value="" disabled selected>Selecione...</option>
-            <option value="donation">Doação</option>
-            <option value="project">Projeto</option>
-            <option value="treatment">Tratamento</option>
-            <option value="research">Pesquisa</option>
-            <option value="other">Outro</option>
-          </select>
-        </div>
+          <div class="patient-appt-field-group">
+            <label class="patient-appt-field-label">Data da Consulta <span class="patient-appt-required">*</span></label>
+            <div class="patient-appt-input-wrapper">
+              <i class="far fa-calendar-alt patient-appt-input-icon"></i>
+              <input type="date" name="date" class="patient-appt-input patient-appt-input-padded"
+                [(ngModel)]="newAppointment.date" required>
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label>Observações</label>
-          <textarea name="observations" class="form-control" rows="4"
-            [(ngModel)]="newAppointment.observations"></textarea>
-        </div>
+          <div class="patient-appt-field-group">
+            <label class="patient-appt-field-label">Objetivo <span class="patient-appt-required">*</span></label>
+            <div class="patient-appt-objective-grid">
+              <button type="button" class="patient-appt-obj-card"
+                [class.patient-appt-obj-active]="newAppointment.objective === 'donation'"
+                [class.patient-appt-obj-donation]="true" (click)="newAppointment.objective = 'donation'">
+                <i class="fas fa-hand-holding-heart"></i>
+                <span>Doacao</span>
+              </button>
+              <button type="button" class="patient-appt-obj-card"
+                [class.patient-appt-obj-active]="newAppointment.objective === 'project'"
+                [class.patient-appt-obj-project]="true" (click)="newAppointment.objective = 'project'">
+                <i class="fas fa-project-diagram"></i>
+                <span>Projeto</span>
+              </button>
+              <button type="button" class="patient-appt-obj-card"
+                [class.patient-appt-obj-active]="newAppointment.objective === 'treatment'"
+                [class.patient-appt-obj-treatment]="true" (click)="newAppointment.objective = 'treatment'">
+                <i class="fas fa-heartbeat"></i>
+                <span>Tratamento</span>
+              </button>
+              <button type="button" class="patient-appt-obj-card"
+                [class.patient-appt-obj-active]="newAppointment.objective === 'research'"
+                [class.patient-appt-obj-research]="true" (click)="newAppointment.objective = 'research'">
+                <i class="fas fa-flask"></i>
+                <span>Pesquisa</span>
+              </button>
+              <button type="button" class="patient-appt-obj-card"
+                [class.patient-appt-obj-active]="newAppointment.objective === 'other'"
+                [class.patient-appt-obj-other]="true" (click)="newAppointment.objective = 'other'">
+                <i class="fas fa-ellipsis-h"></i>
+                <span>Outro</span>
+              </button>
+            </div>
+            <input type="hidden" name="objective" [(ngModel)]="newAppointment.objective" required>
+          </div>
 
-        <div class="modal-footer">
-          <button type="button" class="btn-cancel" (click)="closeAppointmentModal()">Cancelar</button>
-          <button type="submit" class="btn-submit" [disabled]="!appointmentForm.form.valid || savingAppointment">
-            <span *ngIf="!savingAppointment">Agendar</span>
-            <span *ngIf="savingAppointment"><i class="fas fa-spinner fa-spin"></i></span>
-          </button>
+          <div class="patient-appt-field-group">
+            <label class="patient-appt-field-label">Observacoes</label>
+            <textarea name="observations" class="patient-appt-input patient-appt-textarea" rows="4"
+              [(ngModel)]="newAppointment.observations"></textarea>
+          </div>
+
+          <div class="patient-appt-actions">
+            <button type="button" class="patient-appt-btn-ghost" (click)="closeAppointmentModal()">Cancelar</button>
+            <button type="submit" class="patient-appt-btn-submit" [disabled]="!appointmentForm.form.valid || savingAppointment">
+              <span *ngIf="!savingAppointment">Agendar</span>
+              <span *ngIf="savingAppointment"><i class="fas fa-spinner fa-spin"></i></span>
+            </button>
+          </div>
+        </form>
+        <div class="alert-error" *ngIf="appointmentErrorMessage">
+          {{ appointmentErrorMessage }}
         </div>
-      </form>
-      <div class="alert-error" *ngIf="appointmentErrorMessage">
-        {{ appointmentErrorMessage }}
       </div>
     </div>
   </div>

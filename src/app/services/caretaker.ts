@@ -81,15 +81,35 @@ export class CaretakerService {
   /**
    * Obter lista de cuidadores com paginação e filtros
    */
-  getCaretakers(page: number = 1, perPage: number = 15, searchTerm?: string): Observable<CaretakersListResponse> {
+  getCaretakers(page: number = 1, perPage: number = 15, filtersOrSearch?: any): Observable<CaretakersListResponse> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('per_page', perPage.toString());
 
-    // Adicionar filtro de pesquisa se fornecido
-    if (searchTerm && searchTerm.trim()) {
-      params = params.set('full_name', searchTerm.trim());
+    const filters = typeof filtersOrSearch === 'string'
+      ? { search: filtersOrSearch }
+      : (filtersOrSearch || {});
+
+    if (filters.search && filters.search.trim()) {
+      params = params.set('search', filters.search.trim());
+      params = params.set('full_name', filters.search.trim());
     }
+
+    if (filters.gender) params = params.set('gender', filters.gender);
+    if (filters.kinship) params = params.set('kinship', filters.kinship);
+
+    if (filters.ageFilter) {
+      params = params.set('ageFilter', filters.ageFilter);
+      params = params.set('age_filter', filters.ageFilter);
+    }
+
+    if (filters.birthYear) {
+      params = params.set('birthYear', filters.birthYear.toString());
+      params = params.set('birth_year', filters.birthYear.toString());
+    }
+
+    if (filters.sort_by) params = params.set('sort_by', filters.sort_by);
+    if (filters.sort_order) params = params.set('sort_order', filters.sort_order);
 
     return this.http.get<CaretakersListResponse>(`${API_URL}/caregivers`, { params });
   }

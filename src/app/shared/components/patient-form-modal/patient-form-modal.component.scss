@@ -26,7 +26,7 @@ $success-color: #10b981;
     background: white;
     width: 95%;
     max-width: 900px; // Wider for sidebar layout
-    height: auto;
+    height: min(90vh, 760px);
     max-height: 90vh;
     border-radius: 12px;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
@@ -113,6 +113,12 @@ $success-color: #10b981;
             align-items: flex-start;
             gap: 12px;
             position: relative;
+            cursor: pointer;
+            transition: opacity 0.2s;
+
+            &:hover {
+                opacity: 0.9;
+            }
 
             &:not(:last-child)::after {
                 content: '';
@@ -250,6 +256,7 @@ $success-color: #10b981;
         flex: 1;
         padding: 32px;
         overflow-y: auto;
+        min-height: 0;
     }
 
     .main-footer {
@@ -305,6 +312,9 @@ $success-color: #10b981;
 // Form Styles
 .step-content-container {
     animation: fadeIn 0.3s ease-out;
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
 }
 
 .form-group {
@@ -325,6 +335,7 @@ $success-color: #10b981;
 
     .form-control {
         width: 100%;
+        box-sizing: border-box;
         padding: 12px;
         border: 1px solid $border-color;
         border-radius: 8px;
@@ -346,10 +357,30 @@ $success-color: #10b981;
 
 .form-row {
     display: flex;
-    gap: 20px;
+    column-gap: 20px;
+    row-gap: 12px;
+    align-items: flex-start;
+    flex-wrap: wrap;
 
     .form-group {
-        flex: 1;
+        flex: 1 1 260px;
+        min-width: 260px;
+    }
+}
+
+@media (max-width: 768px) {
+    .step-content-container {
+        min-height: auto;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 14px;
+
+        .form-group {
+            width: 100%;
+            min-width: 0;
+        }
     }
 }
 
@@ -360,11 +391,23 @@ $success-color: #10b981;
     padding: 16px;
     border-radius: 8px;
     border: 1px dashed darken($primary-light, 10%);
+    overflow: visible;
 
     h4 {
         margin: 0 0 12px;
         font-size: 14px;
         color: $primary-color;
+    }
+
+    .form-row {
+        gap: 12px;
+        align-items: flex-start;
+        flex-wrap: nowrap;
+
+        .form-group {
+            min-width: 0;
+            margin-bottom: 12px;
+        }
     }
 
     .contact-form-row {
