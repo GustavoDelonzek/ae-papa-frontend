@@ -183,11 +183,17 @@ export class HomeComponent implements OnInit {
     }
 
     this.loadingAppointments = true;
-    const dateFilter = SharedUtils.formatDateForAPI(this.selectedDate);
+    const dateFilter = this.toDateKey(this.selectedDate);
 
     this.appointmentService.listAppointments(1, 100, { date: dateFilter }).subscribe({
       next: (response) => {
-        this.selectedAppointments = response.data || [];
+        const selectedDateKey = this.toDateKey(this.selectedDate);
+        const appointments = response.data || [];
+
+        this.selectedAppointments = appointments
+          .filter((appointment) => this.toDateKey(appointment.date) === selectedDateKey)
+          .sort((a, b) => (a.id || 0) - (b.id || 0));
+
         this.loadingAppointments = false;
       },
       error: (error: any) => {
@@ -241,10 +247,54 @@ export class HomeComponent implements OnInit {
   }
 
   navigateToRegister(): void {
-    this.router.navigate(['/lista-pacientes']);
+    this.router.navigate(['/registro-usuario']);
   }
 
   navigateToAppointments(): void {
     this.router.navigate(['/lista-consultas']);
+  }
+
+  getObjectiveText(objective?: string): string {
+    if (!objective) return 'Atendimento';
+
+    const objectiveMap: { [key: string]: string } = {
+      donation: 'Doação',
+      project: 'Projeto',
+      treatment: 'Tratamento',
+      research: 'Pesquisa',
+      other: 'Outro'
+    };
+
+    return objectiveMap[objective] || objective;
+  }
+
+  getStatusText(status?: string): string {
+    const normalized = (status || 'pending').toLowerCase();
+    const statusMap: { [key: string]: string } = {
+      pending: 'Pendente',
+      scheduled: 'Agendado',
+      confirmed: 'Confirmado',
+      completed: 'Concluído',
+      done: 'Concluído',
+      cancelled: 'Cancelado',
+      canceled: 'Cancelado'
+    };
+
+    return statusMap[normalized] || 'Pendente';
+  }
+
+  formatAppointmentDate(date?: string): string {
+    return SharedUtils.formatDate(date);
+  }
+
+  private toDateKey(date: string | Date | null | undefined): string {
+    if (!date) return '';
+    const parsed = date instanceof Date ? date : SharedUtils.parseDate(date);
+    if (isNaN(parsed.getTime())) return '';
+
+    const year = parsed.getFullYear();
+    const month = String(parsed.getMonth() + 1).padStart(2, '0');
+    const day = String(parsed.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 }

@@ -10,6 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
     selector: 'app-patient-form-modal',
@@ -20,7 +21,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
         MatFormFieldModule,
         MatInputModule,
         MatIconModule,
-        MatDatepickerModule
+        MatDatepickerModule,
+        MatSnackBarModule
     ],
     templateUrl: './patient-form-modal.component.html',
     styleUrls: ['./patient-form-modal.component.scss'],
@@ -33,7 +35,19 @@ export class PatientFormModalComponent implements OnInit {
 
     isEditing: boolean = false;
     isSaving: boolean = false;
-    errorMessage: string = '';
+    
+    get errorMessage(): string { return ''; }
+    set errorMessage(msg: string) {
+        if (msg) {
+            this.snackBar.open(msg, 'Fechar', {
+                duration: 3000,
+                panelClass: ['error-snackbar'],
+                horizontalPosition: 'end',
+                verticalPosition: 'top'
+            });
+        }
+    }
+
     currentStep: number = 1;
     maxBirthDate: Date = new Date();
 
@@ -62,7 +76,7 @@ export class PatientFormModalComponent implements OnInit {
         cep: ''
     };
 
-    constructor(private patientService: PatientService) { }
+    constructor(private patientService: PatientService, private snackBar: MatSnackBar) { }
 
     ngOnInit(): void {
     }
@@ -433,5 +447,13 @@ export class PatientFormModalComponent implements OnInit {
         if (errors.cpf) this.errorMessage = `CPF: ${errors.cpf[0]}`;
         else if (errors.full_name) this.errorMessage = `Nome: ${errors.full_name[0]}`;
         else this.errorMessage = 'Dados inválidos. Verifique os campos.';
+    }
+
+    formatCPF(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        const cleaned = input.value.replace(/\D/g, '');
+        const formatted = SharedUtils.formatCPF(cleaned.substring(0, 11));
+        input.value = formatted;
+        this.currentPatient.cpf = formatted;
     }
 }

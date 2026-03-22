@@ -104,7 +104,7 @@
                 <span class="action-label-new">Estatísticas</span>
               </div>    
               
-              <div class="action-card-new">
+              <div class="action-card-new" (click)="navigateToRegister()">
                 <div class="action-icon-new">
                   <i class="fas fa-user"></i>
                 </div>
@@ -241,16 +241,19 @@
                   Nenhum atendimento para o dia selecionado.
                 </div>
 
-                <div *ngFor="let apt of selectedAppointments" class="alert-item" [ngClass]="{'success': apt.status === 'done', 'urgent': apt.status === 'canceled', 'warning': apt.status !== 'done' && apt.status !== 'canceled'}">
+                <div *ngFor="let apt of selectedAppointments" class="alert-item" [ngClass]="{'success': apt.status === 'done' || apt.status === 'completed', 'urgent': apt.status === 'canceled' || apt.status === 'cancelled', 'warning': apt.status !== 'done' && apt.status !== 'completed' && apt.status !== 'canceled' && apt.status !== 'cancelled'}">
                   <div class="alert-indicator"></div>
-                  <div class="alert-time">ID #{{ apt.id }}</div>
+                  <div class="alert-time">#{{ apt.id }}</div>
                   <div class="alert-content">
-                    <span class="alert-title">{{ apt.objective || 'Atendimento' }}</span>
+                    <span class="alert-title">{{ getObjectiveText(apt.objective) }}</span>
                     <span class="alert-description" *ngIf="apt.patient">Paciente: {{ apt.patient.full_name }}</span>
                     <span class="alert-description" *ngIf="!apt.patient">Paciente não identificado</span>
+                    <span class="alert-description">Data: {{ formatAppointmentDate(apt.date) }}</span>
+                    <span class="alert-description">Status: {{ getStatusText(apt.status) }}</span>
+                    <span class="alert-description" *ngIf="apt.observations">Observações: {{ apt.observations }}</span>
                   </div>
-                  <span class="alert-badge" *ngIf="apt.status === 'done'">CONCLUÍDO</span>
-                  <span class="alert-badge" *ngIf="apt.status === 'canceled'" style="background: #fee2e2; color: #991b1b;">CANCELADO</span>
+                  <span class="alert-badge" *ngIf="apt.status === 'done' || apt.status === 'completed'">CONCLUÍDO</span>
+                  <span class="alert-badge" *ngIf="apt.status === 'canceled' || apt.status === 'cancelled'" style="background: #fee2e2; color: #991b1b;">CANCELADO</span>
                 </div>
                 
               </div>

@@ -655,10 +655,10 @@
   }
 
   .alert-time {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     color: #1f2937;
-    min-width: 45px;
+    min-width: 40px;
   }
 
   .alert-content {
@@ -676,6 +676,8 @@
     .alert-description {
       font-size: 12px;
       color: #6b7280;
+      line-height: 1.35;
+      word-break: break-word;
     }
   }
 

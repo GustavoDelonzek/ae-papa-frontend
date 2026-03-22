@@ -92,7 +92,7 @@
                                 <div class="form-group">
                                     <label>CPF <span class="required">*</span></label>
                                     <input type="text" name="cpf" class="form-control" [(ngModel)]="currentPatient.cpf"
-                                        required mask="000.000.000-00" placeholder="000.000.000-00">
+                                        required (input)="formatCPF($event)" maxlength="14" placeholder="000.000.000-00">
                                 </div>
 
                                 <div class="form-group">
@@ -210,9 +210,7 @@
 
                     </form>
 
-                    <div class="alert-error" *ngIf="errorMessage">
-                        <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
-                    </div>
+
                 </div>
 
                 <div class="main-footer">

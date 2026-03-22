@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
     selector: 'app-caretaker-form-modal',
@@ -18,7 +19,8 @@ import { MatNativeDateModule } from '@angular/material/core';
         MatFormFieldModule,
         MatInputModule,
         MatDatepickerModule,
-        MatNativeDateModule
+        MatNativeDateModule,
+        MatSnackBarModule
     ],
     templateUrl: './caretaker-form-modal.component.html',
     styleUrls: ['./caretaker-form-modal.component.scss'],
@@ -32,7 +34,19 @@ export class CaretakerFormModalComponent implements OnChanges {
 
     isEditing: boolean = false;
     isSaving: boolean = false;
-    errorMessage: string = '';
+    
+    get errorMessage(): string { return ''; }
+    set errorMessage(msg: string) {
+        if (msg) {
+            this.snackBar.open(msg, 'Fechar', {
+                duration: 3000,
+                panelClass: ['error-snackbar'],
+                horizontalPosition: 'end',
+                verticalPosition: 'top'
+            });
+        }
+    }
+
     maxBirthDate: Date = new Date();
 
     // Patient search
@@ -55,7 +69,8 @@ export class CaretakerFormModalComponent implements OnChanges {
 
     constructor(
         private caretakerService: CaretakerService,
-        private patientService: PatientService
+        private patientService: PatientService,
+        private snackBar: MatSnackBar
     ) { }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -262,9 +277,9 @@ export class CaretakerFormModalComponent implements OnChanges {
     formatCPF(event: Event): void {
         const input = event.target as HTMLInputElement;
         const cleaned = input.value.replace(/\D/g, '');
-        if (cleaned.length <= 11) {
-            this.currentCaretaker.cpf = SharedUtils.formatCPF(cleaned);
-        }
+        const formatted = SharedUtils.formatCPF(cleaned.substring(0, 11));
+        input.value = formatted;
+        this.currentCaretaker.cpf = formatted;
     }
 
     formatPatientCPF(cpf: string): string {
