@@ -44,8 +44,9 @@ export class DocumentListComponent implements OnInit, OnDestroy {
 
   selectedType: string = '';
   searchTerm = '';
-  startDate: string = '';
-  endDate: string = '';
+  startDate: Date | string | null = null;
+  endDate: Date | string | null = null;
+  maxFilterDate: Date = new Date();
 
   currentPage = 1;
   lastPage = 1;
@@ -150,6 +151,10 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   applyFilters(): void {
+    if (!this.validateDateRange()) {
+      return;
+    }
+
     this.stopPolling();
     this.currentPage = 1;
     this.loadDocuments();
@@ -165,9 +170,42 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   clearDates(): void {
-    this.startDate = '';
-    this.endDate = '';
+    this.startDate = null;
+    this.endDate = null;
     this.applyFilters();
+  }
+
+  private validateDateRange(): boolean {
+    this.errorMessage = '';
+
+    if (!this.startDate || !this.endDate) {
+      return true;
+    }
+
+    const start = this.startDate instanceof Date ? this.startDate : SharedUtils.parseDate(this.startDate);
+    const end = this.endDate instanceof Date ? this.endDate : SharedUtils.parseDate(this.endDate);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      this.errorMessage = 'Período inválido. Verifique as datas selecionadas.';
+      return false;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+
+    if (start > end) {
+      this.errorMessage = 'A data inicial não pode ser maior que a data final.';
+      return false;
+    }
+
+    if (start > today || end > today) {
+      this.errorMessage = 'O período não pode conter datas futuras.';
+      return false;
+    }
+
+    return true;
   }
 
   getStatusText(status: string): string {

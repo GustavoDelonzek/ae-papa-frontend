@@ -68,7 +68,7 @@
                     <!-- Date Filter (Date Input) -->
                     <div class="date-input-wrapper" [class.active-date]="!!dateFilter">
                         <i class="far fa-calendar input-icon"></i>
-                        <input type="date" [(ngModel)]="dateFilter" (change)="onFilterChange()" placeholder="Data"
+                        <input type="date" [(ngModel)]="dateFilter" [max]="maxFilterDate" (change)="onFilterChange()" placeholder="Data"
                             title="Data exata">
                     </div>
 
@@ -294,7 +294,7 @@
                             <div class="appt-input-wrapper">
                                 <i class="far fa-calendar-alt appt-input-icon"></i>
                                 <input type="date" name="appointmentDate" class="appt-input appt-input-padded"
-                                    [(ngModel)]="appointmentDate" [disabled]="submitting" required>
+                                    [(ngModel)]="appointmentDate" [min]="minAppointmentDate" [disabled]="submitting" required>
                             </div>
                         </div>
 

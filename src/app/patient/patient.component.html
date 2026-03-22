@@ -394,7 +394,7 @@
                     <!-- Date Filter -->
                     <div class="date-input-wrapper custom-date-picker-wrapper" [class.active-date]="!!dateFilter">
                         <mat-form-field class="custom-mat-form-field">
-                            <input matInput [matDatepicker]="pickerPatientApptFilter" [(ngModel)]="dateFilter" (dateChange)="onFilterChange()" placeholder="Data">
+                          <input matInput [matDatepicker]="pickerPatientApptFilter" [(ngModel)]="dateFilter" [max]="maxFilterDate" (dateChange)="onFilterChange()" placeholder="Data">
                             <mat-datepicker-toggle matIconSuffix [for]="pickerPatientApptFilter"></mat-datepicker-toggle>
                             <mat-datepicker #pickerPatientApptFilter></mat-datepicker>
                         </mat-form-field>
@@ -530,7 +530,7 @@
             <div class="patient-appt-input-wrapper">
               <i class="far fa-calendar-alt patient-appt-input-icon"></i>
               <input type="date" name="date" class="patient-appt-input patient-appt-input-padded"
-                [(ngModel)]="newAppointment.date" required>
+                [(ngModel)]="newAppointment.date" [min]="minAppointmentDate" required>
             </div>
           </div>
 

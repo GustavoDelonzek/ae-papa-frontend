@@ -97,6 +97,8 @@ export class PatientComponent implements OnInit {
   statusFilter: string = '';
   objectiveFilter: string = '';
   dateFilter: any = '';
+  maxFilterDate: Date = new Date();
+  minAppointmentDate: string = this.getTodayISODate();
 
   // Appointment Details Modal
   showDetailsModal = false;
@@ -447,6 +449,14 @@ export class PatientComponent implements OnInit {
   loadAppointments(): void {
     this.loadingAppointments = true;
 
+    if (this.dateFilter && this.isInvalidDate(this.dateFilter)) {
+      this.loadingAppointments = false;
+      this.appointmentErrorMessage = 'Data de filtro inválida.';
+      return;
+    }
+
+    this.appointmentErrorMessage = '';
+
     const filters: any = { patient_id: this.patientId };
     if (this.statusFilter) filters.status = this.statusFilter;
     if (this.objectiveFilter) filters.objective = this.objectiveFilter;
@@ -503,6 +513,11 @@ export class PatientComponent implements OnInit {
   }
 
   createAppointment(): void {
+    if (this.isDateBeforeToday(this.newAppointment.date)) {
+      this.appointmentErrorMessage = 'A data da consulta não pode ser anterior a hoje.';
+      return;
+    }
+
     this.savingAppointment = true;
     this.appointmentErrorMessage = '';
 
@@ -701,5 +716,28 @@ export class PatientComponent implements OnInit {
     if (!contacts) return null;
     const contact = contacts.find(c => c.type === type && c.is_primary);
     return contact ? contact.value : null;
+  }
+
+  private getTodayISODate(): string {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private isInvalidDate(date: string | Date): boolean {
+    const parsed = date instanceof Date ? date : SharedUtils.parseDate(date);
+    return isNaN(parsed.getTime());
+  }
+
+  private isDateBeforeToday(date: string | Date): boolean {
+    if (this.isInvalidDate(date)) return false;
+    const parsed = date instanceof Date ? date : SharedUtils.parseDate(date);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    parsed.setHours(0, 0, 0, 0);
+    return parsed < today;
   }
 }

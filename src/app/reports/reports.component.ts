@@ -40,6 +40,7 @@ export class ReportsComponent implements OnInit {
     from: this.getFirstDayOfMonth(),
     to: new Date()
   };
+  maxPeriodDate: Date = new Date();
 
   private getFirstDayOfMonth(): Date {
     const now = new Date();
@@ -81,8 +82,38 @@ export class ReportsComponent implements OnInit {
   }
 
   onDownload(): void {
+    if (!this.validatePeriod()) {
+      return;
+    }
+
     const config = this.mapStateToConfig();
     this.executeDownload(config, 'relatorio_customizado');
+  }
+
+  private validatePeriod(): boolean {
+    if (!this.period.from || !this.period.to) {
+      alert('Preencha as datas inicial e final do período.');
+      return false;
+    }
+
+    const from = new Date(this.period.from);
+    const to = new Date(this.period.to);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    from.setHours(0, 0, 0, 0);
+    to.setHours(0, 0, 0, 0);
+
+    if (from > to) {
+      alert('A data inicial não pode ser maior que a data final.');
+      return false;
+    }
+
+    if (from > today || to > today) {
+      alert('As datas do período não podem ser futuras.');
+      return false;
+    }
+
+    return true;
   }
 
   private mapStateToConfig(): ReportConfig {

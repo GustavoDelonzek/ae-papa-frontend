@@ -35,6 +35,7 @@ export class PatientFormModalComponent implements OnInit {
     isSaving: boolean = false;
     errorMessage: string = '';
     currentStep: number = 1;
+    maxBirthDate: Date = new Date();
 
     currentPatient: Patient = {
         full_name: '',
@@ -410,6 +411,12 @@ export class PatientFormModalComponent implements OnInit {
         const p = this.currentPatient;
         if (!p.full_name?.trim()) { this.errorMessage = 'Nome completo é obrigatório'; return false; }
         if (!p.birth_date) { this.errorMessage = 'Data de nascimento é obrigatória'; return false; }
+        const birthDate = SharedUtils.parseDate(p.birth_date as any);
+        if (isNaN(birthDate.getTime())) { this.errorMessage = 'Data de nascimento inválida'; return false; }
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        birthDate.setHours(0, 0, 0, 0);
+        if (birthDate > today) { this.errorMessage = 'Data de nascimento não pode ser futura'; return false; }
         if (!p.gender) { this.errorMessage = 'Gênero é obrigatório'; return false; }
         if (!p.marital_status) { this.errorMessage = 'Estado civil é obrigatório'; return false; }
         if (!p.cpf) { this.errorMessage = 'CPF é obrigatório'; return false; }

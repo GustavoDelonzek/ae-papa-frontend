@@ -33,6 +33,7 @@ export class CaretakerFormModalComponent implements OnChanges {
     isEditing: boolean = false;
     isSaving: boolean = false;
     errorMessage: string = '';
+    maxBirthDate: Date = new Date();
 
     // Patient search
     showPatientSearch: boolean = false;
@@ -234,6 +235,12 @@ export class CaretakerFormModalComponent implements OnChanges {
         const c = this.currentCaretaker;
         if (!c.full_name?.trim()) { this.errorMessage = 'Nome completo é obrigatório'; return false; }
         if (!c.birth_date) { this.errorMessage = 'Data de nascimento é obrigatória'; return false; }
+        const birthDate = SharedUtils.parseDate(c.birth_date as any);
+        if (isNaN(birthDate.getTime())) { this.errorMessage = 'Data de nascimento inválida'; return false; }
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        birthDate.setHours(0, 0, 0, 0);
+        if (birthDate > today) { this.errorMessage = 'Data de nascimento não pode ser futura'; return false; }
         if (!c.gender) { this.errorMessage = 'Gênero é obrigatório'; return false; }
         if (!c.cpf) { this.errorMessage = 'CPF é obrigatório'; return false; }
         if (!SharedUtils.isValidCPF(c.cpf)) { this.errorMessage = 'CPF inválido'; return false; }
