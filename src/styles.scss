@@ -30,13 +30,13 @@
     .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline__leading,
     .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline__notch,
     .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline__trailing {
-        border-color: #5b2fa8 !important; /* Deep Purple */
+        border-color: #6a307d !important; /* Deep Purple */
     }
 
     .mdc-text-field--focused .mdc-notched-outline__leading,
     .mdc-text-field--focused .mdc-notched-outline__notch,
     .mdc-text-field--focused .mdc-notched-outline__trailing {
-        border-color: #5b2fa8 !important;
+        border-color: #6a307d !important;
         border-width: 2px !important;
     }
 
@@ -80,7 +80,7 @@
         display: inline-flex;
         justify-content: center;
         align-items: center;
-        color: #5b2fa8;
+        color: #6a307d;
         padding: 0;
         width: 38px;
         height: 38px;

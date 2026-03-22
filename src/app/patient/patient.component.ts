@@ -642,7 +642,7 @@ export class PatientComponent implements OnInit {
 
     if (typeof parsed !== 'object' || parsed === null) return parsed || 'Não informado';
 
-    const parts = [];
+    const parts: string[] = [];
     if (parsed.piped_water) parts.push('Água Encanada');
     if (parsed.water_tank) parts.push('Caixa D\'água');
     if (parsed.electricity) parts.push('Luz Elétrica');

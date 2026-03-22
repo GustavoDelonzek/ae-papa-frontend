@@ -1,0 +1,97 @@
+<app-sidebar></app-sidebar>
+
+<div class="statistics-page-container">
+  <!-- Header -->
+  <header class="statistics-header">
+    <div class="header-top">
+      <div class="back-link" (click)="goHome()">
+        <i class="fas fa-arrow-left"></i>
+        <span>Voltar ao início</span>
+      </div>
+    </div>
+
+    <div class="header-main-row">
+      <div class="title-section">
+        <h1>Estatísticas</h1>
+        <p class="subtitle">Visão geral e desempenho do último período.</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Top 4 Cards Grid -->
+  <div class="stats-top-grid">
+    <app-stat-card
+      iconClass="fa-solid fa-briefcase-medical"
+      iconColor="purple"
+      title="Atendimentos Realizados"
+      [value]="totalAppointments"
+      [trendValue]="appointmentsTrendValue"
+      [trendType]="appointmentsTrendType"
+      supportText="Evolução Mensal"
+    ></app-stat-card>
+
+    <app-stat-card
+      iconClass="fa-solid fa-hand-holding-usd"
+      iconColor="blue"
+      title="Perfis Socioeconômicos"
+      [value]="totalSocioeconomicProfiles"
+      trendValue=""
+      trendType="neutral"
+      supportText="Cadastros validados"
+    ></app-stat-card>
+
+    <app-stat-card
+      iconClass="fa-regular fa-folder"
+      iconColor="orange"
+      title="Registros Clínicos"
+      [value]="totalClinicalRecords > 1000 ? (totalClinicalRecords/1000 | number:'1.1-1') + 'k' : totalClinicalRecords"
+      trendValue=""
+      trendType="neutral"
+      supportText="Arquivos e consultas"
+    ></app-stat-card>
+
+    <app-stat-card
+      iconClass="fa-solid fa-user-plus"
+      iconColor="green"
+      title="Novos Atendidos"
+      [value]="newPatientsThisMonth"
+      [trendValue]="newPatientsTrendValue"
+      [trendType]="newPatientsTrendType"
+      supportText="Adquiridos no mês"
+    ></app-stat-card>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="stats-main-grid">
+    <!-- Chart Section -->
+    <div class="chart-section">
+      <div class="chart-header">
+        <div class="chart-title">
+          <h2>{{ periodChartTitle }}</h2>
+          <p>{{ periodChartSubtitle }}</p>
+        </div>
+        <div class="period-toggle-group">
+          <button class="period-toggle-btn" [class.active]="activeChartMetric === 'total'" (click)="setChartMetric('total')">Atendimentos</button>
+          <button class="period-toggle-btn green-toggle" [class.active-green]="activeChartMetric === 'new'" (click)="setChartMetric('new')">Novos Atendidos</button>
+        </div>
+      </div>
+      <div class="chart-canvas-wrapper" *ngIf="!loading">
+        <canvas
+          baseChart
+          [data]="periodChartData"
+          [options]="periodChartOptions"
+          [type]="periodChartType"
+        ></canvas>
+      </div>
+    </div>
+
+    <!-- Side Block -->
+    <div class="side-block">
+      <app-appointments-type
+        [items]="appointmentsByType"
+        [totalItems]="appointmentsByTypeTotal"
+        [score]="efficiencyScore"
+      ></app-appointments-type>
+    </div>
+  </div>
+</div>

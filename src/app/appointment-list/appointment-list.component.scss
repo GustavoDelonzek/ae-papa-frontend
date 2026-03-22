@@ -41,7 +41,7 @@ $pink-color: #ec4899;
 // Container - Using .appointment-list-container matching the HTML
 .appointment-list-container {
   padding: 30px;
-  margin-left: 250px; // Sidebar width adjustment
+  margin-left: 260px; // Sidebar width adjustment
   transition: margin-left 0.3s ease;
 
   @media (max-width: 768px) {
@@ -1039,7 +1039,7 @@ $pink-color: #ec4899;
 .appt-sidebar {
   width: 260px;
   min-width: 260px;
-  background: linear-gradient(160deg, #5b2fa8 0%, #7c3aed 100%);
+  background: linear-gradient(160deg, #6a307d 0%, #7c3aed 100%);
   padding: 28px 24px;
   display: flex;
   flex-direction: column;
@@ -1550,7 +1550,7 @@ $pink-color: #ec4899;
 
 .appt-btn-submit {
   padding: 10px 22px;
-  background: linear-gradient(135deg, #5b2fa8, #7c3aed);
+  background: linear-gradient(135deg, #6a307d, #7c3aed);
   border: none;
   border-radius: 8px;
   color: white;

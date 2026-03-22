@@ -10,12 +10,18 @@ import { AuthGuard } from './guards/auth.guard';
 import { AppointmentListComponent } from './appointment-list/appointment-list.component';
 import { UserRegisterComponent } from './user-register/user-register.component';
 import { ReportsComponent } from './reports/reports.component';
+import { StatisticsComponent } from './statistics/statistics.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   {
     path: '',
     component: HomeComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'estatisticas',
+    component: StatisticsComponent,
     canActivate: [AuthGuard]
   },
   {
