@@ -24,8 +24,18 @@ export class ReportsService {
 
   constructor(private http: HttpClient) { }
 
-  getStats(): Observable<ReportStats> {
-    return this.http.get<ReportStats>(`${API_URL}/reports/stats`);
+  getStats(startDate?: string, endDate?: string): Observable<ReportStats> {
+    const params: Record<string, string> = {};
+
+    if (startDate) {
+      params['start_date'] = startDate;
+    }
+
+    if (endDate) {
+      params['end_date'] = endDate;
+    }
+
+    return this.http.get<ReportStats>(`${API_URL}/reports/stats`, { params });
   }
 
   generateReport(config: ReportConfig): Observable<Blob> {

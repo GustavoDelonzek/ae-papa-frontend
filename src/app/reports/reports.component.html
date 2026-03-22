@@ -33,47 +33,242 @@
     </div>
   </section>
 
-  <!-- Summary Cards Row -->
-  <div class="summary-cards-row">
-    <!-- Atendidos Card -->
-    <div class="summary-card compact">
-      <div class="card-header">
-        <div class="icon-box purple-icon">
-          <i class="fa-solid fa-user"></i>
-        </div>
-        <div class="header-text">
-          <span class="metric-label purple">ATENDIDOS</span>
-          <span class="metric-value">{{ stats.patient_count }}</span>
+  <section class="statistics-overview-section custom-config-section">
+    <div class="section-title">
+      <div class="section-title-main">
+        <i class="fa-solid fa-chart-pie"></i>
+        <div class="title-copy">
+          <h2>Estatísticas de Atendimento</h2>
+          <p>Painel consolidado com evolução do período e distribuição por tipo.</p>
         </div>
       </div>
     </div>
 
-    <!-- Perfis Socioeconômicos Card -->
-    <div class="summary-card compact">
-      <div class="card-header">
-        <div class="icon-box green-icon">
-          <i class="fa-solid fa-hand-holding-usd"></i>
+    <h3 class="statistics-group-title">GERAIS</h3>
+    <div class="stats-overview-grid general-grid">
+      <div
+        class="summary-card compact chart-selectable"
+        [class.chart-selected]="isChartCardSelected('attended')"
+        (click)="onStatisticsCardClick('attended')"
+      >
+        <div class="card-header">
+          <div class="icon-box purple-icon">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <div class="header-text">
+            <span class="metric-label purple">ATENDIDOS</span>
+            <span class="metric-value">{{ stats.patient_count }}</span>
+          </div>
         </div>
-        <div class="header-text">
-          <span class="metric-label green">PERFIS SOCIOECONÔMICOS</span>
-          <span class="metric-value">{{ stats.socioeconomic_profile_count }}</span>
+      </div>
+
+      <div
+        class="summary-card compact chart-selectable"
+        [class.chart-selected]="isChartCardSelected('socioeconomicProfiles')"
+        (click)="onStatisticsCardClick('socioeconomicProfiles')"
+      >
+        <div class="card-header">
+          <div class="icon-box green-icon">
+            <i class="fa-solid fa-hand-holding-usd"></i>
+          </div>
+          <div class="header-text">
+            <span class="metric-label green">PERFIS SOCIOECONÔMICOS</span>
+            <span class="metric-value">{{ stats.socioeconomic_profile_count }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="summary-card compact chart-selectable"
+        [class.chart-selected]="isChartCardSelected('clinicalRecords')"
+        (click)="onStatisticsCardClick('clinicalRecords')"
+      >
+        <div class="card-header">
+          <div class="icon-box orange-icon">
+            <i class="fa-solid fa-clipboard-list"></i>
+          </div>
+          <div class="header-text">
+            <span class="metric-label orange">REGISTROS CLÍNICOS</span>
+            <span class="metric-value">{{ stats.clinical_record_count }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="statistics-filter-row">
+      <h3 class="statistics-group-title">FILTRÁVEIS PELO MÊS SELECIONADO</h3>
+
+      <div class="month-filter month-filter-inline">
+        <div class="date-input">
+          <span class="input-label">MÊS DE REFERÊNCIA</span>
+          <mat-form-field class="month-picker-field" appearance="outline">
+            <input
+              id="statisticsMonthDate"
+              matInput
+              [matDatepicker]="statisticsMonthPicker"
+              [ngModel]="selectedStatisticsDate"
+              readonly
+              placeholder="MM/AAAA"
+            >
+            <mat-datepicker-toggle matIconSuffix [for]="statisticsMonthPicker"></mat-datepicker-toggle>
+            <mat-datepicker
+              #statisticsMonthPicker
+              startView="multi-year"
+              panelClass="month-reference-picker"
+              (monthSelected)="onStatisticsMonthPicked($event, statisticsMonthPicker)"
+            ></mat-datepicker>
+          </mat-form-field>
         </div>
       </div>
     </div>
 
-    <!-- Registros Clínicos Card -->
-    <div class="summary-card compact">
-      <div class="card-header">
-        <div class="icon-box orange-icon">
-          <i class="fa-solid fa-clipboard-list"></i>
-        </div>
-        <div class="header-text">
-          <span class="metric-label orange">REGISTROS CLÍNICOS</span>
-          <span class="metric-value">{{ stats.clinical_record_count }}</span>
+    <div class="stats-overview-grid">
+      <div
+        class="summary-card compact chart-selectable"
+        [class.chart-selected]="isChartCardSelected('appointmentsMonth')"
+        (click)="onStatisticsCardClick('appointmentsMonth')"
+      >
+        <div class="card-header">
+          <div class="icon-box purple-icon">
+            <i class="fa-solid fa-calendar-days"></i>
+          </div>
+          <div class="header-text">
+            <span class="metric-label purple">ATENDIMENTOS NO MÊS</span>
+            <span class="metric-value">{{ statisticsLoading ? '...' : appointmentsInCurrentMonth }}</span>
+          </div>
         </div>
       </div>
+
+      <div
+        class="summary-card compact chart-selectable"
+        [class.chart-selected]="isChartCardSelected('newPatients')"
+        (click)="onStatisticsCardClick('newPatients')"
+      >
+        <div class="card-header">
+          <div class="icon-box orange-icon">
+            <i class="fa-solid fa-user-plus"></i>
+          </div>
+          <div class="header-text">
+            <span class="metric-label orange">NOVOS PACIENTES</span>
+            <span class="metric-value">{{ statisticsLoading ? '...' : newPatientsInSelectedMonth }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="summary-card compact chart-selectable"
+        [class.chart-selected]="isChartCardSelected('patientsGrowth')"
+        (click)="onStatisticsCardClick('patientsGrowth')"
+      >
+        <div class="card-header">
+          <div class="icon-box orange-icon">
+            <i class="fa-solid fa-chart-line"></i>
+          </div>
+          <div class="header-text">
+            <span class="metric-label orange">CRESCIMENTO MENSAL DE PACIENTES</span>
+            <span
+              class="metric-value growth-value"
+              [class.up]="patientsMonthlyGrowthDirection === 'up'"
+              [class.down]="patientsMonthlyGrowthDirection === 'down'"
+            >{{ statisticsLoading ? '...' : patientsMonthlyGrowthText }}</span>
+            <span class="metric-support-text">Mês atual x mês anterior</span>
+          </div>
+        </div>
+      </div>
+
     </div>
-  </div>
+
+    <div class="stats-by-type" *ngIf="!statisticsLoading && appointmentsByTypeLoaded">
+      <div class="stats-by-type-header">
+        <h3>Atendimentos por tipo</h3>
+        <span class="type-total-pill">Total: {{ getAppointmentsByTypeTotal() }}</span>
+      </div>
+
+      <div class="type-cards-grid" *ngIf="appointmentsByTypeSorted.length; else emptyTypeState">
+        <div class="type-card" [class.is-top]="i === 0" *ngFor="let item of appointmentsByTypeSorted; let i = index">
+          <div class="type-card-top">
+            <div>
+              <span class="type-name">{{ getAppointmentObjectiveLabel(item.objective) }}</span>
+              <span class="type-meta">Objetivo do atendimento</span>
+            </div>
+            <div class="type-count-wrap">
+              <span class="top-badge" *ngIf="i === 0">Top 1</span>
+              <div class="type-count">{{ item.total }}</div>
+            </div>
+          </div>
+
+          <div class="type-progress-track" role="presentation">
+            <span
+              class="type-progress-fill"
+              [style.width.%]="getAppointmentTypePercentage(item.total)"
+            ></span>
+          </div>
+
+          <div class="type-percent">{{ getAppointmentTypePercentage(item.total) }}% do total</div>
+        </div>
+      </div>
+
+      <ng-template #emptyTypeState>
+        <div class="type-empty-state">
+          <i class="fa-solid fa-circle-info"></i>
+          <span>Sem atendimentos por tipo no mês selecionado (total: 0).</span>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="period-chart-block">
+      <div class="period-chart-header">
+        <div>
+          <h3>{{ periodChartTitle }}</h3>
+          <p>{{ periodChartSubtitle }}</p>
+        </div>
+        <div class="period-toggle-group" *ngIf="canShowPeriodGranularityToggle()">
+          <button
+            type="button"
+            class="period-toggle-btn"
+            [class.active]="periodGranularity === 'day'"
+            (click)="setPeriodGranularity('day')"
+          >Dia</button>
+          <button
+            type="button"
+            class="period-toggle-btn"
+            [class.active]="periodGranularity === 'week'"
+            (click)="setPeriodGranularity('week')"
+          >Semana</button>
+          <button
+            type="button"
+            class="period-toggle-btn"
+            [class.active]="periodGranularity === 'month'"
+            (click)="setPeriodGranularity('month')"
+          >Mês</button>
+        </div>
+      </div>
+
+      <div class="period-chart-body" *ngIf="!periodChartLoading && (periodChartType !== 'line' || periodChartPoints.length); else periodChartEmptyState">
+        <div class="period-chart-canvas">
+          <canvas
+            baseChart
+            [data]="periodChartData"
+            [options]="periodChartOptions"
+            [type]="periodChartType"
+          ></canvas>
+        </div>
+
+        <div class="period-trend" [class.up]="periodTrendDirection === 'up'" [class.down]="periodTrendDirection === 'down'">
+          <i class="fa-solid" [class.fa-arrow-trend-up]="periodTrendDirection === 'up'" [class.fa-arrow-trend-down]="periodTrendDirection === 'down'" [class.fa-minus]="periodTrendDirection === 'flat'"></i>
+          <span>{{ periodTrendText }}</span>
+        </div>
+      </div>
+
+      <ng-template #periodChartEmptyState>
+        <div class="period-chart-empty">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>{{ periodChartLoading ? 'Carregando gráfico...' : 'Sem dados de atendimentos para o período selecionado' }}</span>
+        </div>
+      </ng-template>
+    </div>
+  </section>
 
   <!-- Custom Configuration Section -->
   <section class="custom-config-section">
