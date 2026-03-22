@@ -128,9 +128,9 @@
                                     </select>
                                 </div>
                                 <div class="form-group" style="flex: 2;">
-                                    <label>Contato <span class="required">*</span></label>
+                                    <label>Contato</label>
                                     <input type="text" class="form-control" [(ngModel)]="newContact.value"
-                                        name="contactValue" placeholder="Ex: (00) 00000-0000" required>
+                                        name="contactValue" placeholder="Ex: (00) 00000-0000">
                                 </div>
                             </div>
 
@@ -216,9 +216,9 @@
                 </div>
 
                 <div class="main-footer">
-                    <button type="button" class="btn-cancel" (click)="onClose()">Cancelar</button>
+                    <button type="button" class="btn-secondary" (click)="onClose()">Cancelar</button>
 
-                    <button type="button" class="btn-cancel" *ngIf="currentStep > 1" (click)="prevStep()">
+                    <button type="button" class="btn-secondary" *ngIf="currentStep > 1" (click)="prevStep()">
                         <i class="fas fa-arrow-left"></i> Anterior
                     </button>
 
@@ -226,7 +226,10 @@
                         Próximo <i class="fas fa-arrow-right"></i>
                     </button>
 
-                    <button type="button" class="btn-submit" (click)="save()" [disabled]="isSaving">
+                    <button type="button" class="btn-submit" 
+                        *ngIf="isEditing || currentStep === 3" 
+                        (click)="save()" 
+                        [disabled]="isSaving">
                         <span *ngIf="!isSaving">{{ isEditing ? 'Atualizar' : 'Salvar' }}</span>
                         <span *ngIf="isSaving"><i class="fas fa-spinner fa-spin"></i></span>
                     </button>

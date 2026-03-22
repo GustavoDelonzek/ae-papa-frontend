@@ -1,6 +1,7 @@
-import { Component, OnInit, OnDestroy, ViewChild, TemplateRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { CaretakerService, Caretaker, CaretakersListResponse } from '../services';
+import { SharedUtils } from '../core/utils/shared-utils';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -65,10 +66,14 @@ export class CaretakerListComponent implements OnInit, OnDestroy {
 
   private searchTimeout: any;
 
-  protected Math = Math;
+  public Math = Math;
 
   sortColumn: string = '';
-  sortDirection: 'asc' | 'desc' = 'asc';
+  public sortDirection: 'asc' | 'desc' = 'asc';
+
+  public trackByCaretakerId(index: number, caretaker: Caretaker): number {
+    return caretaker.id || index;
+  }
 
   // Modal control
   // Properties are re-added in later replacement block
@@ -117,9 +122,9 @@ export class CaretakerListComponent implements OnInit, OnDestroy {
       next: (response: CaretakersListResponse) => {
         this.caretakers = response.data || [];
         this.filteredCaretakers = [...this.caretakers];
-        this.paginationMeta = response.meta;
-        this.totalPages = response.meta?.last_page || 1;
-        this.totalItems = response.meta?.total || 0;
+        this.paginationMeta = response.meta || {};
+        this.totalPages = this.paginationMeta.last_page || 0;
+        this.totalItems = this.paginationMeta.total || 0;
         this.loading = false;
         this.searching = false;
       },
@@ -213,16 +218,34 @@ export class CaretakerListComponent implements OnInit, OnDestroy {
     return labels[kinship] || kinship;
   }
 
-  getCaretakerAge(birthDate: string): number {
-    if (!birthDate) return 0;
-    const birth = new Date(birthDate);
-    const today = new Date();
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-      age--;
+  getCaretakerAge(birthDate: any): string {
+    if (!birthDate) return 'N/A';
+    try {
+      const birth = SharedUtils.parseDate(String(birthDate));
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+      return String(age);
+    } catch (e) {
+      return '?';
     }
-    return age;
+  }
+
+  getCaretakerYear(birthDate: any): string {
+    if (!birthDate) return '';
+    try {
+      const birth = SharedUtils.parseDate(String(birthDate));
+      return String(birth.getFullYear());
+    } catch (e) {
+      return '';
+    }
+  }
+
+  getGenderLabel(gender: string | null | undefined): string {
+    return SharedUtils.getGenderLabel(gender);
   }
 
   showCaretakerModal: boolean = false;

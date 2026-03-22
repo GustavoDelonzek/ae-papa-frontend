@@ -98,15 +98,15 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let patient of filteredPatients" (click)="onRowClick(patient)">
+        <tr *ngFor="let patient of filteredPatients; trackBy: trackByPatientId" (click)="onRowClick(patient)">
           <td>
             <div class="patient-cell">
               <div class="avatar-circle" [ngClass]="(patient.id || 0) % 2 === 0 ? 'bg-blue' : 'bg-purple'">
-                {{ patient.full_name.charAt(0) }}
+                {{ (patient.full_name || '?').charAt(0).toUpperCase() }}
               </div>
               <div class="info">
-                <span class="name">{{ patient.full_name }}</span>
-                <span class="id">ID: #{{ patient.id }}</span>
+                <span class="name">{{ patient.full_name || 'Sem nome' }}</span>
+                <span class="id">ID: #{{ patient.id || '---' }}</span>
               </div>
             </div>
           </td>
@@ -114,12 +114,12 @@
           <td>
             <div class="age-cell">
               <span class="years">{{ getPatientAge(patient.birth_date) }} anos</span>
-              <span class="year-born">({{ patient.birth_date | date:'yyyy' }})</span>
+              <span class="year-born" *ngIf="getPatientYear(patient.birth_date)">({{ getPatientYear(patient.birth_date) }})</span>
             </div>
           </td>
           <td>
-            <span class="gender-pill" [class.male]="patient.gender === 'M'" [class.female]="patient.gender === 'F'">
-              {{ patient.gender === 'M' ? 'Masculino' : 'Feminino' }}
+            <span class="gender-pill" *ngIf="patient.gender" [class.male]="patient.gender === 'M'" [class.female]="patient.gender === 'F'">
+              {{ getGenderLabel(patient.gender) }}
             </span>
           </td>
           <td class="actions-cell">

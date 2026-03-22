@@ -206,8 +206,7 @@ export class PatientComponent implements OnInit {
   }
 
   getGenderText(): string {
-    if (!this.patientData?.gender) return 'Não informado';
-    return this.patientData.gender === 'M' ? 'Masculino' : 'Feminino';
+    return SharedUtils.getGenderLabel(this.patientData?.gender) || 'Não informado';
   }
 
   getMaritalStatusText(): string {

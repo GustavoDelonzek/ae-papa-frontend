@@ -97,8 +97,7 @@ export class CaretakerComponent implements OnInit {
     }
 
     getGenderText(): string {
-        if (!this.caretakerData?.gender) return 'Não informado';
-        return this.caretakerData.gender === 'M' ? 'Masculino' : 'Feminino';
+        return SharedUtils.getGenderLabel(this.caretakerData?.gender) || 'Não informado';
     }
 
     getKinshipText(kinship: string): string {

@@ -72,7 +72,10 @@ export class PatientFormModalComponent implements OnInit {
             this.isEditing = true;
             this.currentPatient = { ...val };
             if (this.currentPatient.birth_date) {
-                this.currentPatient.birth_date = SharedUtils.toInputDate(this.currentPatient.birth_date);
+                const date = SharedUtils.parseDate(this.currentPatient.birth_date);
+                if (!isNaN(date.getTime())) {
+                    (this.currentPatient as any).birth_date = date;
+                }
             }
 
             this.contactsList = val.contacts ? [...val.contacts] : [];
@@ -123,6 +126,14 @@ export class PatientFormModalComponent implements OnInit {
 
     nextStep(): void {
         this.errorMessage = '';
+        
+        // Validate current step before proceeding
+        if (this.currentStep === 1) {
+            if (!this.validateStep1()) return;
+        } else if (this.currentStep === 2) {
+            if (!this.validateStep2()) return;
+        }
+
         if (this.currentStep < 3) {
             this.currentStep++;
             if (this.currentPatient.id && (this.currentStep === 2 || this.currentStep === 3)) {
@@ -334,6 +345,10 @@ export class PatientFormModalComponent implements OnInit {
     }
 
     private upsertContact(patientId: number): Observable<any> {
+        if (!this.newContact.value) {
+            return of(null);
+        }
+
         const contact = {
             ...this.newContact,
             patient_id: patientId,
@@ -403,10 +418,7 @@ export class PatientFormModalComponent implements OnInit {
     }
 
     validateStep2(): boolean {
-        if (!this.newContact.value) {
-            this.errorMessage = 'Informe o contato principal.';
-            return false;
-        }
+        // Contact is now optional
         return true;
     }
 

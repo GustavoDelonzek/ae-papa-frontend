@@ -66,7 +66,10 @@ export class CaretakerFormModalComponent implements OnChanges {
                 this.isEditing = true;
                 this.currentCaretaker = { ...this.caretaker };
                 if (this.currentCaretaker.birth_date) {
-                    this.currentCaretaker.birth_date = SharedUtils.toInputDate(this.currentCaretaker.birth_date);
+                    const date = SharedUtils.parseDate(this.currentCaretaker.birth_date);
+                    if (!isNaN(date.getTime())) {
+                        (this.currentCaretaker as any).birth_date = date;
+                    }
                 }
             } else {
                 this.isEditing = false;

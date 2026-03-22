@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { PatientService, Patient } from '../services';
 import { SharedUtils } from '../core/utils/shared-utils';
@@ -22,7 +22,7 @@ import { PatientFormModalComponent } from '../shared/components/patient-form-mod
   templateUrl: './patient-list.component.html',
   styleUrls: ['./patient-list.component.scss'],
 })
-export class PatientListComponent implements OnInit, OnDestroy, AfterViewInit {
+export class PatientListComponent implements OnInit, OnDestroy {
 
   searchTerm: string = '';
   loading: boolean = false;
@@ -57,21 +57,14 @@ export class PatientListComponent implements OnInit, OnDestroy, AfterViewInit {
   // Timeout para pesquisa com delay
   private searchTimeout: any;
 
-  protected Math = Math;
+  public Math = Math;
 
-  // Templates
-  @ViewChild('patientTpl') patientTpl!: TemplateRef<any>;
-  @ViewChild('cpfTpl') cpfTpl!: TemplateRef<any>;
-  @ViewChild('ageTpl') ageTpl!: TemplateRef<any>;
-  @ViewChild('genderTpl') genderTpl!: TemplateRef<any>;
-  @ViewChild('actionsTpl') actionsTpl!: TemplateRef<any>;
+  public showCreateModal: boolean = false;
+  public currentPatient: Patient | null = null;
 
-  // Columns definition
-  columns: any[] = [];
-
-  // Modal
-  showCreateModal: boolean = false;
-  currentPatient: Patient | null = null;
+  public trackByPatientId(index: number, patient: Patient): number {
+    return patient.id || index;
+  }
 
   constructor(
     private router: Router,
@@ -91,17 +84,7 @@ export class PatientListComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  ngAfterViewInit(): void {
-    setTimeout(() => {
-      this.columns = [
-        { key: 'full_name', label: 'Nome', sortable: true, type: 'template', cellTemplate: this.patientTpl, headerClass: 'w-30' },
-        { key: 'cpf', label: 'CPF', sortable: true, type: 'template', cellTemplate: this.cpfTpl, cellClass: 'font-mono' },
-        { key: 'birth_date', label: 'Idade', sortable: true, type: 'template', cellTemplate: this.ageTpl },
-        { key: 'gender', label: 'Gênero', sortable: true, type: 'template', cellTemplate: this.genderTpl, headerClass: 'text-center', cellClass: 'text-center' },
-        { key: 'actions', label: 'Ações', sortable: false, type: 'template', cellTemplate: this.actionsTpl, headerClass: 'text-center', cellClass: 'text-center w-actions' }
-      ];
-    });
-  }
+
 
   loadPatients(page: number = 1): void {
     this.loading = true;
@@ -129,11 +112,12 @@ export class PatientListComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.patientService.getPatients(page, this.perPage, filters).subscribe({
       next: (response) => {
-        this.patients = response.data;
-        this.filteredPatients = [...this.patients]; // No client-side filtering
-        this.paginationMeta = response.meta;
-        this.totalPages = response.meta.last_page;
-        this.totalItems = response.meta.total;
+        this.patients = response.data || [];
+        console.log('Patients loaded:', this.patients);
+        this.filteredPatients = [...this.patients];
+        this.paginationMeta = response.meta || {};
+        this.totalPages = this.paginationMeta.last_page || 0;
+        this.totalItems = this.paginationMeta.total || 0;
         this.loading = false;
       },
       error: (error) => {
@@ -200,20 +184,38 @@ export class PatientListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.router.navigate(['/']);
   }
 
-  getPatientAge(birthDate: string): number {
-    if (!birthDate) return 0;
-    const birth = SharedUtils.parseDate(birthDate);
-    const today = new Date();
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-      age--;
+  getPatientAge(birthDate: any): string {
+    if (!birthDate) return 'N/A';
+    try {
+      const birth = SharedUtils.parseDate(String(birthDate));
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+      return String(age);
+    } catch (e) {
+      return '?';
     }
-    return age;
+  }
+
+  getPatientYear(birthDate: any): string {
+    if (!birthDate) return '';
+    try {
+      const birth = SharedUtils.parseDate(String(birthDate));
+      return String(birth.getFullYear());
+    } catch (e) {
+      return '';
+    }
   }
 
   formatCPF(cpf: string): string {
     return SharedUtils.formatCPF(cpf);
+  }
+
+  getGenderLabel(gender: string | null | undefined): string {
+    return SharedUtils.getGenderLabel(gender);
   }
 
   // Modal Logic

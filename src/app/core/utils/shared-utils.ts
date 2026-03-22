@@ -13,6 +13,14 @@ export class SharedUtils {
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
 
+  static getGenderLabel(gender: string | null | undefined): string {
+    if (!gender) return '';
+    const g = String(gender).trim().toUpperCase();
+    if (g === 'M' || g === 'MASCULINO') return 'Masculino';
+    if (g === 'F' || g === 'FEMININO') return 'Feminino';
+    return gender;
+  }
+
   static formatDate(dateStr: string | undefined): string {
     if (!dateStr) return '';
     const date = this.parseDate(dateStr);
@@ -58,10 +66,14 @@ export class SharedUtils {
     return `${month}-${day}-${year}`;
   }
 
-  static parseDate(dateStr: string): Date {
+  static parseDate(dateStr: any): Date {
+    if (!dateStr) return new Date();
+    
+    const str = String(dateStr);
+    
     // Handle YYYY-MM-DD or YYYY-MM-DDT...
-    if (dateStr.includes('T') || /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-      const datePart = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+    if (str.includes('T') || /^\d{4}-\d{2}-\d{2}$/.test(str)) {
+      const datePart = str.includes('T') ? str.split('T')[0] : str;
       const [year, month, day] = datePart.split('-').map(Number);
       return new Date(year, month - 1, day);
     }
