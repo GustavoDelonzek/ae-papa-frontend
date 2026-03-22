@@ -1,3 +1,4 @@
+@use 'sass:color';
 // Variables
 $primary-color: #6a307d; // Design System Purple
 $primary-dark: #4a2157;
@@ -161,7 +162,7 @@ $danger-color: #ef4444;
       }
 
       &:hover {
-        background: darken(#6a307d, 5%);
+        background: color.adjust(#6a307d, $lightness: -5%);
       }
     }
   }
@@ -233,7 +234,7 @@ $danger-color: #ef4444;
 
       &:hover {
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        border-color: lighten($primary-color, 40%);
+        border-color: color.adjust($primary-color, $lightness: 40%);
       }
 
       @media (max-width: 768px) {
@@ -323,7 +324,7 @@ $danger-color: #ef4444;
 
             &.author {
               font-style: italic;
-              color: lighten($text-secondary, 10%);
+              color: color.adjust($text-secondary, $lightness: 10%);
             }
           }
         }

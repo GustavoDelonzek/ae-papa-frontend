@@ -1,3 +1,4 @@
+@use 'sass:color';
 // Variables
 $primary-color: #5b2fa8; // Deep purple from the screenshot/theme
 $primary-light: #f3f0fa;
@@ -160,7 +161,7 @@ $success-color: #10b981;
 
                 .step-desc {
                     font-size: 12px;
-                    color: lighten($text-muted, 20%);
+                    color: color.adjust($text-muted, $lightness: 20%);
                     display: block;
                 }
             }
@@ -211,7 +212,7 @@ $success-color: #10b981;
         p {
             margin: 0;
             font-size: 12px;
-            color: darken($text-muted, 10%);
+            color: color.adjust($text-muted, $lightness: -10%);
             line-height: 1.4;
         }
     }
@@ -294,7 +295,7 @@ $success-color: #10b981;
                 gap: 8px;
 
                 &:hover {
-                    background: darken($primary-color, 5%);
+                    background: color.adjust($primary-color, $lightness: -5%);
                     transform: translateY(-1px);
                     box-shadow: 0 4px 6px -1px rgba($primary-color, 0.2);
                 }
@@ -390,7 +391,7 @@ $success-color: #10b981;
     background-color: $primary-light;
     padding: 16px;
     border-radius: 8px;
-    border: 1px dashed darken($primary-light, 10%);
+    border: 1px dashed color.adjust($primary-light, $lightness: -10%);
     overflow: visible;
 
     h4 {
@@ -459,7 +460,7 @@ $success-color: #10b981;
             font-weight: 500;
 
             &:hover {
-                background-color: darken($primary-color, 5%);
+                background-color: color.adjust($primary-color, $lightness: -5%);
             }
 
             &:disabled {

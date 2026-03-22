@@ -1,3 +1,4 @@
+@use 'sass:color';
 // Variables
 $primary-purple: #7B1FA2; // Adjust based on exact branding if needed, using a rich purple
 $primary-purple-light: #F3E5F5;
@@ -398,7 +399,7 @@ $error-color: #EF4444;
 
   &:hover:not(:disabled) {
     background-color: $bg-light;
-    border-color: darken($border-color, 10%);
+    border-color: color.adjust($border-color, $lightness: -10%);
   }
 
   &:disabled {
@@ -428,7 +429,7 @@ $error-color: #EF4444;
   }
 
   &:disabled {
-    background-color: lighten($primary-purple, 20%);
+    background-color: color.adjust($primary-purple, $lightness: 20%);
     cursor: not-allowed;
     box-shadow: none;
     transform: none;

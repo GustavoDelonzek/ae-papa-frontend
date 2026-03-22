@@ -1,3 +1,4 @@
+@use 'sass:color';
 // Variables
 $primary-color: #6a307d; // Design System Purple
 $primary-dark: #4a2157;
@@ -107,7 +108,7 @@ $danger-color: #ef4444;
         box-shadow: 0 4px 6px -1px rgba($primary-color, 0.2);
 
         &:hover {
-          background: mix(black, $primary-color, 5%);
+          background: color.mix(black, $primary-color, $weight: 5%);
           transform: translateY(-1px);
         }
       }
@@ -488,7 +489,7 @@ $danger-color: #ef4444;
     top: 50%;
     transform: translateY(-50%);
     font-size: 2rem;
-    color: mix(white, $text-secondary, 30%);
+    color: color.mix(white, $text-secondary, $weight: 30%);
     pointer-events: none;
   }
 
@@ -551,7 +552,7 @@ $danger-color: #ef4444;
   transition: background 0.2s;
 
   &:hover {
-    background: mix(black, $primary-color, 5%);
+    background: color.mix(black, $primary-color, $weight: 5%);
   }
 }
 
@@ -814,7 +815,7 @@ $danger-color: #ef4444;
 
       .year {
         font-size: 0.75rem;
-        color: mix(white, $primary-dark, 40%);
+        color: color.mix(white, $primary-dark, $weight: 40%);
       }
     }
 
@@ -1571,7 +1572,7 @@ $danger-color: #ef4444;
 
           &:hover {
             background: #f9fafb;
-            border-color: mix(black, $border-color, 10%);
+            border-color: color.mix(black, $border-color, $weight: 10%);
           }
 
           i {
@@ -1595,7 +1596,7 @@ $danger-color: #ef4444;
       box-shadow: 0 4px 6px -1px rgba($primary-color, 0.2);
 
       &:hover {
-        background: mix(black, $primary-color, 5%);
+        background: color.mix(black, $primary-color, $weight: 5%);
       }
     }
   }

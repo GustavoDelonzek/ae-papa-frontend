@@ -78,7 +78,7 @@ export class SidebarComponent implements OnInit {
       adminOnly: true
     },
     {
-      text: 'Cadastrar Usuário',
+      text: 'Usuários',
       icon: 'fa-solid fa-user-shield',
       link: '/registro-usuario',
       type: 'link',

@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DashboardService, DashboardMetrics } from '../services';
+import { AppointmentService } from '../services/appointment.service';
+import { Appointment } from '../core/models/appointment.model';
+import { SharedUtils } from '../core/utils/shared-utils';
 
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../sidebar/sidebar.component';
@@ -30,13 +33,16 @@ export class HomeComponent implements OnInit {
   currentYear: number = 0;
   calendarDays: any[] = [];
   selectedDate: Date | null = null;
+  selectedAppointments: Appointment[] = [];
 
   // Loading
   loading: boolean = false;
+  loadingAppointments: boolean = false;
 
   constructor(
     private router: Router,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private appointmentService: AppointmentService
   ) { }
 
   ngOnInit(): void {
@@ -167,6 +173,29 @@ export class HomeComponent implements OnInit {
     this.selectedDate = dayData.date;
     this.calendarDays.forEach(d => d.isSelected = false);
     dayData.isSelected = true;
+    this.loadSelectedDateAppointments();
+  }
+
+  loadSelectedDateAppointments(): void {
+    if (!this.selectedDate) {
+      this.selectedAppointments = [];
+      return;
+    }
+
+    this.loadingAppointments = true;
+    const dateFilter = SharedUtils.formatDateForAPI(this.selectedDate);
+
+    this.appointmentService.listAppointments(1, 100, { date: dateFilter }).subscribe({
+      next: (response) => {
+        this.selectedAppointments = response.data || [];
+        this.loadingAppointments = false;
+      },
+      error: (error: any) => {
+        console.error('Erro ao carregar agendamentos da data selecionada:', error);
+        this.selectedAppointments = [];
+        this.loadingAppointments = false;
+      }
+    });
   }
 
   goToToday(): void {
