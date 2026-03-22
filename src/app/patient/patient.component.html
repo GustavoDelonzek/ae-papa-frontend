@@ -43,12 +43,20 @@
     <div class="profile-header-card">
       <div class="profile-content">
         <div class="profile-image-container">
-          <div class="profile-image">
-            <img [src]="patientData.photo || 'assets/default-avatar.png'" alt="Foto do Atendido"
-              *ngIf="patientData.photo">
-            <div class="avatar-placeholder" *ngIf="!patientData.photo">
+          <div class="profile-image" (click)="onPhotoClick()" style="cursor: pointer; position: relative;">
+            <img [secureImage]="patientData.profile_picture_url" alt="Foto do Atendido"
+              *ngIf="patientData.profile_picture_url">
+            <div class="avatar-placeholder" *ngIf="!patientData.profile_picture_url">
               <span>{{ patientData.full_name.charAt(0) }}</span>
             </div>
+            
+            <!-- Upload Overlay -->
+            <div class="photo-overlay" [class.uploading]="uploadingPhoto">
+              <i class="fas" [ngClass]="uploadingPhoto ? 'fa-spinner fa-spin' : 'fa-camera'"></i>
+            </div>
+            
+            <input type="file" id="profilePhotoInput" style="display: none;" 
+              accept="image/*" (change)="onFileSelected($event)">
           </div>
         </div>
 

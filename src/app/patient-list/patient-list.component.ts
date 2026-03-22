@@ -8,6 +8,9 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { PatientFormModalComponent } from '../shared/components/patient-form-modal/patient-form-modal.component';
+import { CaretakerFormModalComponent } from '../shared/components/caretaker-form-modal/caretaker-form-modal.component';
+import { Title } from '@angular/platform-browser';
+import { SecureImageDirective } from '../core/directives/secure-image.directive';
 
 @Component({
   selector: 'app-patient-list',
@@ -17,7 +20,9 @@ import { PatientFormModalComponent } from '../shared/components/patient-form-mod
     FormsModule,
     RouterModule,
     SidebarComponent,
-    PatientFormModalComponent
+    PatientFormModalComponent,
+    CaretakerFormModalComponent,
+    SecureImageDirective
   ],
   templateUrl: './patient-list.component.html',
   styleUrls: ['./patient-list.component.scss'],

@@ -117,7 +117,8 @@
                         <td>
                             <div class="patient-cell">
                                 <div class="avatar-circle bg-purple">
-                                    {{ getInitials(item.patient?.full_name || '') }}
+                                    <img *ngIf="item.patient?.profile_picture_url" [secureImage]="item.patient?.profile_picture_url" class="avatar-img" alt="Foto"/>
+                                    <span *ngIf="!item.patient?.profile_picture_url">{{ getInitials(item.patient?.full_name || '') }}</span>
                                 </div>
                                 <div class="info">
                                     <span class="name">{{ item.patient?.full_name || 'Atendido não identificado'
@@ -268,7 +269,8 @@
                             <div class="appt-patient-selector" (click)="openPatientSearch()" [class.appt-selector-filled]="selectedPatient">
                                 <div class="appt-selector-left">
                                     <div class="appt-selector-avatar" *ngIf="selectedPatient">
-                                        {{ getInitials(selectedPatient.full_name || '') }}
+                                        <img *ngIf="selectedPatient?.profile_picture_url" [secureImage]="selectedPatient?.profile_picture_url" class="avatar-img" alt="Foto"/>
+                                        <span *ngIf="!selectedPatient?.profile_picture_url">{{ getInitials(selectedPatient.full_name || '') }}</span>
                                     </div>
                                     <i class="fas fa-search appt-selector-icon" *ngIf="!selectedPatient"></i>
                                     <div class="appt-selector-info">
@@ -415,7 +417,8 @@
                 <div class="appt-search-results-list" *ngIf="searchResults.length > 0" style="max-height: 350px; overflow-y: auto; padding-right: 5px;">
                     <div class="appt-search-result" *ngFor="let result of searchResults" (click)="selectPatient(result)" style="margin-bottom: 8px;">
                         <div class="appt-result-avatar">
-                            {{ getInitials(result.full_name) }}
+                            <img *ngIf="result?.profile_picture_url" [secureImage]="result?.profile_picture_url" class="avatar-img" alt="Foto"/>
+                            <span *ngIf="!result?.profile_picture_url">{{ getInitials(result.full_name) }}</span>
                         </div>
                         <div class="appt-result-info">
                             <h3>{{ result.full_name }}</h3>

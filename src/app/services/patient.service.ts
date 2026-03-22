@@ -15,6 +15,7 @@ export interface Patient {
   cpf: string;
   rg?: string;
   photo?: string;
+  profile_picture_url?: string;
   created_at?: string;
   updated_at?: string;
   socioeconomic_profile?: SocioeconomicProfile;
@@ -149,5 +150,11 @@ export class PatientService {
 
   deleteAddress(id: number): Observable<any> {
     return this.http.delete(`${API_URL}/addresses/${id}`);
+  }
+
+  uploadProfilePicture(id: number, file: File): Observable<PatientResponse> {
+    const formData = new FormData();
+    formData.append('image', file);
+    return this.http.post<PatientResponse>(`${API_URL}/patients/${id}/profile-picture`, formData);
   }
 }

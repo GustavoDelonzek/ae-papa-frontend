@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { AppointmentDetailsModalComponent } from '../shared/components/appointment-details-modal/appointment-details-modal.component';
+import { SecureImageDirective } from '../core/directives/secure-image.directive';
 
 @Component({
   selector: 'app-appointment-list',
@@ -22,7 +23,8 @@ import { AppointmentDetailsModalComponent } from '../shared/components/appointme
     FormsModule,
     RouterModule,
     SidebarComponent,
-    AppointmentDetailsModalComponent
+    AppointmentDetailsModalComponent,
+    SecureImageDirective
   ],
   templateUrl: './appointment-list.component.html',
   styleUrl: './appointment-list.component.scss'

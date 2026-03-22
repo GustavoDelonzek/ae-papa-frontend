@@ -102,8 +102,9 @@
           <td>
             <div class="patient-cell">
               <div class="avatar-circle" [ngClass]="(patient.id || 0) % 2 === 0 ? 'bg-blue' : 'bg-purple'">
-                {{ (patient.full_name || '?').charAt(0).toUpperCase() }}
-              </div>
+              <img *ngIf="patient.profile_picture_url" [secureImage]="patient.profile_picture_url" alt="Foto" class="avatar-img"/>
+              <span *ngIf="!patient.profile_picture_url">{{ (patient.full_name || '?').charAt(0).toUpperCase() }}</span>
+            </div>
               <div class="info">
                 <span class="name">{{ patient.full_name || 'Sem nome' }}</span>
                 <span class="id">ID: #{{ patient.id || '---' }}</span>

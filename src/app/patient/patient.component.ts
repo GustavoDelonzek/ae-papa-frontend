@@ -22,6 +22,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { SecureImageDirective } from '../core/directives/secure-image.directive';
 
 @Component({
   selector: 'app-patient',
@@ -41,7 +42,8 @@ import { MatNativeDateModule } from '@angular/material/core';
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    SecureImageDirective
   ],
   templateUrl: './patient.component.html',
   styleUrls: ['./patient.component.scss'],
@@ -51,6 +53,7 @@ export class PatientComponent implements OnInit {
   patientId: number = 0;
   activeTab: string = 'detalhes';
   loading: boolean = false;
+  uploadingPhoto: boolean = false;
   errorMessage: string = '';
 
   patientData: Patient | null = null;
@@ -247,20 +250,42 @@ export class PatientComponent implements OnInit {
     this.openEditModal();
   }
 
-  onPhotoUpload(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        // Aqui você pode implementar upload real de foto
-        if (this.patientData) {
-          this.patientData.photo = e.target.result;
+  onPhotoClick(): void {
+    const fileInput = document.getElementById('profilePhotoInput') as HTMLInputElement;
+    if (fileInput) fileInput.click();
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files?.[0];
+    if (!file || !this.patientData?.id) return;
+
+    // Local preview (optional but nice)
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      if (this.patientData) {
+        this.patientData.profile_picture_url = e.target.result;
+      }
+    };
+    reader.readAsDataURL(file);
+
+    this.uploadingPhoto = true;
+    this.patientService.uploadProfilePicture(this.patientData.id, file).subscribe({
+      next: (response: any) => {
+        this.uploadingPhoto = false;
+        if (this.patientData && response.data) {
+          this.patientData.profile_picture_url = response.data.profile_picture_url;
         }
-        console.log('Foto carregada:', e.target.result);
-        // TODO: Implementar upload real para o backend
-      };
-      reader.readAsDataURL(file);
-    }
+      },
+      error: (error: any) => {
+        console.error('Erro ao fazer upload da foto:', error);
+        this.uploadingPhoto = false;
+        // Revert preview on error if you wanted to be very strict
+      }
+    });
+  }
+
+  onPhotoUpload(event: any): void {
+    this.onFileSelected(event);
   }
 
   deleteDocument(document: any): void {
