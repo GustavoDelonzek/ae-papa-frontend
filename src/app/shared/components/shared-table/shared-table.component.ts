@@ -17,11 +17,16 @@ export interface TableAction {
     title?: string;
 }
 
+import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { FormsModule } from '@angular/forms';
+
 @Component({
     selector: 'app-shared-table',
+    standalone: true,
+    imports: [CommonModule, MatIconModule, FormsModule],
     templateUrl: './shared-table.component.html',
     styleUrls: ['./shared-table.component.scss'],
-    standalone: false
 })
 export class SharedTableComponent {
     @Input() data: any[] = [];

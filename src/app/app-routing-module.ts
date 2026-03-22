@@ -1,27 +1,21 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { Login } from './login/login';
-import { Home } from './home/home';
-import { PatientRegister } from './patient-register/patient-register';
+import { LoginComponent } from './login/login.component';
+import { HomeComponent } from './home/home.component';
 import { PatientComponent } from './patient/patient.component';
 import { PatientListComponent } from './patient-list/patient-list.component';
-import { CaretakerList } from './caretaker-list/caretaker-list';
+import { CaretakerListComponent } from './caretaker-list/caretaker-list.component';
 import { CaretakerComponent } from './caretaker/caretaker.component';
 import { AuthGuard } from './guards/auth.guard';
-import { ApointmentCreate } from './apointment-create/apointment-create';
-import { ApointmentList } from './apointment-list/apointment-list';
-import { UserRegister } from './user-register/user-register';
+import { AppointmentListComponent } from './appointment-list/appointment-list.component';
+import { UserRegisterComponent } from './user-register/user-register.component';
+import { ReportsComponent } from './reports/reports.component';
 
-const routes: Routes = [
-  { path: 'login', component: Login },
+export const routes: Routes = [
+  { path: 'login', component: LoginComponent },
   {
     path: '',
-    component: Home,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'registro-paciente',
-    component: PatientRegister,
+    component: HomeComponent,
     canActivate: [AuthGuard]
   },
   {
@@ -40,34 +34,28 @@ const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
-    path: 'registro-paciente/:id',
-    component: PatientRegister,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'lista-cuidadores',
-    component: CaretakerList,
-    canActivate: [AuthGuard]
-  },
-
-  {
-    path: 'cuidador/:id',
-    component: CaretakerComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'criar-consulta',
-    component: ApointmentCreate,
-    canActivate: [AuthGuard]
-  },
-  {
     path: 'lista-consultas',
-    component: ApointmentList,
+    component: AppointmentListComponent,
     canActivate: [AuthGuard]
   },
   {
     path: 'registro-usuario',
-    component: UserRegister,
+    component: UserRegisterComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'relatorios',
+    component: ReportsComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'lista-cuidadores',
+    component: CaretakerListComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'cuidador/:id',
+    component: CaretakerComponent,
     canActivate: [AuthGuard]
   },
   {

@@ -6,14 +6,28 @@ import { Appointment, AppointmentCreate } from '../core/models/appointment.model
 import { TableColumn } from '../shared/components/shared-table/shared-table.component';
 import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
+import { SharedUtils } from '../core/utils/shared-utils';
+
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { SidebarComponent } from '../sidebar/sidebar.component';
+import { AppointmentDetailsModalComponent } from '../shared/components/appointment-details-modal/appointment-details-modal.component';
 
 @Component({
-  selector: 'app-apointment-list',
-  standalone: false,
-  templateUrl: './apointment-list.html',
-  styleUrl: './apointment-list.scss'
+  selector: 'app-appointment-list',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    SidebarComponent,
+    AppointmentDetailsModalComponent
+  ],
+  templateUrl: './appointment-list.component.html',
+  styleUrl: './appointment-list.component.scss'
 })
-export class ApointmentList implements OnInit {
+export class AppointmentListComponent implements OnInit {
 
   appointments: Appointment[] = [];
   loading: boolean = false;
@@ -159,40 +173,31 @@ export class ApointmentList implements OnInit {
   }
 
   formatCPF(cpf: string): string {
-    if (!cpf) return '';
-    const cleaned = cpf.replace(/\D/g, '');
-    return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    return SharedUtils.formatCPF(cpf);
   }
 
   getInitials(name: string): string {
-    if (!name) return '??';
-    const parts = name.split(' ');
-    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    return SharedUtils.getInitials(name);
   }
 
   formatDate(date: string): string {
-    if (!date) return '';
+    return SharedUtils.formatDate(date);
+  }
 
-    // Avoid timezone shift for date-only strings (YYYY-MM-DD).
-    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      const [year, month, day] = date.split('-');
-      return `${day}/${month}/${year}`;
-    }
+  getDay(date: string): string {
+    return SharedUtils.getDateParts(date).day;
+  }
 
-    // Keep compatibility if backend returns MM-DD-YYYY.
-    if (/^\d{2}-\d{2}-\d{4}$/.test(date)) {
-      const [month, day, year] = date.split('-');
-      return `${day}/${month}/${year}`;
-    }
+  getShortMonth(date: string): string {
+    return SharedUtils.getDateParts(date).month;
+  }
 
-    const d = new Date(date);
-    if (isNaN(d.getTime())) return date;
+  getYear(date: string): string {
+    return SharedUtils.getDateParts(date).year;
+  }
 
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
-    return `${day}/${month}/${year}`;
+  private parseDate(dateStr: string): Date {
+    return SharedUtils.parseDate(dateStr);
   }
 
   getObjectiveText(objective: string): string {
@@ -351,23 +356,7 @@ export class ApointmentList implements OnInit {
     this.submitting = true;
 
     // Converter a data suportando string ou objeto Date do Material UI
-    let formattedDate = '';
-    const aptDate = this.appointmentDate as any;
-    if (aptDate instanceof Date) {
-        const year = aptDate.getFullYear();
-        const month = String(aptDate.getMonth() + 1).padStart(2, '0');
-        const day = String(aptDate.getDate()).padStart(2, '0');
-        formattedDate = `${month}-${day}-${year}`;
-    } else if (typeof aptDate === 'string') {
-        const dateParts = aptDate.split('T')[0].split('-');
-        if (dateParts.length === 3 && dateParts[0].length === 4) {
-            formattedDate = `${dateParts[1]}-${dateParts[2]}-${dateParts[0]}`;
-        } else {
-            formattedDate = aptDate;
-        }
-    } else {
-        formattedDate = String(aptDate);
-    }
+    let formattedDate = SharedUtils.formatDateForAPI(this.appointmentDate);
 
     const appointmentData: AppointmentCreate = {
       patient_id: this.selectedPatient.id!,
@@ -451,7 +440,7 @@ export class ApointmentList implements OnInit {
       marital_status: '',
       cpf: ''
     };
-    this.appointmentDate = this.toInputDate(appointment.date);
+    this.appointmentDate = SharedUtils.toInputDate(appointment.date);
     this.appointmentObjective = appointment.objective || '';
     this.observations = appointment.observations || '';
     this.searchCpf = '';
@@ -463,33 +452,6 @@ export class ApointmentList implements OnInit {
 
   isEditMode(): boolean {
     return this.editingAppointmentId !== null;
-  }
-
-  private toInputDate(date: string): string {
-    if (!date) return '';
-
-    if (date.includes('T')) {
-      return date.split('T')[0];
-    }
-
-    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      return date;
-    }
-
-    if (/^\d{2}-\d{2}-\d{4}$/.test(date)) {
-      const [month, day, year] = date.split('-');
-      return `${year}-${month}-${day}`;
-    }
-
-    const parsedDate = new Date(date);
-    if (!isNaN(parsedDate.getTime())) {
-      const year = parsedDate.getFullYear();
-      const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
-      const day = String(parsedDate.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    }
-
-    return '';
   }
 
   applyFilters(): void {

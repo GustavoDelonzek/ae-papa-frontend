@@ -5,6 +5,7 @@ import { Subject, Subscription, timer } from 'rxjs';
 import { switchMap, takeUntil } from 'rxjs/operators';
 import { Document } from '../core/models/document.model';
 import { DocumentService } from '../services/document.service';
+import { SharedUtils } from '../core/utils/shared-utils';
 
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -35,12 +36,10 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   loading = false;
   errorMessage = '';
   
-  // Smart Polling
   private destroy$ = new Subject<void>();
   private pollingSubscription?: Subscription;
   private isPollingActive = false;
 
-  // Filtros
   statusFilter: '' | 'pending' | 'completed' | 'failed' = '';
 
   selectedType: string = '';
@@ -48,7 +47,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   startDate: string = '';
   endDate: string = '';
 
-  // Paginação
   currentPage = 1;
   lastPage = 1;
   perPage = 10;
@@ -70,26 +68,9 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     return doc.id;
   }
 
-  private formatDateForApi(date: any): string {
-    if (!date) return '';
-    if (typeof date === 'string') return date;
-    if (date instanceof Date) {
-      const d = new Date(date);
-      let month = '' + (d.getMonth() + 1);
-      let day = '' + d.getDate();
-      const year = d.getFullYear();
-
-      if (month.length < 2) month = '0' + month;
-      if (day.length < 2) day = '0' + day;
-
-      return [year, month, day].join('-');
-    }
-    return '';
-  }
-
   private getFilters(page: number) {
-    const formattedStartDate = this.formatDateForApi(this.startDate);
-    const formattedEndDate = this.formatDateForApi(this.endDate);
+    const formattedStartDate = SharedUtils.formatDateForAPI(this.startDate);
+    const formattedEndDate = SharedUtils.formatDateForAPI(this.endDate);
 
     return {
       patient_id: this.patientId,
@@ -244,8 +225,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     }
   }
 
-
-
   deleteDocument(doc: Document): void {
     if (confirm(`Tem certeza que deseja excluir o documento "${doc.file_name}"?`)) {
       this.documentService.deleteDocument(doc.id).subscribe({
@@ -261,9 +240,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   formatDate(dateString: string): string {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR');
+    return SharedUtils.formatDate(dateString);
   }
 
   formatFileSize(bytes: number): string {

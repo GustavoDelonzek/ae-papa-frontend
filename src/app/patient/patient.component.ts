@@ -1,17 +1,50 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
-import { PatientService, Patient, CaretakerService, Caretaker, SocioeconomicProfileService, SocioeconomicProfile } from '../services';
-import { Contact } from '../services/caretaker';
+import { PatientService, Patient, Caretaker, SocioeconomicProfileService, SocioeconomicProfile, CaretakerService, Contact } from '../services';
 import { AuthService } from '../services/auth.service';
 import { AppointmentService } from '../services/appointment.service';
 import { Appointment, AppointmentCreate } from '../core/models/appointment.model';
 import { ClinicalRecord, ClinicalRecordService } from '../services/clinical-record.service';
+import { SharedUtils } from '../core/utils/shared-utils';
+
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { SidebarComponent } from '../sidebar/sidebar.component';
+import { PatientFormModalComponent } from '../shared/components/patient-form-modal/patient-form-modal.component';
+import { CaretakerFormModalComponent } from '../shared/components/caretaker-form-modal/caretaker-form-modal.component';
+import { AppointmentDetailsModalComponent } from '../shared/components/appointment-details-modal/appointment-details-modal.component';
+import { SocioeconomicProfileModalComponent } from '../shared/components/socioeconomic-profile-modal/socioeconomic-profile-modal.component';
+import { ClinicalRecordModalComponent } from '../shared/components/clinical-record-modal/clinical-record-modal.component';
+import { DocumentListComponent } from '../document-list/document-list.component';
+import { DocumentUploadComponent } from '../document-upload/document-upload.component';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-patient',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    SidebarComponent,
+    PatientFormModalComponent,
+    CaretakerFormModalComponent,
+    AppointmentDetailsModalComponent,
+    SocioeconomicProfileModalComponent,
+    ClinicalRecordModalComponent,
+    DocumentListComponent,
+    DocumentUploadComponent,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule
+  ],
   templateUrl: './patient.component.html',
   styleUrls: ['./patient.component.scss'],
-  standalone: false,
 })
 export class PatientComponent implements OnInit {
 
@@ -20,43 +53,34 @@ export class PatientComponent implements OnInit {
   loading: boolean = false;
   errorMessage: string = '';
 
-  // Dados reais do paciente do backend
   patientData: Patient | null = null;
 
-  // Socioeconomic Profile
   socioeconomicProfile: SocioeconomicProfile | null = null;
   showSocioeconomicModal: boolean = false;
   loadingProfile: boolean = false;
 
-  // Dados dos cuidadores
   caretakers: Caretaker[] = [];
   filteredCaretakers: Caretaker[] = [];
   loadingCaretakers: boolean = false;
 
-  // Filtros de Cuidador
   caretakerGenderFilter: string = '';
   caretakerAgeFilter: string = '';
   caretakerKinshipFilter: string = '';
 
-  // Controle do modal de upload de documentos
   showUploadModal = false;
   currentUserId: number = 0;
   @ViewChild('docList') docList: any;
 
-  // Controle do modal de cuidador
   showCaretakerModal = false;
   currentCaretaker: Caretaker | null = null;
 
-  // Controle do modal de Registros Clínicos
   showClinicalRecordModal = false;
   currentClinicalRecord: ClinicalRecord | null = null;
   existingClinicalRecord: ClinicalRecord | null = null; // Single record reference
 
-  // Dados das consultas
   appointments: Appointment[] = [];
   loadingAppointments: boolean = false;
 
-  // Controle do modal de consulta
   showAppointmentModal = false;
   newAppointment: AppointmentCreate = {
     patient_id: 0,
@@ -67,7 +91,6 @@ export class PatientComponent implements OnInit {
   savingAppointment = false;
   appointmentErrorMessage = '';
 
-  // Filtros de Consulta
   statusFilter: string = '';
   objectiveFilter: string = '';
   dateFilter: any = '';
@@ -88,11 +111,9 @@ export class PatientComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // Obter ID do usuário logado
     const user = this.authService.getCurrentUser();
     this.currentUserId = user?.id || 0;
 
-    // Pegar ID do paciente da rota
     this.route.params.subscribe((params: Params) => {
       if (params['id']) {
         this.patientId = parseInt(params['id'], 10);
@@ -102,11 +123,9 @@ export class PatientComponent implements OnInit {
       }
     });
 
-    // Verificar se deve abrir a aba de cuidadores
     this.route.queryParams.subscribe((queryParams: any) => {
       if (queryParams['tab']) {
         this.activeTab = queryParams['tab'];
-        // Se for aba de cuidador, carrega os cuidadores
         if (queryParams['tab'] === 'Cuidador') {
           this.loadCaretakers();
         }
@@ -166,7 +185,6 @@ export class PatientComponent implements OnInit {
   selectTab(tab: string): void {
     this.activeTab = tab;
 
-    // Carregar cuidadores quando a aba for selecionada
     if (tab === 'Cuidador' && this.caretakers.length === 0) {
       this.loadCaretakers();
     }
@@ -205,17 +223,13 @@ export class PatientComponent implements OnInit {
   }
 
   formatCPF(cpf: string): string {
-    if (!cpf) return 'Não informado';
-    const cleaned = cpf.replace(/\D/g, '');
-    return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    return SharedUtils.formatCPF(cpf);
   }
 
   formatDate(date: string): string {
-    if (!date) return 'Não informado';
-    return new Date(date).toLocaleDateString('pt-BR');
+    return SharedUtils.formatDate(date);
   }
 
-  // Controle do modal de edição
   showEditModal: boolean = false;
 
   openEditModal(): void {
@@ -277,13 +291,11 @@ export class PatientComponent implements OnInit {
     }
   }
 
-  // Métodos para gerenciar cuidadores
   loadCaretakers(): void {
     this.loadingCaretakers = true;
 
     this.caretakerService.getCaretakers(1, 100).subscribe({
       next: (response: any) => {
-        // Filtrar apenas cuidadores deste paciente
         this.caretakers = (response.data || []).filter(
           (caretaker: Caretaker) => caretaker.patient_id === this.patientId
         );
@@ -370,7 +382,6 @@ export class PatientComponent implements OnInit {
     if (confirm('Tem certeza que deseja excluir este cuidador?')) {
       this.caretakerService.deleteCaretaker(caretakerId).subscribe({
         next: () => {
-          // Recarregar lista de cuidadores
           this.loadCaretakers();
         },
         error: (error: any) => {
@@ -409,7 +420,6 @@ export class PatientComponent implements OnInit {
     this.router.navigate(['/lista-pacientes']);
   }
 
-  // Métodos para gerenciar consultas
   loadAppointments(): void {
     this.loadingAppointments = true;
 
@@ -417,15 +427,7 @@ export class PatientComponent implements OnInit {
     if (this.statusFilter) filters.status = this.statusFilter;
     if (this.objectiveFilter) filters.objective = this.objectiveFilter;
     if (this.dateFilter) {
-      if (this.dateFilter instanceof Date) {
-        const d = this.dateFilter;
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        filters.date = `${year}-${month}-${day}`;
-      } else {
-        filters.date = this.dateFilter;
-      }
+      filters.date = SharedUtils.formatDateForAPI(this.dateFilter);
     }
 
     this.appointmentService.listAppointments(1, 100, filters).subscribe({
@@ -456,7 +458,6 @@ export class PatientComponent implements OnInit {
   }
 
   openCreateAppointmentModal(): void {
-    // Resetar formulário
     this.newAppointment = {
       patient_id: this.patientId,
       user_id: this.currentUserId,
@@ -481,24 +482,7 @@ export class PatientComponent implements OnInit {
     this.savingAppointment = true;
     this.appointmentErrorMessage = '';
 
-    // Converter a data suportando string ou objeto Date do Material UI
-    let formattedDate = '';
-    const aptDate = this.newAppointment.date as any;
-    if (aptDate instanceof Date) {
-        const year = aptDate.getFullYear();
-        const month = String(aptDate.getMonth() + 1).padStart(2, '0');
-        const day = String(aptDate.getDate()).padStart(2, '0');
-        formattedDate = `${month}-${day}-${year}`;
-    } else if (typeof aptDate === 'string') {
-        const dateParts = aptDate.split('T')[0].split('-');
-        if (dateParts.length === 3 && dateParts[0].length === 4) {
-            formattedDate = `${dateParts[1]}-${dateParts[2]}-${dateParts[0]}`;
-        } else {
-            formattedDate = aptDate;
-        }
-    } else {
-        formattedDate = String(aptDate);
-    }
+    const formattedDate = SharedUtils.formatDateForAPI(this.newAppointment.date);
 
     const appointmentData: AppointmentCreate = {
       ...this.newAppointment,
@@ -511,7 +495,6 @@ export class PatientComponent implements OnInit {
       next: (response: any) => {
         this.savingAppointment = false;
         this.closeAppointmentModal();
-        // Recarregar lista de consultas
         this.reloadAppointments();
       },
       error: (error: any) => {
@@ -523,28 +506,7 @@ export class PatientComponent implements OnInit {
   }
 
   formatAppointmentDate(date: string): string {
-    if (!date) return 'Data não informada';
-
-    date = date.trim();
-    const parts = date.split('-');
-
-    if (parts.length === 3) {
-      if (parts[0].length === 4) {
-        // Formato YYYY-MM-DD
-        const year = parts[0];
-        const month = parts[1].padStart(2, '0');
-        const day = parts[2].padStart(2, '0');
-        return `${day}/${month}/${year}`;
-      } else {
-        // Formato MM-DD-YYYY
-        const month = parts[0].padStart(2, '0');
-        const day = parts[1].padStart(2, '0');
-        const year = parts[2];
-        return `${day}/${month}/${year}`;
-      }
-    }
-
-    return date;
+    return SharedUtils.formatDate(date);
   }
 
   getStatusText(status: string): string {
@@ -597,7 +559,6 @@ export class PatientComponent implements OnInit {
     this.router.navigate(['/cuidador', caretakerId]);
   }
 
-  // Socioeconomic Profile Methods
   openSocioeconomicModal(): void {
     this.showSocioeconomicModal = true;
   }
@@ -654,14 +615,12 @@ export class PatientComponent implements OnInit {
     return parts.length > 0 ? parts.join(', ') : 'Nenhum item selecionado';
   }
 
-  // Clinical Records Helpers & Logic
   loadClinicalRecords(): void {
     if (!this.patientId) return;
 
     this.clinicalRecordService.getClinicalRecords(this.patientId).subscribe({
       next: (response: any) => {
         const records = response.data || [];
-        // Take the first one if any exist
         this.existingClinicalRecord = records.length > 0 ? records[0] : null;
       },
       error: (error: any) => {
@@ -691,13 +650,9 @@ export class PatientComponent implements OnInit {
   }
 
   getInitials(name: string): string {
-    if (!name) return '??';
-    const parts = name.split(' ');
-    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    return SharedUtils.getInitials(name);
   }
 
-  // Clinical Record Modal Methods
   openClinicalRecordModal() {
     this.currentClinicalRecord = null;
     this.showClinicalRecordModal = true;

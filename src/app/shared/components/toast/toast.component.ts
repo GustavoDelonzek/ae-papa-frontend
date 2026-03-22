@@ -1,11 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Toast, ToastService } from '../../../services/toast.service';
 
+import { CommonModule } from '@angular/common';
+
 @Component({
     selector: 'app-toast',
+    standalone: true,
+    imports: [CommonModule],
     templateUrl: './toast.component.html',
     styleUrls: ['./toast.component.scss'],
-    standalone: false
 })
 export class ToastComponent implements OnInit {
     toasts: Toast[] = [];

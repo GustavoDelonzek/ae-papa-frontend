@@ -1,12 +1,26 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, TemplateRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { PatientService, Patient } from '../services';
+import { SharedUtils } from '../core/utils/shared-utils';
+
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { SidebarComponent } from '../sidebar/sidebar.component';
+import { PatientFormModalComponent } from '../shared/components/patient-form-modal/patient-form-modal.component';
 
 @Component({
   selector: 'app-patient-list',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    SidebarComponent,
+    PatientFormModalComponent
+  ],
   templateUrl: './patient-list.component.html',
   styleUrls: ['./patient-list.component.scss'],
-  standalone: false,
 })
 export class PatientListComponent implements OnInit, OnDestroy, AfterViewInit {
 
@@ -188,7 +202,7 @@ export class PatientListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   getPatientAge(birthDate: string): number {
     if (!birthDate) return 0;
-    const birth = new Date(birthDate);
+    const birth = SharedUtils.parseDate(birthDate);
     const today = new Date();
     let age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
@@ -199,9 +213,7 @@ export class PatientListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   formatCPF(cpf: string): string {
-    if (!cpf) return '';
-    const cleaned = cpf.replace(/\D/g, '');
-    return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    return SharedUtils.formatCPF(cpf);
   }
 
   // Modal Logic

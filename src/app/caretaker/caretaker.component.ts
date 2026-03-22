@@ -1,12 +1,26 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { CaretakerService, Caretaker, PatientService, Patient } from '../services';
+import { SharedUtils } from '../core/utils/shared-utils';
+
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { SidebarComponent } from '../sidebar/sidebar.component';
+import { CaretakerFormModalComponent } from '../shared/components/caretaker-form-modal/caretaker-form-modal.component';
 
 @Component({
     selector: 'app-caretaker',
+    standalone: true,
+    imports: [
+        CommonModule, 
+        FormsModule, 
+        RouterModule,
+        SidebarComponent,
+        CaretakerFormModalComponent
+    ],
     templateUrl: './caretaker.component.html',
     styleUrls: ['./caretaker.component.scss'],
-    standalone: false,
 })
 export class CaretakerComponent implements OnInit {
 
@@ -14,13 +28,10 @@ export class CaretakerComponent implements OnInit {
     loading: boolean = false;
     errorMessage: string = '';
 
-    // Dados do cuidador
     caretakerData: Caretaker | null = null;
 
-    // Modal de edição (Dados Pessoais)
     showEditModal: boolean = false;
 
-    // Modal de vínculo (Relacionamento)
     showRelationModal: boolean = false;
     allPatients: Patient[] = [];
     loadingPatients: boolean = false;
@@ -114,14 +125,11 @@ export class CaretakerComponent implements OnInit {
     }
 
     formatCPF(cpf: string): string {
-        if (!cpf) return 'Não informado';
-        const cleaned = cpf.replace(/\D/g, '');
-        return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        return SharedUtils.formatCPF(cpf);
     }
 
     formatDate(date: string): string {
-        if (!date) return 'Não informado';
-        return new Date(date).toLocaleDateString('pt-BR');
+        return SharedUtils.formatDate(date);
     }
 
     openEditModal(): void {
@@ -137,7 +145,6 @@ export class CaretakerComponent implements OnInit {
         this.loadCaretakerData();
     }
 
-    // Relationship Management
     openRelationModal(): void {
         this.showRelationModal = true;
         this.loadAllPatients();
@@ -154,7 +161,6 @@ export class CaretakerComponent implements OnInit {
         this.patientService.getPatients(1, 100).subscribe({ // Assuming getPatients exists and handles pagination info
             next: (response: any) => {
                 this.allPatients = response.data || [];
-                // Filter out patients already linked?
                 if (this.caretakerData?.patients) {
                     const linkedIds = this.caretakerData.patients.map(p => p.id);
                     this.allPatients = this.allPatients.filter(p => !linkedIds.includes(p.id!));
@@ -176,7 +182,7 @@ export class CaretakerComponent implements OnInit {
             next: () => {
                 this.savingRelation = false;
                 this.closeRelationModal();
-                this.loadCaretakerData(); // Reload to see new patient
+                this.loadCaretakerData();
             },
             error: (err) => {
                 console.error('Erro ao vincular paciente', err);

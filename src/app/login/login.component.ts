@@ -8,13 +8,22 @@ interface LoginData {
   password: string;
 }
 
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+
 @Component({
   selector: 'app-login',
-  standalone: false,
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule
+  ],
   templateUrl: './login.html',
-  styleUrls: ['./login.scss']
+  styleUrl: './login.scss'
 })
-export class Login implements OnInit {
+export class LoginComponent implements OnInit {
 
   loginData: LoginData = {
     email: '',

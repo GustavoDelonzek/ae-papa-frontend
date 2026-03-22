@@ -1,11 +1,27 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CaretakerService, Caretaker, CaretakerResponse, PatientService, Patient } from '../../../services';
+import { SharedUtils } from '../../../core/utils/shared-utils';
+
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
     selector: 'app-caretaker-form-modal',
+    standalone: true,
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatDatepickerModule,
+        MatNativeDateModule
+    ],
     templateUrl: './caretaker-form-modal.component.html',
     styleUrls: ['./caretaker-form-modal.component.scss'],
-    standalone: false
 })
 export class CaretakerFormModalComponent implements OnChanges {
     @Input() visible: boolean = false;
@@ -50,7 +66,7 @@ export class CaretakerFormModalComponent implements OnChanges {
                 this.isEditing = true;
                 this.currentCaretaker = { ...this.caretaker };
                 if (this.currentCaretaker.birth_date) {
-                    this.currentCaretaker.birth_date = this.currentCaretaker.birth_date.split('T')[0];
+                    this.currentCaretaker.birth_date = SharedUtils.toInputDate(this.currentCaretaker.birth_date);
                 }
             } else {
                 this.isEditing = false;
@@ -63,7 +79,6 @@ export class CaretakerFormModalComponent implements OnChanges {
     }
 
     onOpen(): void {
-        // Nada necessário no onOpen para buscar massiva de pacientes.
     }
 
     openPatientSearch(): void {
@@ -85,15 +100,7 @@ export class CaretakerFormModalComponent implements OnChanges {
             if (cpf.length > 11) {
                 cpf = cpf.substring(0, 11);
             }
-            if (cpf.length > 9) {
-                this.searchCpf = cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4');
-            } else if (cpf.length > 6) {
-                this.searchCpf = cpf.replace(/(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
-            } else if (cpf.length > 3) {
-                this.searchCpf = cpf.replace(/(\d{3})(\d{0,3})/, '$1.$2');
-            } else {
-                this.searchCpf = cpf;
-            }
+            this.searchCpf = SharedUtils.formatCPF(cpf);
         }
 
         if (this.patientSearchTimeout) {
@@ -113,7 +120,7 @@ export class CaretakerFormModalComponent implements OnChanges {
 
         const term = this.searchCpf.trim();
         const cpfOnly = term.replace(/\D/g, '');
-        const isCpf = /^[0-9.\- ]*$/.test(term) && cpfOnly.length > 0;
+        const isCpf = term.replace(/[0-9.\- ]/g, '').length === 0 && cpfOnly.length > 0;
 
         const filters: any = isCpf ? { cpf: cpfOnly } : { full_name: term };
 
@@ -190,14 +197,11 @@ export class CaretakerFormModalComponent implements OnChanges {
 
         const formattedData = {
             ...this.currentCaretaker,
-            birth_date: this.formatDateForAPI(this.currentCaretaker.birth_date)
+            birth_date: SharedUtils.formatDateForAPI(this.currentCaretaker.birth_date)
         };
 
         const payload: any = { ...formattedData };
         if (!payload.rg) delete payload.rg;
-
-        console.log('Payload sendo enviado:', payload);
-        console.log('currentCaretaker:', this.currentCaretaker);
 
         const request = this.isEditing && this.currentCaretaker.id
             ? this.caretakerService.updateCaretaker(this.currentCaretaker.id, payload)
@@ -229,53 +233,14 @@ export class CaretakerFormModalComponent implements OnChanges {
         if (!c.birth_date) { this.errorMessage = 'Data de nascimento é obrigatória'; return false; }
         if (!c.gender) { this.errorMessage = 'Gênero é obrigatório'; return false; }
         if (!c.cpf) { this.errorMessage = 'CPF é obrigatório'; return false; }
-        if (!this.isValidCPF(c.cpf)) { this.errorMessage = 'CPF inválido'; return false; }
+        if (!SharedUtils.isValidCPF(c.cpf)) { this.errorMessage = 'CPF inválido'; return false; }
 
-        // Validação de parentesco apenas na criação
         if (!this.isEditing) {
             if (!c.patient_id) { this.errorMessage = 'Selecione um paciente'; return false; }
             if (!c.kinship) { this.errorMessage = 'Parentesco é obrigatório'; return false; }
         }
 
         return true;
-    }
-
-    isValidCPF(cpf: string): boolean {
-        cpf = cpf.replace(/[^\d]/g, '');
-        if (cpf.length !== 11) return false;
-        if (/^(\d)\1{10}$/.test(cpf)) return false;
-
-        let sum = 0;
-        for (let i = 0; i < 9; i++) sum += parseInt(cpf.charAt(i)) * (10 - i);
-        let remainder = (sum * 10) % 11;
-        if (remainder === 10 || remainder === 11) remainder = 0;
-        if (remainder !== parseInt(cpf.charAt(9))) return false;
-
-        sum = 0;
-        for (let i = 0; i < 10; i++) sum += parseInt(cpf.charAt(i)) * (11 - i);
-        remainder = (sum * 10) % 11;
-        if (remainder === 10 || remainder === 11) remainder = 0;
-        if (remainder !== parseInt(cpf.charAt(10))) return false;
-
-        return true;
-    }
-
-    formatDateForAPI(date: any): string {
-        if (!date) return '';
-        if (date instanceof Date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${month}-${day}-${year}`;
-        }
-        if (typeof date === 'string') {
-            const parts = date.split('T')[0].split('-');
-            if (parts.length === 3 && parts[0].length === 4) {
-                return `${parts[1]}-${parts[2]}-${parts[0]}`;
-            }
-            return date;
-        }
-        return String(date);
     }
 
     handleValidationErrors(errors: any): void {
@@ -286,31 +251,17 @@ export class CaretakerFormModalComponent implements OnChanges {
 
     formatCPF(event: Event): void {
         const input = event.target as HTMLInputElement;
-        let cleaned = input.value.replace(/\D/g, '');
-
+        const cleaned = input.value.replace(/\D/g, '');
         if (cleaned.length <= 11) {
-            if (cleaned.length > 9) {
-                cleaned = cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
-            } else if (cleaned.length > 6) {
-                cleaned = cleaned.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
-            } else if (cleaned.length > 3) {
-                cleaned = cleaned.replace(/(\d{3})(\d{1,3})/, '$1.$2');
-            }
-
-            this.currentCaretaker.cpf = cleaned;
+            this.currentCaretaker.cpf = SharedUtils.formatCPF(cleaned);
         }
     }
 
     formatPatientCPF(cpf: string): string {
-        if (!cpf) return '';
-        const cleaned = cpf.replace(/\D/g, '');
-        return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        return SharedUtils.formatCPF(cpf);
     }
 
     getInitials(name: string): string {
-        if (!name) return '??';
-        const parts = name.split(' ');
-        if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
-        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        return SharedUtils.getInitials(name);
     }
 }

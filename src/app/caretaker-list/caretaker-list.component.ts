@@ -2,29 +2,39 @@ import { Component, OnInit, OnDestroy, ViewChild, TemplateRef, AfterViewInit } f
 import { Router } from '@angular/router';
 import { CaretakerService, Caretaker, CaretakersListResponse } from '../services';
 
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { SidebarComponent } from '../sidebar/sidebar.component';
+import { CaretakerFormModalComponent } from '../shared/components/caretaker-form-modal/caretaker-form-modal.component';
+
 @Component({
   selector: 'app-caretaker-list',
-  standalone: false,
-  templateUrl: './caretaker-list.html',
-  styleUrl: './caretaker-list.scss',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    SidebarComponent,
+    CaretakerFormModalComponent
+  ],
+  templateUrl: './caretaker-list.component.html',
+  styleUrl: './caretaker-list.component.scss',
 })
-export class CaretakerList implements OnInit, OnDestroy {
+export class CaretakerListComponent implements OnInit, OnDestroy {
 
   searchTerm: string = '';
   loading: boolean = false;
   errorMessage: string = '';
   searching: boolean = false;
 
-  // Filters
   genderFilter: 'M' | 'F' | null = null;
   ageFilter: string = '';
   kinshipFilter: string = '';
   birthYearFilter: string = ''; // year as string for select
 
-  // Birth year options
   birthYearOptions: number[] = [];
 
-  // Kinship options
   kinshipOptions: { value: string; label: string }[] = [
     { value: 'son', label: 'Filho' },
     { value: 'daughter', label: 'Filha' },
@@ -43,25 +53,20 @@ export class CaretakerList implements OnInit, OnDestroy {
     { value: 'other', label: 'Outro' }
   ];
 
-  // Paginação
   currentPage: number = 1;
   perPage: number = 10;
   totalPages: number = 0;
   totalItems: number = 0;
 
-  // Lista de cuidadores
   caretakers: Caretaker[] = [];
   filteredCaretakers: Caretaker[] = [];
 
-  // Metadados de paginação
   paginationMeta: any = null;
 
-  // Timeout para pesquisa com delay
   private searchTimeout: any;
 
   protected Math = Math;
 
-  // Sorting
   sortColumn: string = '';
   sortDirection: 'asc' | 'desc' = 'asc';
 
@@ -93,7 +98,6 @@ export class CaretakerList implements OnInit, OnDestroy {
     this.errorMessage = '';
     this.currentPage = page;
 
-    // Filters object construction
     const filters: any = {};
     if (this.searchTerm) filters.search = this.searchTerm;
     if (this.genderFilter) filters.gender = this.genderFilter;
@@ -182,8 +186,6 @@ export class CaretakerList implements OnInit, OnDestroy {
 
   getPatientsSummary(patients: any[] | undefined | null): string {
     if (!patients || patients.length === 0) return '-';
-    // Se tiver apenas 1, mostra "Nome (Parentesco)"
-    // Se tiver mais, mostra "X Pacientes"
     if (patients.length === 1) {
       return `${patients[0].full_name} (${this.getKinshipLabel(patients[0].kinship)})`;
     }
@@ -223,7 +225,6 @@ export class CaretakerList implements OnInit, OnDestroy {
     return age;
   }
 
-  // Modal control
   showCaretakerModal: boolean = false;
   currentCaretaker: Caretaker | null = null;
 

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Appointment } from '../../../core/models/appointment.model';
+import { SharedUtils } from '../../../core/utils/shared-utils';
 
 @Component({
     selector: 'app-appointment-details-modal',
@@ -26,10 +27,11 @@ export class AppointmentDetailsModalComponent {
     }
 
     formatDate(dateStr: string | undefined): string {
-        if (!dateStr) return '-';
-        // Assume format YYYY-MM-DD
-        const date = new Date(dateStr);
-        return date.toLocaleDateString('pt-BR');
+        return SharedUtils.formatDate(dateStr);
+    }
+
+    private parseDate(dateStr: string): Date {
+        return SharedUtils.parseDate(dateStr);
     }
 
     getObjectiveLabel(objective: string | undefined): string {
@@ -45,15 +47,7 @@ export class AppointmentDetailsModalComponent {
     }
 
     getInitials(name: string | undefined): string {
-        if (!name) return '??';
-        const parts = name.split(' ');
-        if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
-        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    }
-
-    extractTime(dateStr: string | undefined): string {
-        if (!dateStr) return '--:--';
-        const date = new Date(dateStr);
-        return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        return SharedUtils.getInitials(name);
     }
 }
+

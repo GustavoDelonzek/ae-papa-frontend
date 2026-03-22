@@ -71,16 +71,10 @@ export class CaretakerService {
 
   constructor(private http: HttpClient) { }
 
-  /**
-   * Criar novo cuidador
-   */
   createCaretaker(caretakerData: Caretaker): Observable<CaretakerResponse> {
     return this.http.post<CaretakerResponse>(`${API_URL}/caregivers`, caretakerData);
   }
 
-  /**
-   * Obter lista de cuidadores com paginação e filtros
-   */
   getCaretakers(page: number = 1, perPage: number = 15, filtersOrSearch?: any): Observable<CaretakersListResponse> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -98,14 +92,12 @@ export class CaretakerService {
     if (filters.gender) params = params.set('gender', filters.gender);
     if (filters.kinship) params = params.set('kinship', filters.kinship);
 
-    if (filters.ageFilter) {
-      params = params.set('ageFilter', filters.ageFilter);
-      params = params.set('age_filter', filters.ageFilter);
+    if (filters.age_filter || filters.ageFilter) {
+      params = params.set('age_filter', filters.age_filter || filters.ageFilter);
     }
 
-    if (filters.birthYear) {
-      params = params.set('birthYear', filters.birthYear.toString());
-      params = params.set('birth_year', filters.birthYear.toString());
+    if (filters.birth_year || filters.birthYear) {
+      params = params.set('birth_year', (filters.birth_year || filters.birthYear).toString());
     }
 
     if (filters.sort_by) params = params.set('sort_by', filters.sort_by);
@@ -114,44 +106,26 @@ export class CaretakerService {
     return this.http.get<CaretakersListResponse>(`${API_URL}/caregivers`, { params });
   }
 
-  /**
-   * Obter cuidador por ID
-   */
   getCaretaker(id: number): Observable<CaretakerResponse> {
     return this.http.get<CaretakerResponse>(`${API_URL}/caregivers/${id}`);
   }
 
-  /**
-   * Atualizar cuidador (Dados pessoais apenas)
-   */
   updateCaretaker(id: number, caretakerData: Partial<Caretaker>): Observable<CaretakerResponse> {
     return this.http.patch<CaretakerResponse>(`${API_URL}/caregivers/${id}`, caretakerData);
   }
 
-  /**
-   * Deletar cuidador
-   */
   deleteCaretaker(id: number): Observable<any> {
     return this.http.delete(`${API_URL}/caregivers/${id}`);
   }
 
-  /**
-   * Associar cuidador a paciente
-   */
   linkPatient(caretakerId: number, patientId: number, kinship: string): Observable<any> {
     return this.http.post(`${API_URL}/caregivers/${caretakerId}/patients/${patientId}`, { kinship });
   }
 
-  /**
-   * Atualizar relacionamento (Kinship)
-   */
   updatePatientRelation(caretakerId: number, patientId: number, kinship: string): Observable<any> {
     return this.http.patch(`${API_URL}/caregivers/${caretakerId}/patients/${patientId}`, { kinship });
   }
 
-  /**
-   * Remover associação com paciente
-   */
   unlinkPatient(caretakerId: number, patientId: number): Observable<any> {
     return this.http.delete(`${API_URL}/caregivers/${caretakerId}/patients/${patientId}`);
   }

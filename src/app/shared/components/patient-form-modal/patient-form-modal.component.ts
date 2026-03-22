@@ -2,12 +2,28 @@ import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { Patient, PatientService, PatientContact, Address } from '../../../services/patient.service';
 import { forkJoin, Observable, of } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
+import { SharedUtils } from '../../../core/utils/shared-utils';
+
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 
 @Component({
     selector: 'app-patient-form-modal',
+    standalone: true,
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatIconModule,
+        MatDatepickerModule
+    ],
     templateUrl: './patient-form-modal.component.html',
     styleUrls: ['./patient-form-modal.component.scss'],
-    standalone: false
 })
 export class PatientFormModalComponent implements OnInit {
     @Input() visible: boolean = false;
@@ -29,7 +45,6 @@ export class PatientFormModalComponent implements OnInit {
         rg: ''
     };
 
-    // Contacts
     contactsList: PatientContact[] = [];
     newContact: PatientContact = {
         type: 'phone',
@@ -37,7 +52,6 @@ export class PatientFormModalComponent implements OnInit {
         is_primary: false
     };
 
-    // Addresses
     addressesList: Address[] = [];
     newAddress: Address = {
         street: '',
@@ -58,27 +72,26 @@ export class PatientFormModalComponent implements OnInit {
             this.isEditing = true;
             this.currentPatient = { ...val };
             if (this.currentPatient.birth_date) {
-                this.currentPatient.birth_date = this.currentPatient.birth_date.split('T')[0];
+                this.currentPatient.birth_date = SharedUtils.toInputDate(this.currentPatient.birth_date);
             }
 
-            // Load contacts - Find primary or take first or default
             this.contactsList = val.contacts ? [...val.contacts] : [];
             const primary = this.contactsList.find(c => c.is_primary);
             if (primary) {
                 this.newContact = { ...primary }; // Clone for editing
             } else if (this.contactsList.length > 0) {
-                // If no primary is marked, take the first one and make it primary effectively in UI?? 
-                // Or just show empty form? Let's take first if exists, else empty.
                 this.newContact = { ...this.contactsList[0], is_primary: true };
             } else {
                 this.newContact = { type: 'phone', value: '', is_primary: true };
             }
 
-            // Load addresses
             if (val.addresses) {
                 this.addressesList = [...val.addresses];
             } else {
                 this.addressesList = [];
+            }
+            if (this.currentPatient.id) {
+                this.refreshPatientData();
             }
         } else {
             this.isEditing = false;
@@ -112,6 +125,9 @@ export class PatientFormModalComponent implements OnInit {
         this.errorMessage = '';
         if (this.currentStep < 3) {
             this.currentStep++;
+            if (this.currentPatient.id && (this.currentStep === 2 || this.currentStep === 3)) {
+                this.refreshPatientData();
+            }
         }
     }
 
@@ -126,21 +142,46 @@ export class PatientFormModalComponent implements OnInit {
         this.errorMessage = '';
         if (step >= 1 && step <= 3) {
             this.currentStep = step;
+            if (this.currentPatient.id && (step === 2 || step === 3)) {
+                this.refreshPatientData();
+            }
         }
     }
 
-    // --- Step 1: Patient ---
+    refreshPatientData(): void {
+        if (!this.currentPatient.id) return;
+        
+        this.patientService.getPatient(this.currentPatient.id).subscribe({
+            next: (response: any) => {
+                const p = response.data;
+                if (p) {
+                    this.contactsList = p.contacts ? [...p.contacts] : [];
+                    this.addressesList = p.addresses ? [...p.addresses] : [];
+                    
+                    // Update main contact for form
+                    const primary = this.contactsList.find(c => c.is_primary);
+                    if (primary) {
+                        this.newContact = { ...primary };
+                    } else if (this.contactsList.length > 0) {
+                        this.newContact = { ...this.contactsList[0], is_primary: true };
+                    }
+                }
+            },
+            error: (err) => console.error('Erro ao recarregar dados do atendido:', err)
+        });
+    }
+
+
 
     handleStep1(): void {
         this.isSaving = true;
 
         const patientPayload: any = {
             ...this.currentPatient,
-            birth_date: this.formatDateForAPI(this.currentPatient.birth_date)
+            birth_date: SharedUtils.formatDateForAPI(this.currentPatient.birth_date)
         };
         if (!patientPayload.rg) delete patientPayload.rg;
 
-        // Clean up nested
         delete patientPayload.contacts;
         delete patientPayload.addresses;
         delete patientPayload.caregivers;
@@ -160,15 +201,16 @@ export class PatientFormModalComponent implements OnInit {
                 this.isSaving = false;
                 if (!this.currentPatient.id && response.data?.id) {
                     this.currentPatient.id = response.data.id;
-                    this.isEditing = true; // Switch to edit mode
+                    this.isEditing = true;
                 }
                 this.currentStep = 2;
+                this.refreshPatientData();
             },
             error: (error) => this.handleError(error)
         });
     }
 
-    // --- Step 2: Contact ---
+
 
     handleStep2(): void {
         if (!this.currentPatient.id) {
@@ -183,7 +225,6 @@ export class PatientFormModalComponent implements OnInit {
         let request: Observable<any>;
 
         if (contact.id) {
-            // Update
             const payload: any = { ...contact };
             delete payload.id;
             delete payload.pivot;
@@ -192,14 +233,12 @@ export class PatientFormModalComponent implements OnInit {
             delete payload.updated_at;
             request = this.patientService.updateContact(contact.id, payload);
         } else {
-            // Create
             request = this.patientService.createContact(contact);
         }
 
         request.subscribe({
             next: (response: any) => {
                 this.isSaving = false;
-                // Update local contact with ID if created
                 if (!contact.id && response.data?.id) {
                     this.newContact.id = response.data.id;
                 } else if (!contact.id && response.id) {
@@ -211,7 +250,7 @@ export class PatientFormModalComponent implements OnInit {
         });
     }
 
-    // --- Step 3: Address (Final Save) ---
+
 
     addAddress(): void {
         if (!this.newAddress.street) return;
@@ -272,7 +311,7 @@ export class PatientFormModalComponent implements OnInit {
     private upsertPatient(): Observable<number | null> {
         const patientPayload: any = {
             ...this.currentPatient,
-            birth_date: this.formatDateForAPI(this.currentPatient.birth_date)
+            birth_date: SharedUtils.formatDateForAPI(this.currentPatient.birth_date)
         };
 
         if (!patientPayload.rg) delete patientPayload.rg;
@@ -359,7 +398,7 @@ export class PatientFormModalComponent implements OnInit {
         if (!p.gender) { this.errorMessage = 'Gênero é obrigatório'; return false; }
         if (!p.marital_status) { this.errorMessage = 'Estado civil é obrigatório'; return false; }
         if (!p.cpf) { this.errorMessage = 'CPF é obrigatório'; return false; }
-        if (!this.isValidCPF(p.cpf)) { this.errorMessage = 'CPF inválido'; return false; }
+        if (!SharedUtils.isValidCPF(p.cpf)) { this.errorMessage = 'CPF inválido'; return false; }
         return true;
     }
 
@@ -369,44 +408,6 @@ export class PatientFormModalComponent implements OnInit {
             return false;
         }
         return true;
-    }
-
-    isValidCPF(cpf: string): boolean {
-        cpf = cpf.replace(/[^\d]/g, '');
-        if (cpf.length !== 11) return false;
-        if (/^(\d)\1{10}$/.test(cpf)) return false;
-
-        let sum = 0;
-        for (let i = 0; i < 9; i++) sum += parseInt(cpf.charAt(i)) * (10 - i);
-        let remainder = (sum * 10) % 11;
-        if (remainder === 10 || remainder === 11) remainder = 0;
-        if (remainder !== parseInt(cpf.charAt(9))) return false;
-
-        sum = 0;
-        for (let i = 0; i < 10; i++) sum += parseInt(cpf.charAt(i)) * (11 - i);
-        remainder = (sum * 10) % 11;
-        if (remainder === 10 || remainder === 11) remainder = 0;
-        if (remainder !== parseInt(cpf.charAt(10))) return false;
-
-        return true;
-    }
-
-    formatDateForAPI(date: any): string {
-        if (!date) return '';
-        if (date instanceof Date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${month}-${day}-${year}`;
-        }
-        if (typeof date === 'string') {
-            const parts = date.split('T')[0].split('-');
-            if (parts.length === 3 && parts[0].length === 4) {
-                return `${parts[1]}-${parts[2]}-${parts[0]}`;
-            }
-            return date;
-        }
-        return String(date);
     }
 
     handleValidationErrors(errors: any): void {

@@ -127,9 +127,12 @@
                             </div>
                         </td>
                         <td>
-                            <div class="date-cell">
-                                <i class="far fa-calendar-alt"></i>
-                                <span>{{ formatDate(item.date) }}</span>
+                            <div class="date-badge-compact">
+                                <div class="day">{{ getDay(item.date) }}</div>
+                                <div class="month-year">
+                                    <span class="month">{{ getShortMonth(item.date) }}</span>
+                                    <span class="year">{{ getYear(item.date) }}</span>
+                                </div>
                             </div>
                         </td>
                         <td>
@@ -179,7 +182,7 @@
     </div>
 
     <app-appointment-details-modal [visible]="showDetailsModal" [appointment]="selectedAppointment"
-        (close)="closeDetailsModal()" (edit)="onEditAppointment($event)">
+        (close)="closeDetailsModal()" (edit)="onEditAppointment($any($event))">
     </app-appointment-details-modal>
 
     <!-- ================================================== -->
@@ -265,13 +268,13 @@
                             <div class="appt-patient-selector" (click)="openPatientSearch()" [class.appt-selector-filled]="selectedPatient">
                                 <div class="appt-selector-left">
                                     <div class="appt-selector-avatar" *ngIf="selectedPatient">
-                                        {{ getInitials(selectedPatient.full_name) }}
+                                        {{ getInitials(selectedPatient.full_name || '') }}
                                     </div>
                                     <i class="fas fa-search appt-selector-icon" *ngIf="!selectedPatient"></i>
                                     <div class="appt-selector-info">
                                         <span class="appt-selector-name" *ngIf="selectedPatient">{{ selectedPatient.full_name }}</span>
                                         <span class="appt-selector-hint" *ngIf="!selectedPatient">Clique para buscar um atendido...</span>
-                                        <span class="appt-selector-cpf" *ngIf="selectedPatient">CPF: {{ formatCPF(selectedPatient.cpf) }}</span>
+                                        <span class="appt-selector-cpf" *ngIf="selectedPatient">CPF: {{ formatCPF(selectedPatient.cpf || '') }}</span>
                                     </div>
                                 </div>
                                 <span class="appt-selector-badge" *ngIf="selectedPatient">

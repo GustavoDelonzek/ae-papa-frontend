@@ -1,0 +1,160 @@
+<app-sidebar></app-sidebar>
+
+<div class="reports-container" [class.is-loading]="loading">
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="loading">
+    <div class="spinner-content">
+      <i class="fa-solid fa-circle-notch fa-spin"></i>
+      <p>Gerando relatório, por favor aguarde...</p>
+    </div>
+  </div>
+
+  <!-- Header / Quick Export -->
+  <section class="quick-export-section">
+    <div class="quick-export-content">
+      <div class="header-info">
+        <h1>Exportação Rápida</h1>
+        <p>Gere arquivos instantâneos com configurações padrão.</p>
+      </div>
+      <div class="export-cards">
+        <button class="export-card" (click)="onQuickExport('PDF')" [disabled]="loading">
+          <div class="icon-container">
+            <i class="fa-solid fa-file-pdf"></i>
+          </div>
+          <span class="export-label">Exportar Todos Pacientes (PDF)</span>
+        </button>
+        <button class="export-card" (click)="onQuickExport('XLS')" [disabled]="loading">
+          <div class="icon-container">
+            <i class="fa-solid fa-file-excel"></i>
+          </div>
+          <span class="export-label">Exportar Socioeconômico (XLS)</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Summary Cards Row -->
+  <div class="summary-cards-row">
+    <!-- Atendidos Card -->
+    <div class="summary-card compact">
+      <div class="card-header">
+        <div class="icon-box purple-icon">
+          <i class="fa-solid fa-user"></i>
+        </div>
+        <div class="header-text">
+          <span class="metric-label purple">ATENDIDOS</span>
+          <span class="metric-value">{{ stats.patient_count }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Perfis Socioeconômicos Card -->
+    <div class="summary-card compact">
+      <div class="card-header">
+        <div class="icon-box green-icon">
+          <i class="fa-solid fa-hand-holding-usd"></i>
+        </div>
+        <div class="header-text">
+          <span class="metric-label green">PERFIS SOCIOECONÔMICOS</span>
+          <span class="metric-value">{{ stats.socioeconomic_profile_count }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Registros Clínicos Card -->
+    <div class="summary-card compact">
+      <div class="card-header">
+        <div class="icon-box orange-icon">
+          <i class="fa-solid fa-clipboard-list"></i>
+        </div>
+        <div class="header-text">
+          <span class="metric-label orange">REGISTROS CLÍNICOS</span>
+          <span class="metric-value">{{ stats.clinical_record_count }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Configuration Section -->
+  <section class="custom-config-section">
+    <div class="section-title">
+      <i class="fa-solid fa-gear"></i>
+      <h2>Configuração de Relatório Personalizado</h2>
+    </div>
+
+    <div class="config-grid">
+      <!-- Colunas Incluídas -->
+      <div class="config-col">
+        <h3>COLUNAS INCLUÍDAS</h3>
+        <div class="checkbox-group">
+          <div class="custom-checkbox" [class.selected]="selectedColumns.personalInfo" (click)="toggleColumn('personalInfo')">
+            <i class="fa-solid" [class.fa-square-check]="selectedColumns.personalInfo" [class.fa-square]="!selectedColumns.personalInfo"></i>
+            Informações Pessoais
+          </div>
+          <div class="custom-checkbox" [class.selected]="selectedColumns.clinicalRecords" (click)="toggleColumn('clinicalRecords')">
+            <i class="fa-solid" [class.fa-square-check]="selectedColumns.clinicalRecords" [class.fa-square]="!selectedColumns.clinicalRecords"></i>
+            Registros Clínicos
+          </div>
+          <div class="custom-checkbox" [class.selected]="selectedColumns.socioeconomic" (click)="toggleColumn('socioeconomic')">
+            <i class="fa-solid" [class.fa-square-check]="selectedColumns.socioeconomic" [class.fa-square]="!selectedColumns.socioeconomic"></i>
+            Histórico Socioeconômico
+          </div>
+          <div class="custom-checkbox disabled" title="Em breve">
+            <i class="fa-solid fa-square"></i>
+            Frequência de Atendimento
+          </div>
+        </div>
+      </div>
+
+      <!-- Período -->
+      <div class="config-col">
+        <h3>PERÍODO</h3>
+        <div class="date-inputs">
+          <div class="date-input">
+            <span class="input-label">DE</span>
+            <mat-form-field class="custom-mat-form-field" appearance="outline">
+              <input matInput [matDatepicker]="pickerFrom" [(ngModel)]="period.from" placeholder="DD/MM/AAAA">
+              <mat-datepicker-toggle matIconSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+              <mat-datepicker #pickerFrom></mat-datepicker>
+            </mat-form-field>
+          </div>
+          <div class="date-input">
+            <span class="input-label">ATÉ</span>
+            <mat-form-field class="custom-mat-form-field" appearance="outline">
+              <input matInput [matDatepicker]="pickerTo" [(ngModel)]="period.to" placeholder="DD/MM/AAAA">
+              <mat-datepicker-toggle matIconSuffix [for]="pickerTo"></mat-datepicker-toggle>
+              <mat-datepicker #pickerTo></mat-datepicker>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="config-col">
+        <h3>NÍVEL DE DETALHAMENTO</h3>
+        <div class="toggle-group">
+          <button class="toggle-btn" [class.active]="detailLevel === 'Completo'" (click)="setDetailLevel('Completo')">Completo</button>
+          <button class="toggle-btn" [class.active]="detailLevel === 'Resumido'" (click)="setDetailLevel('Resumido')">Resumido</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer Action Bar -->
+  <footer class="action-footer">
+    <div class="footer-left">
+      <span>Formato do Arquivo:</span>
+      <div class="format-options">
+        <button class="format-btn" [class.active]="fileFormat === 'PDF'" (click)="setFileFormat('PDF')">PDF</button>
+        <button class="format-btn" [class.active]="fileFormat === 'XLSX'" (click)="setFileFormat('XLSX')">XLSX</button>
+        <button class="format-btn" [class.active]="fileFormat === 'CSV'" (click)="setFileFormat('CSV')">CSV</button>
+      </div>
+    </div>
+    <div class="footer-right">
+      <button class="download-button" (click)="onDownload()" [disabled]="loading">
+        <i class="fa-solid fa-cloud-arrow-down"></i>
+        Baixar Arquivo
+      </button>
+    </div>
+  </footer>
+</div>

@@ -2,13 +2,22 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DashboardService, DashboardMetrics } from '../services';
 
+import { CommonModule } from '@angular/common';
+import { SidebarComponent } from '../sidebar/sidebar.component';
+import { RouterModule } from '@angular/router';
+
 @Component({
   selector: 'app-home',
-  standalone: false,
+  standalone: true,
+  imports: [
+    CommonModule,
+    SidebarComponent,
+    RouterModule
+  ],
   templateUrl: './home.html',
   styleUrl: './home.scss'
 })
-export class Home implements OnInit {
+export class HomeComponent implements OnInit {
   // Estatísticas do dashboard
   totalPatients: number = 0;
   appointmentsToday: number = 0;

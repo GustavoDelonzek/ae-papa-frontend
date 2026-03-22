@@ -12,14 +12,18 @@ interface MenuItem {
   active?: boolean; // For default active state if needed (mainly handled by routerLinkActive)
 }
 
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+
 @Component({
   selector: 'app-sidebar',
-  standalone: false,
+  standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './sidebar.html',
   styleUrls: ['./sidebar.scss'],
   providers: [AuthService]
 })
-export class Sidebar implements OnInit {
+export class SidebarComponent implements OnInit {
   isAdmin: boolean = false;
   isSidebarOpen: boolean = false;
 
@@ -63,9 +67,9 @@ export class Sidebar implements OnInit {
       type: 'link'
     },
     {
-      text: 'Documentos',
-      icon: 'fa-solid fa-file-lines',
-      link: '/documentos', // Placeholder link
+      text: 'Gerar Relatórios',
+      icon: 'fa-solid fa-file-contract',
+      link: '/relatorios',
       type: 'link'
     },
     {

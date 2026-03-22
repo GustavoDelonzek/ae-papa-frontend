@@ -10,13 +10,19 @@ interface UserData {
   role: string;
 }
 
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { SidebarComponent } from '../sidebar/sidebar.component';
+import { RouterModule } from '@angular/router';
+
 @Component({
   selector: 'app-user-register',
-  standalone: false,
-  templateUrl: './user-register.html',
-  styleUrls: ['./user-register.scss']
+  standalone: true,
+  imports: [CommonModule, FormsModule, SidebarComponent, RouterModule],
+  templateUrl: './user-register.component.html',
+  styleUrls: ['./user-register.component.scss']
 })
-export class UserRegister implements OnInit {
+export class UserRegisterComponent implements OnInit {
   userData: UserData = {
     name: '',
     email: '',
@@ -41,7 +47,6 @@ export class UserRegister implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Verificar se o usuário logado é admin
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser || currentUser.role !== 'admin') {
       this.router.navigate(['/']);
@@ -60,7 +65,6 @@ export class UserRegister implements OnInit {
           this.isLoading = false;
           this.successMessage = 'Usuário cadastrado com sucesso!';
           
-          // Limpar formulário
           this.userData = {
             name: '',
             email: '',
@@ -74,7 +78,6 @@ export class UserRegister implements OnInit {
           this.isLoading = false;
 
           if (error.status === 422) {
-            // Erros de validação
             const errors = error.error?.errors;
             if (errors) {
               const firstError = Object.values(errors)[0];

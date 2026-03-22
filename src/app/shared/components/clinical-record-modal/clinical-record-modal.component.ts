@@ -1,11 +1,25 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ClinicalRecord, ClinicalRecordService } from '../../../services/clinical-record.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
     selector: 'app-clinical-record-modal',
+    standalone: true,
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatDatepickerModule,
+        MatNativeDateModule
+    ],
     templateUrl: './clinical-record-modal.component.html',
     styleUrls: ['./clinical-record-modal.component.scss'],
-    standalone: false
 })
 export class ClinicalRecordModalComponent implements OnInit {
     @Input() visible: boolean = false;

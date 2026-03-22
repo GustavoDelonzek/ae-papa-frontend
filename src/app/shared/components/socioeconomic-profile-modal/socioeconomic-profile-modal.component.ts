@@ -1,11 +1,15 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { SocioeconomicProfile, SocioeconomicProfileService } from '../../../services/socioeconomic-profile.service';
 
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
 @Component({
     selector: 'app-socioeconomic-profile-modal',
+    standalone: true,
+    imports: [CommonModule, FormsModule],
     templateUrl: './socioeconomic-profile-modal.component.html',
     styleUrls: ['./socioeconomic-profile-modal.component.scss'],
-    standalone: false
 })
 export class SocioeconomicProfileModalComponent implements OnInit {
     @Input() visible: boolean = false;

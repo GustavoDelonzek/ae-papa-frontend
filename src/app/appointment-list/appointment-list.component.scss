@@ -548,19 +548,42 @@ $pink-color: #ec4899;
 // Appointment Specific Styles
 // ============================================
 
-// Date Cell
-.date-cell {
+// Date Badge Compact (Mini-calendar style)
+.date-badge-compact {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  background: #f8f9fa;
+  padding: 0.4rem 0.75rem;
+  border-radius: 10px;
+  width: fit-content;
+  border: 1px solid #eef2f6;
 
-  .date {
-    font-weight: 500;
-    color: $text-dark;
+  .day {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: $primary-color;
+    line-height: 1;
   }
 
-  .time {
-    font-size: 0.8rem;
-    color: $text-sub;
+  .month-year {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+
+    .month {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: $text-secondary;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .year {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: $text-sub;
+    }
   }
 }
 

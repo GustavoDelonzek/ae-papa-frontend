@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_URL } from '../../consts';
 import { SocioeconomicProfile } from './socioeconomic-profile.service';
-import { Caretaker } from './caretaker';
+import { Caretaker } from './caretaker.service';
 import { ClinicalRecord } from './clinical-record.service';
 
 export interface Patient {
@@ -83,20 +83,18 @@ export class PatientService {
       .set('page', page.toString())
       .set('per_page', perPage.toString());
 
-    // Map frontend filters to standardized backend query params
+
     if (filters.search) params = params.set('search', filters.search.trim());
     if (filters.cpf) params = params.set('cpf', filters.cpf.trim());
     if (filters.full_name) params = params.set('full_name', filters.full_name.trim());
     if (filters.gender) params = params.set('gender', filters.gender);
-    if (filters.ageFilter) {
-      params = params.set('ageFilter', filters.ageFilter);
-      params = params.set('age_filter', filters.ageFilter);
+    if (filters.age_filter || filters.ageFilter) {
+      params = params.set('age_filter', filters.age_filter || filters.ageFilter);
     }
     if (filters.age_min) params = params.set('age_min', filters.age_min.toString());
     if (filters.age_max) params = params.set('age_max', filters.age_max.toString());
-    if (filters.birthYear) {
-      params = params.set('birthYear', filters.birthYear.toString());
-      params = params.set('birth_year', filters.birthYear.toString());
+    if (filters.birth_year || filters.birthYear) {
+      params = params.set('birth_year', (filters.birth_year || filters.birthYear).toString());
     }
     if (filters.created_at) params = params.set('created_at', filters.created_at);
     if (filters.sort_by) params = params.set('sort_by', filters.sort_by);
@@ -107,7 +105,7 @@ export class PatientService {
 
   getPatientByCpf(cpf: string): Observable<PatientsListResponse> {
     const params = new HttpParams()
-      .set('search', cpf)
+      .set('cpf', cpf)
       .set('per_page', '5');
 
     return this.http.get<PatientsListResponse>(`${API_URL}/patients`, { params });
@@ -121,14 +119,11 @@ export class PatientService {
     return this.http.patch<PatientResponse>(`${API_URL}/patients/${id}`, patientData);
   }
 
-  /**
-   * Deletar paciente
-   */
   deletePatient(id: number): Observable<any> {
     return this.http.delete(`${API_URL}/patients/${id}`);
   }
 
-  // --- Contacts ---
+
 
   createContact(contact: PatientContact): Observable<any> {
     return this.http.post(`${API_URL}/contacts`, contact);
@@ -142,7 +137,7 @@ export class PatientService {
     return this.http.delete(`${API_URL}/contacts/${id}`);
   }
 
-  // --- Addresses ---
+
 
   createAddress(address: Address): Observable<any> {
     return this.http.post(`${API_URL}/addresses`, address);
