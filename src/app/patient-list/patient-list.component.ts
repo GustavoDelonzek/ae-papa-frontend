@@ -8,7 +8,6 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { PatientFormModalComponent } from '../shared/components/patient-form-modal/patient-form-modal.component';
-import { CaretakerFormModalComponent } from '../shared/components/caretaker-form-modal/caretaker-form-modal.component';
 import { Title } from '@angular/platform-browser';
 import { SecureImageDirective } from '../core/directives/secure-image.directive';
 
@@ -21,7 +20,6 @@ import { SecureImageDirective } from '../core/directives/secure-image.directive'
     RouterModule,
     SidebarComponent,
     PatientFormModalComponent,
-    CaretakerFormModalComponent,
     SecureImageDirective
   ],
   templateUrl: './patient-list.component.html',

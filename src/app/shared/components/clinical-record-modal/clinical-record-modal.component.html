@@ -32,7 +32,7 @@
                             <label>Data do Diagnóstico</label>
                             <mat-form-field class="custom-mat-form-field">
                                 <input matInput [matDatepicker]="pickerDiag" name="diagnosis_date"
-                                    [(ngModel)]="currentRecord.diagnosis_date" required placeholder="DD/MM/AAAA">
+                                    [(ngModel)]="currentRecord.diagnosis_date" [max]="maxDiagnosisDate" required placeholder="DD/MM/AAAA">
                                 <mat-datepicker-toggle matIconSuffix [for]="pickerDiag"></mat-datepicker-toggle>
                                 <mat-datepicker #pickerDiag></mat-datepicker>
                             </mat-form-field>

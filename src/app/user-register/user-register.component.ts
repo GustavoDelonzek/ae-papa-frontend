@@ -1,17 +1,16 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../services';
+import { AuthService, UserService, User } from '../services';
 
-interface UserData {
+interface UserCreateData {
   name: string;
   email: string;
   password: string;
   password_confirmation: string;
-  role: string;
 }
 
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { RouterModule } from '@angular/router';
 
@@ -23,65 +22,97 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./user-register.component.scss']
 })
 export class UserRegisterComponent implements OnInit {
-  userData: UserData = {
+  users: User[] = [];
+  filteredUsers: User[] = [];
+  paginatedUsers: User[] = [];
+
+  userData: UserCreateData = {
     name: '',
     email: '',
     password: '',
-    password_confirmation: '',
-    role: 'reception'
+    password_confirmation: ''
   };
 
-  roles = [
-    { value: 'admin', label: 'Administrador' },
-    { value: 'clinical', label: 'Clínico' },
-    { value: 'reception', label: 'Recepção' }
-  ];
+  showCreateModal: boolean = false;
+  isSubmitting: boolean = false;
+  loading: boolean = false;
+  searchTerm: string = '';
+  sortColumn: 'name' | 'email' | 'role' | 'created_at' = 'name';
+  sortDirection: 'asc' | 'desc' = 'asc';
 
-  isLoading: boolean = false;
+  currentPage: number = 1;
+  perPage: number = 10;
+  totalPages: number = 1;
+  totalItems: number = 0;
+
   errorMessage: string = '';
   successMessage: string = '';
 
   constructor(
     private router: Router,
-    @Inject(AuthService) private authService: AuthService
+    @Inject(AuthService) private authService: AuthService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser || currentUser.role !== 'admin') {
       this.router.navigate(['/']);
+      return;
     }
+
+    this.loadUsers();
   }
 
-  onSubmit(): void {
+  loadUsers(): void {
+    this.loading = true;
+    this.errorMessage = '';
+
+    this.userService.listUsers().subscribe({
+      next: (response) => {
+        this.users = response?.data || [];
+        this.applyFiltersAndPagination();
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Erro ao carregar usuários:', error);
+        this.errorMessage = 'Não foi possível carregar os usuários.';
+        this.loading = false;
+      }
+    });
+  }
+
+  onSubmit(userForm: NgForm): void {
+    if (userForm.invalid) {
+      Object.values(userForm.controls).forEach((control) => control.markAsTouched());
+      this.errorMessage = 'Preencha corretamente os campos obrigatórios.';
+      return;
+    }
+
     if (this.validateForm()) {
-      this.isLoading = true;
+      this.isSubmitting = true;
       this.errorMessage = '';
       this.successMessage = '';
 
-      this.authService.register(this.userData).subscribe({
+      this.userService.createUser(this.userData).subscribe({
         next: (response) => {
           console.log('Usuário cadastrado com sucesso:', response);
-          this.isLoading = false;
+          this.isSubmitting = false;
           this.successMessage = 'Usuário cadastrado com sucesso!';
-          
-          this.userData = {
-            name: '',
-            email: '',
-            password: '',
-            password_confirmation: '',
-            role: 'reception'
-          };
+
+          this.closeCreateModal();
+          this.loadUsers();
         },
         error: (error) => {
           console.error('Erro ao cadastrar usuário:', error);
-          this.isLoading = false;
+          this.isSubmitting = false;
 
           if (error.status === 422) {
             const errors = error.error?.errors;
             if (errors) {
               const firstError = Object.values(errors)[0];
-              this.errorMessage = Array.isArray(firstError) ? firstError[0] : String(firstError);
+              const rawMessage = Array.isArray(firstError) ? String(firstError[0]) : String(firstError);
+              this.errorMessage = this.translateValidationMessage(rawMessage);
             } else {
               this.errorMessage = 'Dados inválidos. Verifique os campos.';
             }
@@ -93,6 +124,104 @@ export class UserRegisterComponent implements OnInit {
         }
       });
     }
+  }
+
+  onSearch(term: string): void {
+    this.searchTerm = term;
+    this.currentPage = 1;
+    this.applyFiltersAndPagination();
+  }
+
+  onSort(column: 'name' | 'email' | 'role' | 'created_at'): void {
+    if (this.sortColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+
+    this.applyFiltersAndPagination();
+  }
+
+  onPageChange(page: number): void {
+    if (page < 1 || page > this.totalPages) return;
+    this.currentPage = page;
+    this.applyFiltersAndPagination();
+  }
+
+  openCreateModal(): void {
+    this.showCreateModal = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+  }
+
+  closeCreateModal(): void {
+    this.showCreateModal = false;
+    this.resetForm();
+  }
+
+  clearSearch(): void {
+    this.onSearch('');
+  }
+
+  getRoleLabel(role: string): string {
+    const normalized = (role || '').toLowerCase();
+    if (normalized === 'admin') return 'Administrador';
+    if (normalized === 'clinical') return 'Clínico';
+    if (normalized === 'reception') return 'Recepção';
+    return role || '-';
+  }
+
+  formatDate(date?: string): string {
+    if (!date) return '-';
+    const parsed = new Date(date);
+    if (isNaN(parsed.getTime())) return '-';
+
+    return parsed.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  }
+
+  private applyFiltersAndPagination(): void {
+    const search = this.searchTerm.trim().toLowerCase();
+
+    let result = this.users.filter((user) => {
+      if (!search) return true;
+      return (
+        (user.name || '').toLowerCase().includes(search) ||
+        (user.email || '').toLowerCase().includes(search) ||
+        this.getRoleLabel(user.role).toLowerCase().includes(search)
+      );
+    });
+
+    result = result.sort((a, b) => this.compareUsers(a, b));
+
+    this.filteredUsers = result;
+    this.totalItems = result.length;
+    this.totalPages = Math.max(1, Math.ceil(this.totalItems / this.perPage));
+
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = this.totalPages;
+    }
+
+    const start = (this.currentPage - 1) * this.perPage;
+    this.paginatedUsers = result.slice(start, start + this.perPage);
+  }
+
+  private compareUsers(a: User, b: User): number {
+    const direction = this.sortDirection === 'asc' ? 1 : -1;
+
+    if (this.sortColumn === 'created_at') {
+      const aDate = new Date(a.created_at || '').getTime() || 0;
+      const bDate = new Date(b.created_at || '').getTime() || 0;
+      return (aDate - bDate) * direction;
+    }
+
+    const aValue = String(a[this.sortColumn] || '').toLowerCase();
+    const bValue = String(b[this.sortColumn] || '').toLowerCase();
+    return aValue.localeCompare(bValue) * direction;
   }
 
   private validateForm(): boolean {
@@ -117,8 +246,8 @@ export class UserRegisterComponent implements OnInit {
       return false;
     }
 
-    if (this.userData.password.length < 6) {
-      this.errorMessage = 'A senha deve ter pelo menos 6 caracteres';
+    if (this.userData.password.length < 8) {
+      this.errorMessage = 'A senha deve ter pelo menos 8 caracteres';
       return false;
     }
 
@@ -127,12 +256,58 @@ export class UserRegisterComponent implements OnInit {
       return false;
     }
 
-    if (!this.userData.role) {
-      this.errorMessage = 'Perfil é obrigatório';
-      return false;
+    return true;
+  }
+
+  private resetForm(): void {
+    this.userData = {
+      name: '',
+      email: '',
+      password: '',
+      password_confirmation: ''
+    };
+  }
+
+  private translateValidationMessage(message: string): string {
+    const normalized = message.trim().toLowerCase();
+
+    if (normalized.includes('password field must contain at least one uppercase and one lowercase letter')) {
+      return 'A senha deve conter pelo menos uma letra maiúscula e uma minúscula.';
     }
 
-    return true;
+    if (normalized.includes('password field must contain at least one symbol')) {
+      return 'A senha deve conter pelo menos um símbolo.';
+    }
+
+    if (normalized.includes('password field must contain at least one number')) {
+      return 'A senha deve conter pelo menos um número.';
+    }
+
+    if (normalized.includes('password field must be at least')) {
+      return 'A senha deve ter no mínimo 8 caracteres.';
+    }
+
+    if (normalized.includes('password confirmation does not match')) {
+      return 'A confirmação da senha não confere.';
+    }
+
+    if (normalized.includes('email has already been taken')) {
+      return 'Este email já está em uso.';
+    }
+
+    if (normalized.includes('name field is required')) {
+      return 'Nome é obrigatório.';
+    }
+
+    if (normalized.includes('email field is required')) {
+      return 'Email é obrigatório.';
+    }
+
+    if (normalized.includes('password field is required')) {
+      return 'Senha é obrigatória.';
+    }
+
+    return message;
   }
 
   cancel(): void {

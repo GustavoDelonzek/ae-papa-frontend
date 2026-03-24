@@ -104,7 +104,7 @@
                 <span class="action-label-new">Estatísticas</span>
               </div>    
               
-              <div class="action-card-new">
+              <div class="action-card-new" (click)="navigateToRegister()">
                 <div class="action-icon-new">
                   <i class="fas fa-user"></i>
                 </div>
@@ -211,7 +211,9 @@
                   <i class="fas fa-calendar-day"></i>
                   {{ getFormattedSelectedDate() }}
                 </p>
-                <p class="events-text">Nenhum evento agendado</p>
+                <p class="events-text">
+                  {{ loadingAppointments ? 'Carregando...' : (selectedAppointments.length === 0 ? 'Nenhum registro encontrado' : selectedAppointments.length + ' agendamento(s)') }}
+                </p>
               </div>
 
               <!-- No Selection Message -->
@@ -226,35 +228,34 @@
             <!-- Próximos Alertas -->
             <div class="alerts-section">
               <div class="alerts-header">
-                <i class="fas fa-bell"></i>
-                <h3>PRÓXIMOS ALERTAS</h3>
+                <i class="fas fa-calendar-check"></i>
+                <h3>AGENDA DO DIA</h3>
               </div>
               <div class="alerts-list">
-                <div class="alert-item urgent">
-                  <div class="alert-indicator"></div>
-                  <div class="alert-time">14:00</div>
-                  <div class="alert-content">
-                    <span class="alert-title">Insulina - Sr. João</span>
-                    <span class="alert-description">Verificar glicemia antes.</span>
-                  </div>
-                  <span class="alert-badge">URGENTE</span>
+                
+                <div *ngIf="loadingAppointments" class="loading-state-small" style="padding: 1rem; text-align: center;">
+                    <span style="color: #6b7280; font-size: 0.9rem;">Carregando...</span>
                 </div>
-                <div class="alert-item warning">
-                  <div class="alert-indicator"></div>
-                  <div class="alert-time">15:30</div>
-                  <div class="alert-content">
-                    <span class="alert-title">Neurologista - D. Maria</span>
-                    <span class="alert-description">Levar exames recentes.</span>
-                  </div>
+
+                <div *ngIf="!loadingAppointments && selectedAppointments.length === 0" class="no-alerts-state" style="padding: 1rem; text-align: center; color: #6b7280; font-size: 0.9rem;">
+                  Nenhum atendimento para o dia selecionado.
                 </div>
-                <div class="alert-item">
+
+                <div *ngFor="let apt of selectedAppointments" class="alert-item" [ngClass]="{'success': apt.status === 'done' || apt.status === 'completed', 'urgent': apt.status === 'canceled' || apt.status === 'cancelled', 'warning': apt.status !== 'done' && apt.status !== 'completed' && apt.status !== 'canceled' && apt.status !== 'cancelled'}">
                   <div class="alert-indicator"></div>
-                  <div class="alert-time">17:00</div>
+                  <div class="alert-time">#{{ apt.id }}</div>
                   <div class="alert-content">
-                    <span class="alert-title">Troca de Turno</span>
-                    <span class="alert-description">Enfermeira Julia assume.</span>
+                    <span class="alert-title">{{ getObjectiveText(apt.objective) }}</span>
+                    <span class="alert-description" *ngIf="apt.patient">Paciente: {{ apt.patient.full_name }}</span>
+                    <span class="alert-description" *ngIf="!apt.patient">Paciente não identificado</span>
+                    <span class="alert-description">Data: {{ formatAppointmentDate(apt.date) }}</span>
+                    <span class="alert-description">Status: {{ getStatusText(apt.status) }}</span>
+                    <span class="alert-description" *ngIf="apt.observations">Observações: {{ apt.observations }}</span>
                   </div>
+                  <span class="alert-badge" *ngIf="apt.status === 'done' || apt.status === 'completed'">CONCLUÍDO</span>
+                  <span class="alert-badge" *ngIf="apt.status === 'canceled' || apt.status === 'cancelled'" style="background: #fee2e2; color: #991b1b;">CANCELADO</span>
                 </div>
+                
               </div>
             </div>
           </div>

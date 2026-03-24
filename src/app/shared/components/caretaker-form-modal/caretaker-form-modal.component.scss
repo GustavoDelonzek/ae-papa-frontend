@@ -1,3 +1,4 @@
+@use 'sass:color';
 // Variables
 $primary-color: #5b2fa8;
 $text-color: #333;
@@ -221,7 +222,7 @@ $success-color: #10b981;
         margin-top: 0.5rem;
         padding: 0.5rem 0.75rem;
         background: rgba($success-color, 0.1);
-        color: darken($success-color, 10%);
+        color: color.adjust($success-color, $lightness: -10%);
         border-radius: 6px;
         font-size: 0.85rem;
         font-weight: 500;
@@ -265,7 +266,7 @@ $success-color: #10b981;
                 align-items: center;
 
                 &:hover {
-                    background: darken($primary-color, 5%);
+                    background: color.adjust($primary-color, $lightness: -5%);
                     transform: translateY(-1px);
                     box-shadow: 0 4px 6px -1px rgba($primary-color, 0.2);
                 }

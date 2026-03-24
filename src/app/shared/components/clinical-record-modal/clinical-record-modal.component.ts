@@ -33,6 +33,7 @@ export class ClinicalRecordModalComponent implements OnInit {
     isEditing: boolean = false;
     isSaving: boolean = false;
     errorMessage: string = '';
+    maxDiagnosisDate: Date = new Date();
 
     currentRecord: Partial<ClinicalRecord> = {};
 
@@ -131,6 +132,26 @@ export class ClinicalRecordModalComponent implements OnInit {
     save(): void {
         if (!this.patientId) {
             this.errorMessage = 'Erro: Atendido não identificado.';
+            return;
+        }
+
+        if (!this.currentRecord.diagnosis_date) {
+            this.errorMessage = 'Data do diagnóstico é obrigatória.';
+            return;
+        }
+
+        const diagnosisDate = new Date(this.currentRecord.diagnosis_date as any);
+
+        if (isNaN(diagnosisDate.getTime())) {
+            this.errorMessage = 'Data do diagnóstico inválida.';
+            return;
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        diagnosisDate.setHours(0, 0, 0, 0);
+        if (diagnosisDate > today) {
+            this.errorMessage = 'Data do diagnóstico não pode ser futura.';
             return;
         }
 

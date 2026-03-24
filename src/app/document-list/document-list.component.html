@@ -38,8 +38,8 @@
       <mat-form-field appearance="outline" class="custom-mat-form-field" subscriptSizing="dynamic">
         <mat-label>Período (Filtro)</mat-label>
         <mat-date-range-input [rangePicker]="picker" class="custom-date-input">
-          <input matStartDate placeholder="Data inicial" [(ngModel)]="startDate" (dateChange)="applyFilters()">
-          <input matEndDate placeholder="Data final" [(ngModel)]="endDate" (dateChange)="applyFilters()">
+          <input matStartDate placeholder="Data inicial" [(ngModel)]="startDate" [max]="endDate || maxFilterDate" (dateChange)="applyFilters()">
+          <input matEndDate placeholder="Data final" [(ngModel)]="endDate" [min]="startDate" [max]="maxFilterDate" (dateChange)="applyFilters()">
         </mat-date-range-input>
         <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-date-range-picker #picker></mat-date-range-picker>

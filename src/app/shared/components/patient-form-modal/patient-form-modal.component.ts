@@ -10,6 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
     selector: 'app-patient-form-modal',
@@ -20,7 +21,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
         MatFormFieldModule,
         MatInputModule,
         MatIconModule,
-        MatDatepickerModule
+        MatDatepickerModule,
+        MatSnackBarModule
     ],
     templateUrl: './patient-form-modal.component.html',
     styleUrls: ['./patient-form-modal.component.scss'],
@@ -33,8 +35,21 @@ export class PatientFormModalComponent implements OnInit {
 
     isEditing: boolean = false;
     isSaving: boolean = false;
-    errorMessage: string = '';
+    
+    get errorMessage(): string { return ''; }
+    set errorMessage(msg: string) {
+        if (msg) {
+            this.snackBar.open(msg, 'Fechar', {
+                duration: 3000,
+                panelClass: ['error-snackbar'],
+                horizontalPosition: 'end',
+                verticalPosition: 'top'
+            });
+        }
+    }
+
     currentStep: number = 1;
+    maxBirthDate: Date = new Date();
 
     currentPatient: Patient = {
         full_name: '',
@@ -61,7 +76,7 @@ export class PatientFormModalComponent implements OnInit {
         cep: ''
     };
 
-    constructor(private patientService: PatientService) { }
+    constructor(private patientService: PatientService, private snackBar: MatSnackBar) { }
 
     ngOnInit(): void {
     }
@@ -410,6 +425,12 @@ export class PatientFormModalComponent implements OnInit {
         const p = this.currentPatient;
         if (!p.full_name?.trim()) { this.errorMessage = 'Nome completo é obrigatório'; return false; }
         if (!p.birth_date) { this.errorMessage = 'Data de nascimento é obrigatória'; return false; }
+        const birthDate = SharedUtils.parseDate(p.birth_date as any);
+        if (isNaN(birthDate.getTime())) { this.errorMessage = 'Data de nascimento inválida'; return false; }
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        birthDate.setHours(0, 0, 0, 0);
+        if (birthDate > today) { this.errorMessage = 'Data de nascimento não pode ser futura'; return false; }
         if (!p.gender) { this.errorMessage = 'Gênero é obrigatório'; return false; }
         if (!p.marital_status) { this.errorMessage = 'Estado civil é obrigatório'; return false; }
         if (!p.cpf) { this.errorMessage = 'CPF é obrigatório'; return false; }
@@ -426,5 +447,13 @@ export class PatientFormModalComponent implements OnInit {
         if (errors.cpf) this.errorMessage = `CPF: ${errors.cpf[0]}`;
         else if (errors.full_name) this.errorMessage = `Nome: ${errors.full_name[0]}`;
         else this.errorMessage = 'Dados inválidos. Verifique os campos.';
+    }
+
+    formatCPF(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        const cleaned = input.value.replace(/\D/g, '');
+        const formatted = SharedUtils.formatCPF(cleaned.substring(0, 11));
+        input.value = formatted;
+        this.currentPatient.cpf = formatted;
     }
 }

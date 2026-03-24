@@ -8,3 +8,4 @@ export * from './clinical-record.service';
 export * from './document.service';
 export * from './reports.service';
 export * from './toast.service';
+export * from './user.service';

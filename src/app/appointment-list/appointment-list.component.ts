@@ -50,6 +50,7 @@ export class AppointmentListComponent implements OnInit {
   searchTerm: string = '';
   statusFilter: string = '';
   dateFilter: string = '';
+  maxFilterDate: string = this.getTodayISODate();
   objectiveFilter: string = '';
 
   // ========================================
@@ -67,6 +68,7 @@ export class AppointmentListComponent implements OnInit {
 
   // Form Fields
   appointmentDate: string = '';
+  minAppointmentDate: string = this.getTodayISODate();
   appointmentObjective: string = '';
   observations: string = '';
   submitting: boolean = false;
@@ -350,6 +352,11 @@ export class AppointmentListComponent implements OnInit {
       return;
     }
 
+    if (this.isDateBeforeToday(this.appointmentDate)) {
+      this.toastService.warning('A data do atendimento não pode ser anterior a hoje.');
+      return;
+    }
+
     if (!this.currentUserId) {
       this.toastService.error('Usuário não identificado. Faça login novamente.');
       return;
@@ -462,6 +469,24 @@ export class AppointmentListComponent implements OnInit {
 
   goHome(): void {
     this.router.navigate(['/']);
+  }
+
+  private getTodayISODate(): string {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private isDateBeforeToday(date: string | Date): boolean {
+    const parsed = date instanceof Date ? date : SharedUtils.parseDate(date);
+    if (isNaN(parsed.getTime())) return false;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    parsed.setHours(0, 0, 0, 0);
+    return parsed < today;
   }
 }
 

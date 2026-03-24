@@ -24,6 +24,7 @@ export class SharedUtils {
   static formatDate(dateStr: string | undefined): string {
     if (!dateStr) return '';
     const date = this.parseDate(dateStr);
+    if (isNaN(date.getTime())) return '';
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
@@ -33,6 +34,7 @@ export class SharedUtils {
   static getDateParts(dateStr: string | undefined) {
     if (!dateStr) return { day: '', month: '', year: '' };
     const d = this.parseDate(dateStr);
+    if (isNaN(d.getTime())) return { day: '', month: '', year: '' };
     const months = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
     return {
       day: String(d.getDate()).padStart(2, '0'),
@@ -69,23 +71,27 @@ export class SharedUtils {
   static parseDate(dateStr: any): Date {
     if (!dateStr) return new Date();
     
+    if (dateStr instanceof Date) {
+      return new Date(dateStr.getTime());
+    }
+    
     const str = String(dateStr);
     
     // Handle YYYY-MM-DD or YYYY-MM-DDT...
-    if (str.includes('T') || /^\d{4}-\d{2}-\d{2}$/.test(str)) {
-      const datePart = str.includes('T') ? str.split('T')[0] : str;
+    if (/^\d{4}-\d{2}-\d{2}(T|$)/.test(str)) {
+      const datePart = str.split('T')[0];
       const [year, month, day] = datePart.split('-').map(Number);
       return new Date(year, month - 1, day);
     }
 
     // Handle MM-DD-YYYY
-    if (/^\d{2}-\d{2}-\d{4}$/.test(dateStr)) {
-      const [month, day, year] = dateStr.split('-').map(Number);
+    if (/^\d{2}-\d{2}-\d{4}$/.test(str)) {
+      const [month, day, year] = str.split('-').map(Number);
       return new Date(year, month - 1, day);
     }
 
     const d = new Date(dateStr);
-    return isNaN(d.getTime()) ? new Date() : d;
+    return isNaN(d.getTime()) ? new Date(NaN) : d;
   }
 
   static toInputDate(date: string | undefined): string {

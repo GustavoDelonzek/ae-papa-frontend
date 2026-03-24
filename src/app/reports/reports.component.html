@@ -113,7 +113,7 @@
           <div class="date-input">
             <span class="input-label">DE</span>
             <mat-form-field class="custom-mat-form-field" appearance="outline">
-              <input matInput [matDatepicker]="pickerFrom" [(ngModel)]="period.from" placeholder="DD/MM/AAAA">
+              <input matInput [matDatepicker]="pickerFrom" [(ngModel)]="period.from" [max]="period.to || maxPeriodDate" placeholder="DD/MM/AAAA">
               <mat-datepicker-toggle matIconSuffix [for]="pickerFrom"></mat-datepicker-toggle>
               <mat-datepicker #pickerFrom></mat-datepicker>
             </mat-form-field>
@@ -121,7 +121,7 @@
           <div class="date-input">
             <span class="input-label">ATÉ</span>
             <mat-form-field class="custom-mat-form-field" appearance="outline">
-              <input matInput [matDatepicker]="pickerTo" [(ngModel)]="period.to" placeholder="DD/MM/AAAA">
+              <input matInput [matDatepicker]="pickerTo" [(ngModel)]="period.to" [min]="period.from" [max]="maxPeriodDate" placeholder="DD/MM/AAAA">
               <mat-datepicker-toggle matIconSuffix [for]="pickerTo"></mat-datepicker-toggle>
               <mat-datepicker #pickerTo></mat-datepicker>
             </mat-form-field>
