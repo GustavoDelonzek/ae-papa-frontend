@@ -9,6 +9,23 @@
     </div>
   </div>
 
+  <!-- Custom Standard Header -->
+  <header class="reports-header">
+    <div class="header-top">
+      <div class="back-link" (click)="goHome()">
+        <i class="fas fa-arrow-left"></i>
+        <span>Voltar ao início</span>
+      </div>
+    </div>
+
+    <div class="header-main-row">
+      <div class="title-section">
+        <h1>Relatórios</h1>
+        <p class="subtitle">Geração e exportação de dados analíticos do sistema.</p>
+      </div>
+    </div>
+  </header>
+
   <!-- Header / Quick Export -->
   <section class="quick-export-section">
     <div class="quick-export-content">
@@ -32,48 +49,6 @@
       </div>
     </div>
   </section>
-
-  <!-- Summary Cards Row -->
-  <div class="summary-cards-row">
-    <!-- Atendidos Card -->
-    <div class="summary-card compact">
-      <div class="card-header">
-        <div class="icon-box purple-icon">
-          <i class="fa-solid fa-user"></i>
-        </div>
-        <div class="header-text">
-          <span class="metric-label purple">ATENDIDOS</span>
-          <span class="metric-value">{{ stats.patient_count }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Perfis Socioeconômicos Card -->
-    <div class="summary-card compact">
-      <div class="card-header">
-        <div class="icon-box green-icon">
-          <i class="fa-solid fa-hand-holding-usd"></i>
-        </div>
-        <div class="header-text">
-          <span class="metric-label green">PERFIS SOCIOECONÔMICOS</span>
-          <span class="metric-value">{{ stats.socioeconomic_profile_count }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Registros Clínicos Card -->
-    <div class="summary-card compact">
-      <div class="card-header">
-        <div class="icon-box orange-icon">
-          <i class="fa-solid fa-clipboard-list"></i>
-        </div>
-        <div class="header-text">
-          <span class="metric-label orange">REGISTROS CLÍNICOS</span>
-          <span class="metric-value">{{ stats.clinical_record_count }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Custom Configuration Section -->
   <section class="custom-config-section">

@@ -1,0 +1,104 @@
+.stat-card-container {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: auto;
+  border: 1px solid rgba(15, 23, 42, 0.04);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    .icon-box {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+
+      &.purple-icon {
+        background: rgba(91, 47, 168, 0.1);
+        color: #6a307d;
+      }
+      &.blue-icon {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+      }
+      &.orange-icon {
+        background: rgba(249, 115, 22, 0.1);
+        color: #f97316;
+      }
+      &.green-icon {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+      }
+    }
+
+    .trend-badge {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+
+      &.trend-up {
+        background: rgba(16, 185, 129, 0.12);
+        color: #059669;
+      }
+
+      &.trend-down {
+        background: rgba(239, 68, 68, 0.12);
+        color: #dc2626;
+      }
+
+      &.trend-neutral {
+        background: rgba(107, 114, 128, 0.08);
+        color: #4b5563;
+      }
+    }
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 4px;
+
+    .stat-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #374151;
+      margin: 0;
+    }
+
+    .stat-value {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: #111827;
+      line-height: 1.1;
+      margin-top: 2px;
+    }
+
+    .stat-support {
+      font-size: 0.8rem;
+      color: #90949d;
+      margin: 0;
+      margin-top: 8px;
+    }
+  }
+}

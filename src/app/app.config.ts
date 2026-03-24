@@ -3,6 +3,7 @@ import { provideRouter, Router } from '@angular/router';
 import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 import { routes } from './app-routing-module';
 import { AuthService } from './services/auth.service';
@@ -29,6 +30,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimations(),
+    provideCharts(withDefaultRegisterables()),
     provideNativeDateAdapter(),
     {
       provide: HTTP_INTERCEPTORS,

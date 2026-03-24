@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { ReportsService, ReportConfig, ReportStats } from '../services/reports.service';
-import { finalize } from 'rxjs/operators';
-import { SharedUtils } from '../core/utils/shared-utils';
-
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { Router } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar.component';
-import { RouterModule } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { ReportsService, ReportConfig } from '../services/reports.service';
+import { SharedUtils } from '../core/utils/shared-utils';
+import { finalize } from 'rxjs/operators';
+import { ToastService } from '../services/toast.service'; // Assuming ToastService is in services folder
 
 @Component({
   selector: 'app-reports',
@@ -18,8 +18,8 @@ import { MatNativeDateModule } from '@angular/material/core';
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     SidebarComponent,
-    RouterModule,
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
@@ -42,34 +42,26 @@ export class ReportsComponent implements OnInit {
   };
   maxPeriodDate: Date = new Date();
 
+  detailLevel = 'Completo'; // 'Completo' | 'Resumido'
+  fileFormat = 'PDF'; // 'PDF' | 'XLSX' | 'CSV'
+  loading = false;
+
+  constructor(
+    private formBuilder: FormBuilder,
+    private reportsService: ReportsService,
+    private toastService: ToastService,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+  }
+
   private getFirstDayOfMonth(): Date {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   }
 
-  detailLevel = 'Completo'; // 'Completo' | 'Resumido'
-  fileFormat = 'PDF'; // 'PDF' | 'XLSX' | 'CSV'
-  loading = false;
-  stats: ReportStats = {
-    patient_count: 0,
-    clinical_record_count: 0,
-    socioeconomic_profile_count: 0
-  };
-
-  constructor(private reportsService: ReportsService) { }
-
-  ngOnInit(): void {
-    this.fetchStats();
-  }
-
-  fetchStats(): void {
-    this.reportsService.getStats().subscribe({
-      next: (data) => this.stats = data,
-      error: (err) => console.error('Erro ao buscar estatísticas:', err)
-    });
-  }
-
-  toggleColumn(column: 'personalInfo' | 'clinicalRecords' | 'socioeconomic'): void {
+  toggleColumn(column: 'personalInfo' | 'clinicalRecords' | 'socioeconomic' | 'attendanceHistory'): void {
     this.selectedColumns[column] = !this.selectedColumns[column];
   }
 
@@ -130,6 +122,10 @@ export class ReportsComponent implements OnInit {
       detail_level: this.detailLevel === 'Completo' ? 'complete' : 'resumed',
       format: this.fileFormat.toLowerCase() as 'pdf' | 'xlsx' | 'csv'
     };
+  }
+
+  goHome(): void {
+    this.router.navigate(['/']);
   }
 
   private executeDownload(config: ReportConfig, fileName: string): void {

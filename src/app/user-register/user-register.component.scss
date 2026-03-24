@@ -7,6 +7,22 @@
   margin-left: 250px;
   background: #f8fafc;
   min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.main-content {
+  flex: 1;
+  padding: 30px;
+  margin-left: 260px;
+  overflow-y: auto;
+}
+
+.content-header {
+  margin-bottom: 30px;
+
+  h1 {
+    font-size: 28px;
+  }
 }
 
 .user-list-header {
