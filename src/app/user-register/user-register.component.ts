@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { RouterModule } from '@angular/router';
+import { ToastService } from '../services/toast.service';
 
 @Component({
   selector: 'app-user-register',
@@ -26,6 +27,13 @@ export class UserRegisterComponent implements OnInit {
   filteredUsers: User[] = [];
   paginatedUsers: User[] = [];
 
+  // Requisitos de Senha
+  get hasMinLength(): boolean { return this.userData.password.length >= 8; }
+  get hasLowerAndUpperCase(): boolean { return /[a-z]/.test(this.userData.password) && /[A-Z]/.test(this.userData.password); }
+  get hasNumber(): boolean { return /[0-9]/.test(this.userData.password); }
+  get hasSymbol(): boolean { return /[^A-Za-z0-9]/.test(this.userData.password); }
+  get isPasswordValid(): boolean { return this.hasMinLength && this.hasLowerAndUpperCase && this.hasNumber && this.hasSymbol; }
+
   userData: UserCreateData = {
     name: '',
     email: '',
@@ -34,6 +42,7 @@ export class UserRegisterComponent implements OnInit {
   };
 
   showCreateModal: boolean = false;
+  showPassword: boolean = false;
   isSubmitting: boolean = false;
   loading: boolean = false;
   searchTerm: string = '';
@@ -45,13 +54,11 @@ export class UserRegisterComponent implements OnInit {
   totalPages: number = 1;
   totalItems: number = 0;
 
-  errorMessage: string = '';
-  successMessage: string = '';
-
   constructor(
     private router: Router,
     @Inject(AuthService) private authService: AuthService,
-    private userService: UserService
+    private userService: UserService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -66,7 +73,6 @@ export class UserRegisterComponent implements OnInit {
 
   loadUsers(): void {
     this.loading = true;
-    this.errorMessage = '';
 
     this.userService.listUsers().subscribe({
       next: (response) => {
@@ -76,7 +82,7 @@ export class UserRegisterComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erro ao carregar usuários:', error);
-        this.errorMessage = 'Não foi possível carregar os usuários.';
+        this.toastService.error('Não foi possível carregar os usuários.');
         this.loading = false;
       }
     });
@@ -85,20 +91,18 @@ export class UserRegisterComponent implements OnInit {
   onSubmit(userForm: NgForm): void {
     if (userForm.invalid) {
       Object.values(userForm.controls).forEach((control) => control.markAsTouched());
-      this.errorMessage = 'Preencha corretamente os campos obrigatórios.';
+      this.toastService.warning('Preencha corretamente os campos obrigatórios.');
       return;
     }
 
     if (this.validateForm()) {
       this.isSubmitting = true;
-      this.errorMessage = '';
-      this.successMessage = '';
 
       this.userService.createUser(this.userData).subscribe({
         next: (response) => {
           console.log('Usuário cadastrado com sucesso:', response);
           this.isSubmitting = false;
-          this.successMessage = 'Usuário cadastrado com sucesso!';
+          this.toastService.success('Usuário cadastrado com sucesso!');
 
           this.closeCreateModal();
           this.loadUsers();
@@ -112,14 +116,14 @@ export class UserRegisterComponent implements OnInit {
             if (errors) {
               const firstError = Object.values(errors)[0];
               const rawMessage = Array.isArray(firstError) ? String(firstError[0]) : String(firstError);
-              this.errorMessage = this.translateValidationMessage(rawMessage);
+              this.toastService.error(this.translateValidationMessage(rawMessage));
             } else {
-              this.errorMessage = 'Dados inválidos. Verifique os campos.';
+              this.toastService.error('Dados inválidos. Verifique os campos.');
             }
           } else if (error.status === 403) {
-            this.errorMessage = 'Você não tem permissão para cadastrar usuários.';
+            this.toastService.warning('Você não tem permissão para cadastrar usuários.');
           } else {
-            this.errorMessage = 'Erro no servidor. Tente novamente.';
+            this.toastService.error('Erro no servidor. Tente novamente.');
           }
         }
       });
@@ -151,8 +155,6 @@ export class UserRegisterComponent implements OnInit {
 
   openCreateModal(): void {
     this.showCreateModal = true;
-    this.errorMessage = '';
-    this.successMessage = '';
   }
 
   closeCreateModal(): void {
@@ -226,33 +228,33 @@ export class UserRegisterComponent implements OnInit {
 
   private validateForm(): boolean {
     if (!this.userData.name.trim()) {
-      this.errorMessage = 'Nome é obrigatório';
+      this.toastService.warning('Nome é obrigatório');
       return false;
     }
 
     if (!this.userData.email.trim()) {
-      this.errorMessage = 'Email é obrigatório';
+      this.toastService.warning('Email é obrigatório');
       return false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(this.userData.email)) {
-      this.errorMessage = 'Email inválido';
+      this.toastService.warning('Email inválido');
       return false;
     }
 
     if (!this.userData.password.trim()) {
-      this.errorMessage = 'Senha é obrigatória';
+      this.toastService.warning('Senha é obrigatória');
       return false;
     }
 
-    if (this.userData.password.length < 8) {
-      this.errorMessage = 'A senha deve ter pelo menos 8 caracteres';
+    if (!this.isPasswordValid) {
+      this.toastService.warning('A senha não atende a todos os requisitos de segurança');
       return false;
     }
 
     if (this.userData.password !== this.userData.password_confirmation) {
-      this.errorMessage = 'As senhas não conferem';
+      this.toastService.warning('As senhas não conferem');
       return false;
     }
 
