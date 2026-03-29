@@ -96,8 +96,6 @@ export class PatientComponent implements OnInit {
 
   statusFilter: string = '';
   objectiveFilter: string = '';
-  dateFilter: any = '';
-  maxFilterDate: Date = new Date();
   minAppointmentDate: string = this.getTodayISODate();
 
   // Appointment Details Modal
@@ -448,21 +446,11 @@ export class PatientComponent implements OnInit {
 
   loadAppointments(): void {
     this.loadingAppointments = true;
-
-    if (this.dateFilter && this.isInvalidDate(this.dateFilter)) {
-      this.loadingAppointments = false;
-      this.appointmentErrorMessage = 'Data de filtro inválida.';
-      return;
-    }
-
     this.appointmentErrorMessage = '';
 
     const filters: any = { patient_id: this.patientId };
     if (this.statusFilter) filters.status = this.statusFilter;
     if (this.objectiveFilter) filters.objective = this.objectiveFilter;
-    if (this.dateFilter) {
-      filters.date = SharedUtils.formatDateForAPI(this.dateFilter);
-    }
 
     this.appointmentService.listAppointments(1, 100, filters).subscribe({
       next: (response: any) => {
@@ -481,12 +469,11 @@ export class PatientComponent implements OnInit {
   }
 
   hasActiveFilters(): boolean {
-    return !!(this.statusFilter || this.dateFilter || this.objectiveFilter);
+    return !!(this.statusFilter || this.objectiveFilter);
   }
 
   clearFilters(): void {
     this.statusFilter = '';
-    this.dateFilter = '';
     this.objectiveFilter = '';
     this.loadAppointments();
   }
@@ -512,8 +499,38 @@ export class PatientComponent implements OnInit {
     this.loadAppointments();
   }
 
+  // ====== Date Mask Handler ======
+  onPatientApptDateInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    input.value = SharedUtils.maskDateBR(input.value);
+    this.newAppointment.date = input.value;
+  }
+
   createAppointment(): void {
-    if (this.isDateBeforeToday(this.newAppointment.date)) {
+    if (!this.newAppointment.date || !this.newAppointment.objective) {
+      this.appointmentErrorMessage = 'Preencha todos os campos obrigatórios.';
+      return;
+    }
+
+    // Convert DD/MM/AAAA to YYYY-MM-DD for validation
+    let parsedDate: Date;
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(this.newAppointment.date)) {
+      const iso = SharedUtils.parseBRDate(this.newAppointment.date);
+      parsedDate = SharedUtils.parseDate(iso);
+    } else {
+      parsedDate = SharedUtils.parseDate(this.newAppointment.date);
+    }
+    
+    if (isNaN(parsedDate.getTime())) {
+      this.appointmentErrorMessage = 'Data inválida.';
+      return;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    parsedDate.setHours(0, 0, 0, 0);
+
+    if (parsedDate < today) {
       this.appointmentErrorMessage = 'A data da consulta não pode ser anterior a hoje.';
       return;
     }

@@ -98,6 +98,7 @@ export class PatientService {
       params = params.set('birth_year', (filters.birth_year || filters.birthYear).toString());
     }
     if (filters.created_at) params = params.set('created_at', filters.created_at);
+    if (filters.birth_month) params = params.set('birth_month', filters.birth_month.toString());
     if (filters.sort_by) params = params.set('sort_by', filters.sort_by);
     if (filters.sort_order) params = params.set('sort_order', filters.sort_order);
 

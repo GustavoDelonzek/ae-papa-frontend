@@ -77,12 +77,12 @@
 // Stats Grid
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
   margin-bottom: 40px;
 
   @media (max-width: 1200px) {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 
   @media (max-width: 600px) {
@@ -214,12 +214,18 @@
   display: grid;
   grid-template-columns: 1fr 400px;
   gap: 30px;
+  align-items: start;
 
   .left-section,
   .right-section {
     display: flex;
     flex-direction: column;
     gap: 20px;
+  }
+
+  // Quick-actions card stretches naturally since it's the only item
+  .quick-actions {
+    flex: 1;
   }
 
   @media (max-width: 1200px) {
@@ -286,6 +292,19 @@
   }
 }
 
+// Clinical: 2x2 grid layout
+.actions-grid-clinical {
+  grid-template-columns: repeat(2, 1fr);
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 500px) {
+    grid-template-columns: 1fr;
+  }
+}
+
 .action-card-new {
   background: #f9fafb;
   border: 1px solid #e5e7eb;
@@ -335,7 +354,123 @@
   }
 }
 
-// Recent Activity
+// Birthday Card
+.birthday-card {
+  .card-body {
+    padding: 16px 20px;
+  }
+}
+
+.birthday-loading,
+.birthday-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px 0;
+  color: #9ca3af;
+  font-size: 14px;
+
+  i { font-size: 18px; }
+  p { margin: 0; }
+}
+
+.birthday-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &.birthday-list-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    .birthday-item {
+      flex: 1 1 220px;
+      max-width: 300px;
+    }
+  }
+}
+
+.birthday-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f9fafb;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: white;
+    border-color: #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  &.birthday-today {
+    background: linear-gradient(135deg, #f3e5f5 0%, #ede7f6 100%);
+    border-color: rgba(106, 48, 125, 0.3);
+    box-shadow: 0 2px 12px rgba(106, 48, 125, 0.12);
+  }
+
+  .birthday-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(106, 48, 125, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    i {
+      font-size: 14px;
+      color: #6a307d;
+    }
+  }
+
+  .birthday-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+
+    .birthday-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1f2937;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .birthday-date {
+      font-size: 11px;
+      color: #6b7280;
+    }
+  }
+
+  .birthday-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: #6a307d;
+    background: rgba(106, 48, 125, 0.08);
+    padding: 3px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    &.badge-today {
+      background: #6a307d;
+      color: white;
+      font-size: 12px;
+    }
+  }
+}
+
+// Recent Activity (kept for reference, now unused)
 .recent-activity {
   .activity-list {
     display: flex;

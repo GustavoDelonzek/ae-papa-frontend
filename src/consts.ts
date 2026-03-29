@@ -2,4 +2,4 @@
 declare const process: any;
 const env = typeof process !== 'undefined' ? process.env : {};
 
-export const API_URL = env['API_URL'] || 'http://localhost:8000/api';
+export const API_URL = 'https://api.aepapa.online/api';

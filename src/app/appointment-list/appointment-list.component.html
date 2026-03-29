@@ -65,12 +65,6 @@
                         <i class="fas fa-chevron-down select-arrow"></i>
                     </div>
 
-                    <!-- Date Filter (Date Input) -->
-                    <div class="date-input-wrapper" [class.active-date]="!!dateFilter">
-                        <i class="far fa-calendar input-icon"></i>
-                        <input type="date" [(ngModel)]="dateFilter" [max]="maxFilterDate" (change)="onFilterChange()" placeholder="Data"
-                            title="Data exata">
-                    </div>
 
                 </div>
 
@@ -291,10 +285,15 @@
                             <label class="appt-field-label">
                                 Data do Atendimento <span class="appt-required">*</span>
                             </label>
-                            <div class="appt-input-wrapper">
-                                <i class="far fa-calendar-alt appt-input-icon"></i>
-                                <input type="date" name="appointmentDate" class="appt-input appt-input-padded"
-                                    [(ngModel)]="appointmentDate" [min]="minAppointmentDate" [disabled]="submitting" required>
+                            <div class="appt-input-wrapper custom-date-picker-wrapper">
+                                <mat-form-field class="custom-mat-form-field" style="width: 100%;">
+                                    <input matInput [matDatepicker]="pickerApptDate" name="appointmentDate"
+                                        [(ngModel)]="appointmentDate"
+                                        placeholder="DD/MM/AAAA"
+                                        [disabled]="submitting" required readonly (click)="pickerApptDate.open()">
+                                    <mat-datepicker-toggle matIconSuffix [for]="pickerApptDate"></mat-datepicker-toggle>
+                                    <mat-datepicker #pickerApptDate></mat-datepicker>
+                                </mat-form-field>
                             </div>
                         </div>
 

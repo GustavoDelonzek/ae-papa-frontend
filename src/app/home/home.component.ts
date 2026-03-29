@@ -2,8 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DashboardService, DashboardMetrics } from '../services';
 import { AppointmentService } from '../services/appointment.service';
+import { AuthService } from '../services/auth.service';
+import { PatientService, Patient } from '../services/patient.service';
 import { Appointment } from '../core/models/appointment.model';
 import { SharedUtils } from '../core/utils/shared-utils';
+import { forkJoin } from 'rxjs';
 
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../sidebar/sidebar.component';
@@ -25,7 +28,6 @@ export class HomeComponent implements OnInit {
   totalPatients: number = 0;
   appointmentsToday: number = 0;
   pendingTasks: number = 0;
-  recentActivity: number = 0;
 
   // Calendário
   currentDate: Date = new Date();
@@ -38,16 +40,27 @@ export class HomeComponent implements OnInit {
   // Loading
   loading: boolean = false;
   loadingAppointments: boolean = false;
+  loadingBirthdays: boolean = false;
+
+  // Role
+  isAdmin: boolean = false;
+
+  // Aniversariantes
+  upcomingBirthdays: { name: string; date: string; daysUntil: number; isToday: boolean }[] = [];
 
   constructor(
     private router: Router,
     private dashboardService: DashboardService,
-    private appointmentService: AppointmentService
+    private appointmentService: AppointmentService,
+    private authService: AuthService,
+    private patientService: PatientService
   ) { }
 
   ngOnInit(): void {
+    this.isAdmin = this.authService.isAdmin();
     this.loadDashboardData();
     this.initializeCalendar();
+    this.loadUpcomingBirthdays();
   }
 
   loadDashboardData(): void {
@@ -59,7 +72,6 @@ export class HomeComponent implements OnInit {
         this.totalPatients = metrics.patient_count;
         this.appointmentsToday = metrics.appointments_count;
         this.pendingTasks = metrics.documents_count;
-        this.recentActivity = 12;
         this.loading = false;
       },
       error: (error: any) => {
@@ -246,12 +258,93 @@ export class HomeComponent implements OnInit {
     this.router.navigate(['/lista-pacientes']);
   }
 
-  navigateToRegister(): void {
-    this.router.navigate(['/registro-usuario']);
+  navigateToNewPatient(): void {
+    this.router.navigate(['/paciente']);
+  }
+
+  navigateToCaretakers(): void {
+    this.router.navigate(['/lista-cuidadores']);
   }
 
   navigateToAppointments(): void {
     this.router.navigate(['/lista-consultas']);
+  }
+
+  navigateToReports(): void {
+    this.router.navigate(['/relatorios']);
+  }
+
+  navigateToStatistics(): void {
+    this.router.navigate(['/estatisticas']);
+  }
+
+  navigateToUserRegister(): void {
+    this.router.navigate(['/registro-usuario']);
+  }
+
+  loadUpcomingBirthdays(): void {
+    const today = new Date();
+    const currentMonth = today.getMonth() + 1; // 1-12
+    const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
+
+    this.loadingBirthdays = true;
+
+    forkJoin([
+      this.patientService.getPatients(1, 100, { birth_month: currentMonth }),
+      this.patientService.getPatients(1, 100, { birth_month: nextMonth })
+    ]).subscribe({
+      next: ([currentRes, nextRes]) => {
+        const allPatients = [
+          ...(currentRes.data || []),
+          ...(nextRes.data || [])
+        ];
+
+        const todayMD = `${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+        const mapped = allPatients
+          .filter(p => !!p.birth_date)
+          .map(p => {
+            const parts = p.birth_date.split('-'); // YYYY-MM-DD
+            const month = parseInt(parts[1], 10);
+            const day = parseInt(parts[2], 10);
+
+            // Calculate days until this birthday this year (or next year if already passed)
+            const thisYear = today.getFullYear();
+            let birthday = new Date(thisYear, month - 1, day);
+            if (birthday < today) {
+              birthday = new Date(thisYear + 1, month - 1, day);
+            }
+
+            const diffMs = birthday.getTime() - today.setHours(0, 0, 0, 0);
+            const daysUntil = Math.round(diffMs / (1000 * 60 * 60 * 24));
+            const birthdayMD = `${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const isToday = birthdayMD === todayMD;
+
+            return {
+              name: p.full_name,
+              date: `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}`,
+              daysUntil,
+              isToday
+            };
+          });
+
+        // Sort by days until birthday; today first, then ascending
+        mapped.sort((a, b) => a.daysUntil - b.daysUntil);
+
+        // Deduplicate by name (patient might appear in both months if near boundary)
+        const seen = new Set<string>();
+        this.upcomingBirthdays = mapped.filter(b => {
+          if (seen.has(b.name)) return false;
+          seen.add(b.name);
+          return true;
+        }).slice(0, 6);
+
+        this.loadingBirthdays = false;
+      },
+      error: () => {
+        this.loadingBirthdays = false;
+      }
+    });
   }
 
   getObjectiveText(objective?: string): string {

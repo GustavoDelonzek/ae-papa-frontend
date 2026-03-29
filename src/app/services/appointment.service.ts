@@ -37,6 +37,12 @@ export class AppointmentService {
       if (filters.date) {
         params = params.set('date', filters.date);
       }
+      if (filters.start_date) {
+        params = params.set('start_date', filters.start_date);
+      }
+      if (filters.end_date) {
+        params = params.set('end_date', filters.end_date);
+      }
       if (filters.status) {
         params = params.set('status', filters.status);
       }

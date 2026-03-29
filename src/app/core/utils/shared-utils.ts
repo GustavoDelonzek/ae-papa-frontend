@@ -45,15 +45,20 @@ export class SharedUtils {
 
   static formatDateForAPI(date: any): string {
     if (!date) return '';
-    
+
     let d: Date;
     if (date instanceof Date) {
       d = date;
     } else if (typeof date === 'string') {
-      const parts = date.split('T')[0].split('-');
-      if (parts.length === 3 && parts[0].length === 4) {
-        // YYYY-MM-DD
-        return `${parts[1]}-${parts[2]}-${parts[0]}`;
+      // If it's YYYY-MM-DD convert to MM-DD-YYYY
+      if (/^\d{4}-\d{2}-\d{2}$/.test(date.split('T')[0])) {
+        const [y, m, ds] = date.split('T')[0].split('-');
+        return `${m}-${ds}-${y}`;
+      }
+      // DD/MM/AAAA (Brazilian format from masked input)
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+        const [day, month, year] = date.split('/');
+        return `${month}-${day}-${year}`;
       }
       d = new Date(date);
     } else {
@@ -67,6 +72,41 @@ export class SharedUtils {
     const day = String(d.getDate()).padStart(2, '0');
     return `${month}-${day}-${year}`;
   }
+
+  /**
+   * Convert DD/MM/AAAA (Brazilian) → MM-DD-YYYY (backend).
+   * Returns '' if input is invalid or incomplete.
+   */
+  static parseBRDate(brDate: string): string {
+    if (!brDate) return '';
+    const match = brDate.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (!match) return '';
+    return `${match[2]}-${match[1]}-${match[3]}`;
+  }
+
+  /**
+   * Auto-mask a date string to DD/MM/AAAA as the user types.
+   * Call from (input) event handler.
+   */
+  static maskDateBR(raw: string): string {
+    const digits = raw.replace(/\D/g, '').substring(0, 8);
+    let result = '';
+    if (digits.length > 0) result += digits.substring(0, 2);
+    if (digits.length > 2) result += '/' + digits.substring(2, 4);
+    if (digits.length > 4) result += '/' + digits.substring(4, 8);
+    return result;
+  }
+
+  /**
+   * Convert YYYY-MM-DD (backend/ISO) → DD/MM/AAAA (display in BR inputs).
+   */
+  static toDisplayDate(dateStr: string | undefined): string {
+    if (!dateStr) return '';
+    const d = this.parseDate(dateStr);
+    if (isNaN(d.getTime())) return '';
+    return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  }
+
 
   static parseDate(dateStr: any): Date {
     if (!dateStr) return new Date();

@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { SharedUtils } from '../../../core/utils/shared-utils';
 
 @Component({
     selector: 'app-clinical-record-modal',
@@ -160,6 +161,7 @@ export class ClinicalRecordModalComponent implements OnInit {
 
         const payload = {
             ...this.currentRecord,
+            diagnosis_date: SharedUtils.formatDateForAPI(this.currentRecord.diagnosis_date),
             patient_id: this.patientId
         };
 

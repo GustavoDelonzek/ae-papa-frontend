@@ -14,6 +14,10 @@ import { RouterModule } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { AppointmentDetailsModalComponent } from '../shared/components/appointment-details-modal/appointment-details-modal.component';
 import { SecureImageDirective } from '../core/directives/secure-image.directive';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-appointment-list',
@@ -24,7 +28,11 @@ import { SecureImageDirective } from '../core/directives/secure-image.directive'
     RouterModule,
     SidebarComponent,
     AppointmentDetailsModalComponent,
-    SecureImageDirective
+    SecureImageDirective,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   templateUrl: './appointment-list.component.html',
   styleUrl: './appointment-list.component.scss'
@@ -49,8 +57,6 @@ export class AppointmentListComponent implements OnInit {
   // Filtros
   searchTerm: string = '';
   statusFilter: string = '';
-  dateFilter: string = '';
-  maxFilterDate: string = this.getTodayISODate();
   objectiveFilter: string = '';
 
   // ========================================
@@ -110,7 +116,6 @@ export class AppointmentListComponent implements OnInit {
     };
 
     if (this.searchTerm) filters.search = this.searchTerm;
-    if (this.dateFilter) filters.date = this.dateFilter;
     if (this.statusFilter) filters.status = this.statusFilter;
     if (this.objectiveFilter) filters.objective = this.objectiveFilter;
 
@@ -153,13 +158,14 @@ export class AppointmentListComponent implements OnInit {
   clearFilters(): void {
     this.searchTerm = '';
     this.statusFilter = '';
-    this.dateFilter = '';
     this.objectiveFilter = '';
     this.loadAppointments(1);
   }
 
+  // ====== Event Handlers ======
+
   hasActiveFilters(): boolean {
-    return !!(this.searchTerm || this.statusFilter || this.dateFilter || this.objectiveFilter);
+    return !!(this.searchTerm || this.statusFilter || this.objectiveFilter);
   }
 
   onSort(column: string): void {
@@ -449,7 +455,8 @@ export class AppointmentListComponent implements OnInit {
       marital_status: '',
       cpf: ''
     };
-    this.appointmentDate = SharedUtils.toInputDate(appointment.date);
+    // Convert ISO date from backend to BR format for display
+    this.appointmentDate = SharedUtils.toDisplayDate(appointment.date);
     this.appointmentObjective = appointment.objective || '';
     this.observations = appointment.observations || '';
     this.searchCpf = '';
@@ -480,7 +487,14 @@ export class AppointmentListComponent implements OnInit {
   }
 
   private isDateBeforeToday(date: string | Date): boolean {
-    const parsed = date instanceof Date ? date : SharedUtils.parseDate(date);
+    // Accept both DD/MM/AAAA (BR mask) and YYYY-MM-DD (ISO)
+    let parsed: Date;
+    if (typeof date === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+      const iso = SharedUtils.parseBRDate(date);
+      parsed = SharedUtils.parseDate(iso);
+    } else {
+      parsed = date instanceof Date ? date : SharedUtils.parseDate(date as string);
+    }
     if (isNaN(parsed.getTime())) return false;
 
     const today = new Date();
