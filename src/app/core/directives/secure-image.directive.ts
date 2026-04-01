@@ -1,6 +1,7 @@
 import { Directive, ElementRef, Input, OnChanges, OnDestroy, SimpleChanges, Renderer2 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subscription } from 'rxjs';
+import { API_URL } from '../../../consts';
 
 @Directive({
   selector: 'img[secureImage]',
@@ -51,7 +52,12 @@ export class SecureImageDirective implements OnChanges, OnDestroy {
       return;
     }
 
-    this.sub = this.http.get(this.secureImage, { responseType: 'blob' }).subscribe({
+    let urlToLoad = this.secureImage;
+    if (urlToLoad && urlToLoad.startsWith('http://') && API_URL.startsWith('https://')) {
+      urlToLoad = urlToLoad.replace('http://', 'https://');
+    }
+
+    this.sub = this.http.get(urlToLoad, { responseType: 'blob' }).subscribe({
       next: (blob: Blob) => {
         this.objectUrl = URL.createObjectURL(blob);
         this.el.nativeElement.src = this.objectUrl;
