@@ -98,7 +98,7 @@
         (click)="selectTab('documentos')">Documentos</button>
       <button class="tab-btn" [class.active]="isTabActive('Cuidador')" (click)="selectTab('Cuidador')">Cuidador</button>
       <button class="tab-btn" [class.active]="isTabActive('consultas')" (click)="selectTab('consultas')">Histórico de
-        Consultas</button>
+        Atendimentos</button>
     </nav>
 
     <!-- Tab Content -->
@@ -351,12 +351,12 @@
         </div>
       </div>
 
-      <!-- CONSULTAS TAB -->
+      <!-- ATENDIMENTOS TAB -->
       <div *ngIf="activeTab === 'consultas'" class="appointments-tab fade-in">
         <div class="appointments-header-actions">
-          <h2>Histórico de Consultas</h2>
+          <h2>Histórico de Atendimentos</h2>
           <button class="btn-primary-small" (click)="openCreateAppointmentModal()">
-            <i class="fas fa-plus"></i> Nova Consulta
+            <i class="fas fa-plus"></i> Novo Atendimento
           </button>
         </div>
 
@@ -410,7 +410,7 @@
 
         <div class="empty-state-box" *ngIf="!loadingAppointments && appointments.length === 0">
           <i class="fas fa-calendar-check"></i>
-          <p>Nenhuma consulta registrada.</p>
+          <p>Nenhum atendimento registrado.</p>
         </div>
 
         <div class="appointments-list" *ngIf="!loadingAppointments && appointments.length > 0">
@@ -456,7 +456,7 @@
         <div class="patient-appt-icon-box">
           <i class="fas fa-calendar-plus"></i>
         </div>
-        <h3>Nova Consulta</h3>
+        <h3>Novo Atendimento</h3>
         <p>Registre um novo atendimento para este atendido</p>
       </div>
 
@@ -506,7 +506,7 @@
         <div class="patient-appt-main-title">
           <i class="fas fa-file-medical-alt patient-appt-title-icon"></i>
           <div>
-            <h2>Dados da Consulta</h2>
+            <h2>Dados do Atendimento</h2>
             <p>Preencha os campos obrigatorios para agendar</p>
           </div>
         </div>
@@ -523,7 +523,7 @@
           </div>
 
           <div class="patient-appt-field-group">
-            <label class="patient-appt-field-label">Data da Consulta <span class="patient-appt-required">*</span></label>
+            <label class="patient-appt-field-label">Data do Atendimento <span class="patient-appt-required">*</span></label>
             <div class="patient-appt-input-wrapper custom-date-picker-wrapper">
               <mat-form-field class="custom-mat-form-field" style="width: 100%;">
                   <input matInput [matDatepicker]="pickerPatientApptModal" name="date"

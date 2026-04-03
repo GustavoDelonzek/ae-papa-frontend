@@ -40,8 +40,8 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
-    path: 'lista-consultas',
-    component: AppointmentListComponent,
+    path: 'lista-atendimentos',
+    loadComponent: () => import('./appointment-list/appointment-list.component').then(m => m.AppointmentListComponent),
     canActivate: [AuthGuard]
   },
   {

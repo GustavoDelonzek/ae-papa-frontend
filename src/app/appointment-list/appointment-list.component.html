@@ -12,8 +12,8 @@
 
             <div class="header-main-row">
                 <div class="title-section">
-                    <h1>Gerenciamento de Consultas</h1>
-                    <p class="subtitle">Acompanhe e organize os atendimentos da clínica.</p>
+                    <h1>Gerenciamento de Atendimentos</h1>
+                    <p class="subtitle">Acompanhe e gerencie todos os atendimentos marcados.</p>
                 </div>
                 <button class="btn-primary" (click)="createAppointment()">
                     <i class="fas fa-plus"></i> Novo Atendimento
@@ -193,7 +193,7 @@
                         <i class="fas" [ngClass]="isEditMode() ? 'fa-pen-to-square' : 'fa-calendar-plus'"></i>
                     </div>
                     <h3>{{ isEditMode() ? 'Editar Atendimento' : 'Novo Atendimento' }}</h3>
-                    <p>{{ isEditMode() ? 'Atualize os dados da consulta' : 'Registre uma nova consulta no sistema' }}</p>
+                    <p>{{ isEditMode() ? 'Atualize os dados do atendimento' : 'Registre um novo atendimento no sistema' }}</p>
                 </div>
 
                 <div class="appt-sidebar-summary">

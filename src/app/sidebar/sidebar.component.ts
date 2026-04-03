@@ -54,7 +54,7 @@ export class SidebarComponent implements OnInit {
       text: 'Atendimentos',
       icon: 'fa-solid fa-calendar-check',
       type: 'link',
-      link: '/lista-consultas'
+      link: '/lista-atendimentos'
     },
     {
       text: 'RELATÓRIOS',

@@ -488,7 +488,7 @@ export class PatientComponent implements OnInit {
         this.loadingAppointments = false;
       },
       error: (error: any) => {
-        console.error('Erro ao carregar consultas:', error);
+        console.error('Erro ao carregar atendimentos:', error);
         this.loadingAppointments = false;
       }
     });
@@ -561,7 +561,7 @@ export class PatientComponent implements OnInit {
     parsedDate.setHours(0, 0, 0, 0);
 
     if (parsedDate < today) {
-      this.appointmentErrorMessage = 'A data da consulta não pode ser anterior a hoje.';
+      this.appointmentErrorMessage = 'A data do atendimento não pode ser anterior a hoje.';
       return;
     }
 
@@ -584,9 +584,9 @@ export class PatientComponent implements OnInit {
         this.reloadAppointments();
       },
       error: (error: any) => {
-        console.error('Erro ao criar consulta:', error);
+        console.error('Erro ao criar atendimento:', error);
         this.savingAppointment = false;
-        this.appointmentErrorMessage = 'Erro ao criar consulta. Tente novamente.';
+        this.appointmentErrorMessage = 'Erro ao criar atendimento. Tente novamente.';
       }
     });
   }

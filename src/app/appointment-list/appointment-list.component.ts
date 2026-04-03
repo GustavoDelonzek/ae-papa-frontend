@@ -133,7 +133,7 @@ export class AppointmentListComponent implements OnInit {
         this.loading = false;
       },
       error: (error: any) => {
-        console.error('Erro ao carregar consultas:', error);
+        console.error('Erro ao carregar atendimentos:', error);
         this.errorMessage = 'Erro ao carregar lista de atendimentos. Tente novamente.';
         this.loading = false;
       }
@@ -390,7 +390,7 @@ export class AppointmentListComponent implements OnInit {
           this.loadAppointments();
         },
         error: (error) => {
-          console.error('Erro ao atualizar consulta:', error);
+          console.error('Erro ao atualizar atendimento:', error);
           this.toastService.error(error.error?.message || 'Erro ao atualizar atendimento. Tente novamente.');
           this.submitting = false;
         }
@@ -406,7 +406,7 @@ export class AppointmentListComponent implements OnInit {
         this.loadAppointments();
       },
       error: (error) => {
-        console.error('Erro ao criar consulta:', error);
+        console.error('Erro ao criar atendimento:', error);
         this.toastService.error(error.error?.message || 'Erro ao criar atendimento. Tente novamente.');
         this.submitting = false;
       }

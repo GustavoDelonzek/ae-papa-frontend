@@ -267,7 +267,7 @@ export class HomeComponent implements OnInit {
   }
 
   navigateToAppointments(): void {
-    this.router.navigate(['/lista-consultas']);
+    this.router.navigate(['/lista-atendimentos']);
   }
 
   navigateToReports(): void {

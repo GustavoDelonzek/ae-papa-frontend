@@ -41,7 +41,7 @@ export class AppointmentDetailsModalComponent {
             'donation': 'Doação',
             'treatment': 'Tratamento',
             'exam': 'Exame',
-            'consultation': 'Consulta'
+            'consultation': 'Atendimento'
         };
         return map[objective] || objective;
     }
