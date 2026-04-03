@@ -18,6 +18,7 @@ export interface Patient {
   profile_picture_url?: string;
   created_at?: string;
   updated_at?: string;
+  deleted_at?: string | null;
   socioeconomic_profile?: SocioeconomicProfile;
   caregivers?: Caretaker[];
   clinical_records?: ClinicalRecord[];
@@ -101,6 +102,9 @@ export class PatientService {
     if (filters.birth_month) params = params.set('birth_month', filters.birth_month.toString());
     if (filters.sort_by) params = params.set('sort_by', filters.sort_by);
     if (filters.sort_order) params = params.set('sort_order', filters.sort_order);
+    if (filters.status !== undefined && filters.status !== null) {
+      params = params.set('status', filters.status.toString());
+    }
 
     return this.http.get<PatientsListResponse>(`${API_URL}/patients`, { params });
   }

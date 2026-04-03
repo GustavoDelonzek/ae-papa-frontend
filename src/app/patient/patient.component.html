@@ -20,6 +20,10 @@
       <button class="btn-secondary" (click)="openEditModal()">
         <i class="fas fa-pen"></i> Editar Perfil
       </button>
+
+      <button class="btn-danger-outline" (click)="openDeactivateModal()">
+        <i class="fas fa-user-slash"></i> Desativar
+      </button>
     </div>
   </header>
 
@@ -615,3 +619,35 @@
 <app-appointment-details-modal [visible]="showDetailsModal" [appointment]="selectedAppointment"
   (close)="closeDetailsModal()" (edit)="onEditAppointmentDetails($event)">
 </app-appointment-details-modal>
+
+<!-- Deactivation Confirmation Modal -->
+<div class="modal-overlay" *ngIf="showDeactivateModal" (click)="closeDeactivateModal()">
+  <div class="modal-dialog danger-dialog" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-icon-wrap">
+        <i class="fas fa-user-slash"></i>
+      </div>
+      <button class="modal-close" (click)="closeDeactivateModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <h3>Desativar Atendido</h3>
+      <p>Você está prestes a desativar <strong>{{ patientData?.full_name }}</strong>.</p>
+      <div class="warning-box">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>Esta ação é <strong>irreversível</strong>. O atendido será removido da listagem ativa e seus dados serão preservados como inativo no sistema.</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeDeactivateModal()" [disabled]="deactivatingLoading">
+        Cancelar
+      </button>
+      <button class="btn-confirm-danger" (click)="confirmDeactivate()" [disabled]="deactivatingLoading">
+        <i class="fas fa-circle-notch fa-spin" *ngIf="deactivatingLoading"></i>
+        <i class="fas fa-user-slash" *ngIf="!deactivatingLoading"></i>
+        {{ deactivatingLoading ? 'Desativando...' : 'Sim, desativar' }}
+      </button>
+    </div>
+  </div>
+</div>

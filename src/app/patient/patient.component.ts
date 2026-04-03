@@ -102,6 +102,10 @@ export class PatientComponent implements OnInit {
   showDetailsModal = false;
   selectedAppointment: Appointment | null = null;
 
+  // Deactivation modal
+  showDeactivateModal = false;
+  deactivatingLoading = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -248,6 +252,32 @@ export class PatientComponent implements OnInit {
 
   editPatient(): void {
     this.openEditModal();
+  }
+
+  openDeactivateModal(): void {
+    this.showDeactivateModal = true;
+  }
+
+  closeDeactivateModal(): void {
+    this.showDeactivateModal = false;
+    this.deactivatingLoading = false;
+  }
+
+  confirmDeactivate(): void {
+    if (!this.patientId) return;
+    this.deactivatingLoading = true;
+    
+    this.patientService.deletePatient(this.patientId).subscribe({
+      next: () => {
+        this.closeDeactivateModal();
+        this.router.navigate(['/lista-pacientes']);
+      },
+      error: (error: any) => {
+        console.error('Erro ao desativar paciente:', error);
+        this.deactivatingLoading = false;
+        this.errorMessage = 'Erro ao desativar atendido. Tente novamente.';
+      }
+    });
   }
 
   onPhotoClick(): void {

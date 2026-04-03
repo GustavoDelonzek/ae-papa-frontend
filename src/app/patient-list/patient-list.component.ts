@@ -65,6 +65,14 @@ export class PatientListComponent implements OnInit, OnDestroy {
   public showCreateModal: boolean = false;
   public currentPatient: Patient | null = null;
 
+  // Inactive view toggle
+  showInactive: boolean = false;
+
+  // Deactivation modal
+  showDeactivateModal: boolean = false;
+  deactivatingPatient: Patient | null = null;
+  deactivatingLoading: boolean = false;
+
   public trackByPatientId(index: number, patient: Patient): number {
     return patient.id || index;
   }
@@ -106,6 +114,10 @@ export class PatientListComponent implements OnInit, OnDestroy {
       filters.birthYear = parseInt(this.birthYearFilter, 10);
     }
 
+    if (this.showInactive) {
+      filters.status = false;
+    }
+
     if (this.sortColumn) {
       filters.sort_by = this.sortColumn;
       filters.sort_order = this.sortDirection;
@@ -142,6 +154,15 @@ export class PatientListComponent implements OnInit, OnDestroy {
   }
 
   clearFilters(): void {
+    this.searchTerm = '';
+    this.genderFilter = null;
+    this.ageFilter = '';
+    this.birthYearFilter = '';
+    this.loadPatients(1);
+  }
+
+  toggleInactiveView(): void {
+    this.showInactive = !this.showInactive;
     this.searchTerm = '';
     this.genderFilter = null;
     this.ageFilter = '';
@@ -239,6 +260,33 @@ export class PatientListComponent implements OnInit, OnDestroy {
 
   viewPatient(id: number): void {
     this.router.navigate(['/paciente', id]);
+  }
+
+  openDeactivateModal(patient: Patient): void {
+    this.deactivatingPatient = patient;
+    this.showDeactivateModal = true;
+  }
+
+  closeDeactivateModal(): void {
+    this.showDeactivateModal = false;
+    this.deactivatingPatient = null;
+    this.deactivatingLoading = false;
+  }
+
+  confirmDeactivate(): void {
+    if (!this.deactivatingPatient?.id) return;
+    this.deactivatingLoading = true;
+    this.patientService.deletePatient(this.deactivatingPatient.id).subscribe({
+      next: () => {
+        this.closeDeactivateModal();
+        this.loadPatients(this.currentPage);
+      },
+      error: (error) => {
+        console.error('Erro ao desativar paciente:', error);
+        this.deactivatingLoading = false;
+        this.errorMessage = 'Erro ao desativar atendido. Tente novamente.';
+      }
+    });
   }
 
   deletePatient(id: number): void {

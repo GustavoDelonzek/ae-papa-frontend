@@ -74,8 +74,8 @@
             <i class="fa-solid" [class.fa-square-check]="selectedColumns.socioeconomic" [class.fa-square]="!selectedColumns.socioeconomic"></i>
             Histórico Socioeconômico
           </div>
-          <div class="custom-checkbox disabled" title="Em breve">
-            <i class="fa-solid fa-square"></i>
+          <div class="custom-checkbox" [class.selected]="selectedColumns.attendanceHistory" (click)="toggleColumn('attendanceHistory')">
+            <i class="fa-solid" [class.fa-square-check]="selectedColumns.attendanceHistory" [class.fa-square]="!selectedColumns.attendanceHistory"></i>
             Frequência de Atendimento
           </div>
         </div>
