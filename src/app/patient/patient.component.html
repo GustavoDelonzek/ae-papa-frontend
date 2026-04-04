@@ -364,21 +364,6 @@
         <div class="filters-container">
             <div class="filters-row">
                 <div class="filter-group">
-                    <!-- Status Filter -->
-                    <div class="select-wrapper">
-                        <i class="fas fa-info-circle input-icon"></i>
-                        <select [(ngModel)]="statusFilter" (change)="onFilterChange()"
-                            [class.active-select]="statusFilter">
-                            <option value="" disabled selected>Status</option>
-                            <option value="">Todos</option>
-                            <option value="scheduled">Agendado</option>
-                            <option value="confirmed">Confirmado</option>
-                            <option value="completed">Concluído</option>
-                            <option value="cancelled">Cancelado</option>
-                        </select>
-                        <i class="fas fa-chevron-down select-arrow"></i>
-                    </div>
-
                     <!-- Objective Filter -->
                     <div class="select-wrapper">
                         <i class="fas fa-bullseye input-icon"></i>
@@ -426,10 +411,8 @@
             </div>
             <div class="appt-details">
               <h3>{{ getObjectiveText(appointment.objective) }}</h3>
-              <p class="obs" *ngIf="appointment.observations">{{ appointment.observations }}</p>
-              <span class="status-tag" [ngClass]="appointment.status || 'pending'">
-                {{ getStatusText(appointment.status || 'pending') }}
-              </span>
+              <p class="obs" *ngIf="appointment.observations && canViewObservations()">{{ appointment.observations }}</p>
+
             </div>
             <div class="appt-actions">
               <button (click)="viewAppointment(appointment.id!); $event.stopPropagation()" class="btn-icon">
@@ -592,7 +575,7 @@
             <input type="hidden" name="objective" [(ngModel)]="newAppointment.objective" required>
           </div>
 
-          <div class="patient-appt-field-group">
+          <div class="patient-appt-field-group" *ngIf="canEditObservations()">
             <label class="patient-appt-field-label">Observacoes</label>
             <textarea name="observations" class="patient-appt-input patient-appt-textarea" rows="4"
               [(ngModel)]="newAppointment.observations"></textarea>

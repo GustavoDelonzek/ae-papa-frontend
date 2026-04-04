@@ -56,7 +56,6 @@ export class AppointmentListComponent implements OnInit {
 
   // Filtros
   searchTerm: string = '';
-  statusFilter: string = '';
   objectiveFilter: string = '';
 
   // ========================================
@@ -116,7 +115,6 @@ export class AppointmentListComponent implements OnInit {
     };
 
     if (this.searchTerm) filters.search = this.searchTerm;
-    if (this.statusFilter) filters.status = this.statusFilter;
     if (this.objectiveFilter) filters.objective = this.objectiveFilter;
 
     if (this.sortColumn) {
@@ -157,15 +155,22 @@ export class AppointmentListComponent implements OnInit {
 
   clearFilters(): void {
     this.searchTerm = '';
-    this.statusFilter = '';
     this.objectiveFilter = '';
     this.loadAppointments(1);
   }
 
   // ====== Event Handlers ======
 
+  canViewObservations(): boolean {
+    return this.authService.isSocialWorker();
+  }
+
+  canEditObservations(): boolean {
+    return this.authService.isSocialWorker();
+  }
+
   hasActiveFilters(): boolean {
-    return !!(this.searchTerm || this.statusFilter || this.objectiveFilter);
+    return !!(this.searchTerm || this.objectiveFilter);
   }
 
   onSort(column: string): void {
@@ -238,19 +243,7 @@ export class AppointmentListComponent implements OnInit {
     return map[objective] || '';
   }
 
-  getStatusClass(status: string): string {
-    return status || 'pending';
-  }
 
-  getStatusText(status: string): string {
-    const statusMap: { [key: string]: string } = {
-      'pending': 'Pendente',
-      'confirmed': 'Confirmado',
-      'completed': 'Concluído',
-      'cancelled': 'Cancelado'
-    };
-    return statusMap[status] || status;
-  }
 
   // ========================================
   // Modal de Criação

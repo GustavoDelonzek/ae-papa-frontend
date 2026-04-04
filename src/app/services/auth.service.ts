@@ -105,6 +105,14 @@ export class AuthService {
   }
 
   /**
+   * Verificar se o usuário atual é Assistente Social
+   */
+  isSocialWorker(): boolean {
+    const user = this.getCurrentUser();
+    return user && user.role === 'social_worker';
+  }
+
+  /**
    * Salvar dados de autenticação
    */
   setAuthData(user: any, token: string): void {

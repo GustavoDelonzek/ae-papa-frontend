@@ -33,22 +33,6 @@
 
             <div class="filters-row">
                 <div class="filter-group">
-
-                    <!-- Status Filter (Select) -->
-                    <div class="select-wrapper">
-                        <i class="fas fa-info-circle input-icon"></i>
-                        <select [(ngModel)]="statusFilter" (change)="onFilterChange()"
-                            [class.active-select]="statusFilter">
-                            <option value="" disabled selected>Status</option>
-                            <option value="">Todos</option>
-                            <option value="scheduled">Agendado</option>
-                            <option value="confirmed">Confirmado</option>
-                            <option value="completed">Concluído</option>
-                            <option value="cancelled">Cancelado</option>
-                        </select>
-                        <i class="fas fa-chevron-down select-arrow"></i>
-                    </div>
-
                     <!-- Objective Filter (Select) -->
                     <div class="select-wrapper">
                         <i class="fas fa-bullseye input-icon"></i>
@@ -100,11 +84,7 @@
                                 class="fas" [ngClass]="sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down'"
                                 *ngIf="sortColumn === 'date'"></i></th>
                         <th>OBJETIVO</th>
-                        <th (click)="onSort('status')">STATUS <i class="fas fa-sort"
-                                *ngIf="sortColumn !== 'status'"></i><i class="fas"
-                                [ngClass]="sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down'"
-                                *ngIf="sortColumn === 'status'"></i></th>
-                        <th>OBSERVAÇÕES</th>
+
                         <th class="text-right">AÇÕES</th>
                     </tr>
                 </thead>
@@ -138,15 +118,8 @@
                                 {{ getObjectiveText(item.objective) }}
                             </span>
                         </td>
-                        <td>
-                            <span class="status-dot-badge" [ngClass]="getStatusClass(item.status || '')">
-                                <i class="fas fa-circle"></i>
-                                {{ getStatusText(item.status || 'pending') }}
-                            </span>
-                        </td>
-                        <td class="observations-cell" [attr.title]="item.observations || '-'">
-                            <span class="observations-text">{{ item.observations || '-' }}</span>
-                        </td>
+
+
                         <td class="actions-cell">
                             <button class="btn-icon edit" (click)="onEditAppointment(item); $event.stopPropagation()">
                                 <i class="fas fa-pencil-alt"></i>
@@ -366,7 +339,7 @@
                         </div>
 
                         <!-- Observações -->
-                        <div class="appt-field-group">
+                        <div class="appt-field-group" *ngIf="canEditObservations()">
                             <label class="appt-field-label">
                                 Observações <span class="appt-optional">(opcional)</span>
                             </label>

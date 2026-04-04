@@ -55,13 +55,13 @@
             </div>
 
             <!-- Observations Section -->
-            <div class="observations-card">
+            <div class="observations-card" *ngIf="canViewObservations()">
                 <div class="card-header-simple">
                     <i class="fas fa-align-left"></i>
                     <h4>Observações do Atendimento</h4>
                 </div>
                 <div class="card-content">
-                    <p class="observations-text" *ngIf="appointment.observations; else noObs">
+                    <p class="observations-text" *ngIf="appointment.observations && canViewObservations(); else noObs">
                         {{ appointment.observations }}
                     </p>
                     <ng-template #noObs>
@@ -69,11 +69,7 @@
                     </ng-template>
                 </div>
 
-                <!-- Alert/Footer Area inside card if needed, e.g. status -->
-                <div class="card-footer-alert" *ngIf="appointment.status === 'pending'">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <span>Atendimento pendente de finalização.</span>
-                </div>
+
             </div>
 
             <!-- Footer Meta (Created By/At) -->

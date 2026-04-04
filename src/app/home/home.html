@@ -276,11 +276,7 @@
                     <span class="alert-description" *ngIf="apt.patient">Paciente: {{ apt.patient.full_name }}</span>
                     <span class="alert-description" *ngIf="!apt.patient">Paciente não identificado</span>
                     <span class="alert-description">Data: {{ formatAppointmentDate(apt.date) }}</span>
-                    <span class="alert-description">Status: {{ getStatusText(apt.status) }}</span>
-                    <span class="alert-description" *ngIf="apt.observations">Observações: {{ apt.observations }}</span>
                   </div>
-                  <span class="alert-badge" *ngIf="apt.status === 'done' || apt.status === 'completed'">CONCLUÍDO</span>
-                  <span class="alert-badge" *ngIf="apt.status === 'canceled' || apt.status === 'cancelled'" style="background: #fee2e2; color: #991b1b;">CANCELADO</span>
                 </div>
                 
               </div>

@@ -94,7 +94,6 @@ export class PatientComponent implements OnInit {
   savingAppointment = false;
   appointmentErrorMessage = '';
 
-  statusFilter: string = '';
   objectiveFilter: string = '';
   minAppointmentDate: string = this.getTodayISODate();
 
@@ -234,6 +233,14 @@ export class PatientComponent implements OnInit {
 
   formatDate(date: string): string {
     return SharedUtils.formatDate(date);
+  }
+
+  canViewObservations(): boolean {
+    return this.authService.isSocialWorker();
+  }
+
+  canEditObservations(): boolean {
+    return this.authService.isSocialWorker();
   }
 
   showEditModal: boolean = false;
@@ -479,7 +486,6 @@ export class PatientComponent implements OnInit {
     this.appointmentErrorMessage = '';
 
     const filters: any = { patient_id: this.patientId };
-    if (this.statusFilter) filters.status = this.statusFilter;
     if (this.objectiveFilter) filters.objective = this.objectiveFilter;
 
     this.appointmentService.listAppointments(1, 100, filters).subscribe({
@@ -499,11 +505,10 @@ export class PatientComponent implements OnInit {
   }
 
   hasActiveFilters(): boolean {
-    return !!(this.statusFilter || this.objectiveFilter);
+    return !!(this.objectiveFilter);
   }
 
   clearFilters(): void {
-    this.statusFilter = '';
     this.objectiveFilter = '';
     this.loadAppointments();
   }
@@ -595,16 +600,7 @@ export class PatientComponent implements OnInit {
     return SharedUtils.formatDate(date);
   }
 
-  getStatusText(status: string): string {
-    const statusMap: { [key: string]: string } = {
-      'scheduled': 'Agendada',
-      'confirmed': 'Confirmada',
-      'completed': 'Realizada',
-      'cancelled': 'Cancelada',
-      'pending': 'Pendente'
-    };
-    return statusMap[status] || status;
-  }
+
 
   getObjectiveText(objective: string): string {
     const objectiveMap: { [key: string]: string } = {

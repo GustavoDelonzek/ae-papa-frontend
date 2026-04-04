@@ -364,20 +364,7 @@ export class HomeComponent implements OnInit {
     return objectiveMap[objective] || objective;
   }
 
-  getStatusText(status?: string): string {
-    const normalized = (status || 'pending').toLowerCase();
-    const statusMap: { [key: string]: string } = {
-      pending: 'Pendente',
-      scheduled: 'Agendado',
-      confirmed: 'Confirmado',
-      completed: 'Concluído',
-      done: 'Concluído',
-      cancelled: 'Cancelado',
-      canceled: 'Cancelado'
-    };
 
-    return statusMap[normalized] || 'Pendente';
-  }
 
   formatAppointmentDate(date?: string): string {
     return SharedUtils.formatDate(date);
@@ -392,5 +379,9 @@ export class HomeComponent implements OnInit {
     const month = String(parsed.getMonth() + 1).padStart(2, '0');
     const day = String(parsed.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  canViewObservations(): boolean {
+    return this.authService.isSocialWorker();
   }
 }

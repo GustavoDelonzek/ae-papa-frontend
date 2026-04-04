@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Appointment } from '../../../core/models/appointment.model';
 import { SharedUtils } from '../../../core/utils/shared-utils';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
     selector: 'app-appointment-details-modal',
@@ -15,6 +16,12 @@ export class AppointmentDetailsModalComponent {
     @Input() appointment: Appointment | null = null;
     @Output() close = new EventEmitter<void>();
     @Output() edit = new EventEmitter<Appointment>();
+
+    constructor(private authService: AuthService) {}
+
+    canViewObservations(): boolean {
+        return this.authService.isSocialWorker();
+    }
 
     closeModal(): void {
         this.close.emit();

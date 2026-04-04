@@ -5,6 +5,7 @@ import { AuthService, UserService, User } from '../services';
 interface UserCreateData {
   name: string;
   email: string;
+  role: string;
   password: string;
   password_confirmation: string;
 }
@@ -37,6 +38,7 @@ export class UserRegisterComponent implements OnInit {
   userData: UserCreateData = {
     name: '',
     email: '',
+    role: 'clinical',
     password: '',
     password_confirmation: ''
   };
@@ -169,8 +171,9 @@ export class UserRegisterComponent implements OnInit {
   getRoleLabel(role: string): string {
     const normalized = (role || '').toLowerCase();
     if (normalized === 'admin') return 'Administrador';
-    if (normalized === 'clinical') return 'Clínico';
+    if (normalized === 'clinical') return 'Comum';
     if (normalized === 'reception') return 'Recepção';
+    if (normalized === 'social_worker') return 'Assistente Social';
     return role || '-';
   }
 
@@ -265,6 +268,7 @@ export class UserRegisterComponent implements OnInit {
     this.userData = {
       name: '',
       email: '',
+      role: 'clinical',
       password: '',
       password_confirmation: ''
     };
