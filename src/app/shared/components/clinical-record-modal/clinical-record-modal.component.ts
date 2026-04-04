@@ -5,8 +5,8 @@ import { ClinicalRecord, ClinicalRecordService } from '../../../services/clinica
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
 import { SharedUtils } from '../../../core/utils/shared-utils';
+import { DateMaskDirective } from '../../directives/date-mask.directive';
 
 @Component({
     selector: 'app-clinical-record-modal',
@@ -17,7 +17,7 @@ import { SharedUtils } from '../../../core/utils/shared-utils';
         MatFormFieldModule,
         MatInputModule,
         MatDatepickerModule,
-        MatNativeDateModule
+        DateMaskDirective
     ],
     templateUrl: './clinical-record-modal.component.html',
     styleUrls: ['./clinical-record-modal.component.scss'],

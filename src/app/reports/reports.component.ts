@@ -6,11 +6,11 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
 import { ReportsService, ReportConfig } from '../services/reports.service';
 import { SharedUtils } from '../core/utils/shared-utils';
 import { finalize } from 'rxjs/operators';
 import { ToastService } from '../services/toast.service'; // Assuming ToastService is in services folder
+import { DateMaskDirective } from '../shared/directives/date-mask.directive';
 
 @Component({
   selector: 'app-reports',
@@ -23,7 +23,7 @@ import { ToastService } from '../services/toast.service'; // Assuming ToastServi
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    DateMaskDirective
   ],
   templateUrl: './reports.component.html',
   styleUrl: './reports.component.scss'

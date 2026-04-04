@@ -2,7 +2,8 @@ import { ApplicationConfig, APP_INITIALIZER, LOCALE_ID, importProvidersFrom } fr
 import { provideRouter, Router } from '@angular/router';
 import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
+import { MAT_DATE_LOCALE, DateAdapter, MAT_DATE_FORMATS, MAT_NATIVE_DATE_FORMATS } from '@angular/material/core';
+import { CustomDateAdapter } from './core/adapters/custom-date-adapter';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 import { routes } from './app-routing-module';
@@ -31,7 +32,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimations(),
     provideCharts(withDefaultRegisterables()),
-    provideNativeDateAdapter(),
+    { provide: DateAdapter, useClass: CustomDateAdapter, deps: [MAT_DATE_LOCALE] },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
@@ -44,6 +45,7 @@ export const appConfig: ApplicationConfig = {
       multi: true
     },
     { provide: MAT_DATE_LOCALE, useValue: 'pt-BR' },
-    { provide: LOCALE_ID, useValue: 'pt-BR' }
+    { provide: LOCALE_ID, useValue: 'pt-BR' },
+    { provide: MAT_DATE_FORMATS, useValue: MAT_NATIVE_DATE_FORMATS }
   ]
 };

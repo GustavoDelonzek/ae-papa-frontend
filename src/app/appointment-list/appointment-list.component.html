@@ -266,7 +266,7 @@
                                     <input matInput [matDatepicker]="pickerApptDate" name="appointmentDate"
                                         [(ngModel)]="appointmentDate"
                                         placeholder="DD/MM/AAAA"
-                                        [disabled]="submitting" required readonly (click)="pickerApptDate.open()">
+                                        [disabled]="submitting" required appDateMask (click)="pickerApptDate.open()">
                                     <mat-datepicker-toggle matIconSuffix [for]="pickerApptDate"></mat-datepicker-toggle>
                                     <mat-datepicker #pickerApptDate></mat-datepicker>
                                 </mat-form-field>

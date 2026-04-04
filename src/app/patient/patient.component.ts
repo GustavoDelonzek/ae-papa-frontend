@@ -21,8 +21,8 @@ import { DocumentUploadComponent } from '../document-upload/document-upload.comp
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
 import { SecureImageDirective } from '../core/directives/secure-image.directive';
+import { DateMaskDirective } from '../shared/directives/date-mask.directive';
 
 @Component({
   selector: 'app-patient',
@@ -42,8 +42,8 @@ import { SecureImageDirective } from '../core/directives/secure-image.directive'
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
-    MatNativeDateModule,
-    SecureImageDirective
+    SecureImageDirective,
+    DateMaskDirective
   ],
   templateUrl: './patient.component.html',
   styleUrls: ['./patient.component.scss'],

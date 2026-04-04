@@ -11,6 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { DateMaskDirective } from '../../directives/date-mask.directive';
 
 @Component({
     selector: 'app-patient-form-modal',
@@ -22,7 +23,8 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
         MatInputModule,
         MatIconModule,
         MatDatepickerModule,
-        MatSnackBarModule
+        MatSnackBarModule,
+        DateMaskDirective
     ],
     templateUrl: './patient-form-modal.component.html',
     styleUrls: ['./patient-form-modal.component.scss'],

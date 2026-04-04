@@ -71,7 +71,7 @@
                                     <label>Data de Nascimento <span class="required">*</span></label>
                                     <mat-form-field class="custom-mat-form-field">
                                         <input matInput [matDatepicker]="pickerBirth" name="birth_date"
-                                            [(ngModel)]="currentPatient.birth_date" [max]="maxBirthDate" required placeholder="DD/MM/AAAA" readonly (click)="pickerBirth.open()">
+                                            [(ngModel)]="currentPatient.birth_date" [max]="maxBirthDate" required placeholder="DD/MM/AAAA" appDateMask (click)="pickerBirth.open()">
                                         <mat-datepicker-toggle matIconSuffix [for]="pickerBirth"></mat-datepicker-toggle>
                                         <mat-datepicker #pickerBirth startView="multi-year"></mat-datepicker>
                                     </mat-form-field>

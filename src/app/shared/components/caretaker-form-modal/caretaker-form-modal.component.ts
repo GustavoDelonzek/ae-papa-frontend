@@ -7,8 +7,8 @@ import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { DateMaskDirective } from '../../directives/date-mask.directive';
 
 @Component({
     selector: 'app-caretaker-form-modal',
@@ -19,8 +19,8 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
         MatFormFieldModule,
         MatInputModule,
         MatDatepickerModule,
-        MatNativeDateModule,
-        MatSnackBarModule
+        MatSnackBarModule,
+        DateMaskDirective
     ],
     templateUrl: './caretaker-form-modal.component.html',
     styleUrls: ['./caretaker-form-modal.component.scss'],

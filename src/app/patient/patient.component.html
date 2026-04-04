@@ -513,7 +513,7 @@
             <div class="patient-appt-input-wrapper custom-date-picker-wrapper">
               <mat-form-field class="custom-mat-form-field" style="width: 100%;">
                   <input matInput [matDatepicker]="pickerPatientApptModal" name="date"
-                    [(ngModel)]="newAppointment.date" [min]="minAppointmentDate" required placeholder="DD/MM/AAAA" readonly (click)="pickerPatientApptModal.open()">
+                    [(ngModel)]="newAppointment.date" [min]="minAppointmentDate" required placeholder="DD/MM/AAAA" appDateMask (click)="pickerPatientApptModal.open()">
                   <mat-datepicker-toggle matIconSuffix [for]="pickerPatientApptModal"></mat-datepicker-toggle>
                   <mat-datepicker #pickerPatientApptModal></mat-datepicker>
               </mat-form-field>
