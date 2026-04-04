@@ -23,6 +23,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { SecureImageDirective } from '../core/directives/secure-image.directive';
 import { DateMaskDirective } from '../shared/directives/date-mask.directive';
+import { ConfirmationModalComponent } from '../shared/components/confirmation-modal/confirmation-modal.component';
 
 @Component({
   selector: 'app-patient',
@@ -43,7 +44,8 @@ import { DateMaskDirective } from '../shared/directives/date-mask.directive';
     MatInputModule,
     MatDatepickerModule,
     SecureImageDirective,
-    DateMaskDirective
+    DateMaskDirective,
+    ConfirmationModalComponent
   ],
   templateUrl: './patient.component.html',
   styleUrls: ['./patient.component.scss'],

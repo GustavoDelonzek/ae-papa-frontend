@@ -1,0 +1,36 @@
+<div class="modal-overlay" *ngIf="visible" (click)="onClose()">
+  <div class="modal-content" [class.danger-theme]="isDanger" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="header-icon-box">
+        <i class="fas" [ngClass]="isDanger ? 'fa-exclamation-triangle' : confirmIcon"></i>
+      </div>
+      <button class="btn-close" (click)="onClose()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <h2>{{ title }}</h2>
+      <p class="message" [innerHTML]="message"></p>
+      
+      <div class="description-box" *ngIf="description">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>{{ description }}</span>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="onClose()" [disabled]="isLoading">
+        {{ cancelText }}
+      </button>
+      <button class="btn-confirm" 
+              [class.btn-danger]="isDanger" 
+              (click)="onConfirm()" 
+              [disabled]="isLoading">
+        <i class="fas fa-spinner fa-spin" *ngIf="isLoading"></i>
+        <i class="fas" [ngClass]="confirmIcon" *ngIf="!isLoading"></i>
+        {{ isLoading ? 'Aguarde...' : confirmText }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -10,6 +10,7 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
 import { PatientFormModalComponent } from '../shared/components/patient-form-modal/patient-form-modal.component';
 import { Title } from '@angular/platform-browser';
 import { SecureImageDirective } from '../core/directives/secure-image.directive';
+import { ConfirmationModalComponent } from '../shared/components/confirmation-modal/confirmation-modal.component';
 
 @Component({
   selector: 'app-patient-list',
@@ -20,7 +21,8 @@ import { SecureImageDirective } from '../core/directives/secure-image.directive'
     RouterModule,
     SidebarComponent,
     PatientFormModalComponent,
-    SecureImageDirective
+    SecureImageDirective,
+    ConfirmationModalComponent
   ],
   templateUrl: './patient-list.component.html',
   styleUrls: ['./patient-list.component.scss'],

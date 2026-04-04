@@ -19,6 +19,7 @@ export interface Patient {
   created_at?: string;
   updated_at?: string;
   deleted_at?: string | null;
+  status?: string;
   socioeconomic_profile?: SocioeconomicProfile;
   caregivers?: Caretaker[];
   clinical_records?: ClinicalRecord[];
