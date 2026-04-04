@@ -216,6 +216,9 @@ export class AppointmentListComponent implements OnInit {
       'project': 'Projeto',
       'treatment': 'Tratamento',
       'research': 'Pesquisa',
+      'visit': 'Visita',
+      'mesa_brasil': 'Mesa Brasil',
+      'social_assistance': 'Sócio Assistencial',
       'other': 'Outro'
     };
     return objectiveMap[objective] || objective;
@@ -225,7 +228,12 @@ export class AppointmentListComponent implements OnInit {
     const map: { [key: string]: string } = {
       'donation': 'objective-donation',
       'treatment': 'objective-treatment',
-      'exam': 'objective-exam'
+      'exam': 'objective-exam',
+      'project': 'objective-project',
+      'research': 'objective-research',
+      'visit': 'objective-visit',
+      'mesa_brasil': 'objective-mesa-brasil',
+      'social_assistance': 'objective-social-assistance'
     };
     return map[objective] || '';
   }

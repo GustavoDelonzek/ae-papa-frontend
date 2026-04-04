@@ -60,6 +60,9 @@
                             <option value="project">Projeto</option>
                             <option value="treatment">Tratamento</option>
                             <option value="research">Pesquisa</option>
+                            <option value="visit">Visita</option>
+                            <option value="mesa_brasil">Mesa Brasil</option>
+                            <option value="social_assistance">Sócio Assistencial</option>
                             <option value="other">Outro</option>
                         </select>
                         <i class="fas fa-chevron-down select-arrow"></i>
@@ -337,6 +340,27 @@
                                     (click)="appointmentObjective = 'other'">
                                     <i class="fas fa-ellipsis-h"></i>
                                     <span>Outro</span>
+                                </button>
+                                <button type="button" class="appt-obj-card"
+                                    [class.appt-obj-active]="appointmentObjective === 'visit'"
+                                    [class.appt-obj-visit]="true"
+                                    (click)="appointmentObjective = 'visit'">
+                                    <i class="fas fa-house-user"></i>
+                                    <span>Visita</span>
+                                </button>
+                                <button type="button" class="appt-obj-card"
+                                    [class.appt-obj-active]="appointmentObjective === 'mesa_brasil'"
+                                    [class.appt-obj-mesa-brasil]="true"
+                                    (click)="appointmentObjective = 'mesa_brasil'">
+                                    <i class="fas fa-utensils"></i>
+                                    <span>Mesa Brasil</span>
+                                </button>
+                                <button type="button" class="appt-obj-card"
+                                    [class.appt-obj-active]="appointmentObjective === 'social_assistance'"
+                                    [class.appt-obj-social-assistance]="true"
+                                    (click)="appointmentObjective = 'social_assistance'">
+                                    <i class="fas fa-hands-helping"></i>
+                                    <span>S. Assistencial</span>
                                 </button>
                             </div>
                         </div>

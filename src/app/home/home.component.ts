@@ -355,6 +355,9 @@ export class HomeComponent implements OnInit {
       project: 'Projeto',
       treatment: 'Tratamento',
       research: 'Pesquisa',
+      visit: 'Visita',
+      mesa_brasil: 'Mesa Brasil',
+      social_assistance: 'Sócio Assistencial',
       other: 'Outro'
     };
 

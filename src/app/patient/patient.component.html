@@ -390,6 +390,9 @@
                             <option value="project">Projeto</option>
                             <option value="treatment">Tratamento</option>
                             <option value="research">Pesquisa</option>
+                            <option value="visit">Visita</option>
+                            <option value="mesa_brasil">Mesa Brasil</option>
+                            <option value="social_assistance">Sócio Assistencial</option>
                             <option value="other">Outro</option>
                         </select>
                         <i class="fas fa-chevron-down select-arrow"></i>
@@ -566,6 +569,24 @@
                 [class.patient-appt-obj-other]="true" (click)="newAppointment.objective = 'other'">
                 <i class="fas fa-ellipsis-h"></i>
                 <span>Outro</span>
+              </button>
+              <button type="button" class="patient-appt-obj-card"
+                [class.patient-appt-obj-active]="newAppointment.objective === 'visit'"
+                [class.patient-appt-obj-visit]="true" (click)="newAppointment.objective = 'visit'">
+                <i class="fas fa-house-user"></i>
+                <span>Visita</span>
+              </button>
+              <button type="button" class="patient-appt-obj-card"
+                [class.patient-appt-obj-active]="newAppointment.objective === 'mesa_brasil'"
+                [class.patient-appt-obj-mesa-brasil]="true" (click)="newAppointment.objective = 'mesa_brasil'">
+                <i class="fas fa-utensils"></i>
+                <span>Mesa Brasil</span>
+              </button>
+              <button type="button" class="patient-appt-obj-card"
+                [class.patient-appt-obj-active]="newAppointment.objective === 'social_assistance'"
+                [class.patient-appt-obj-social-assistance]="true" (click)="newAppointment.objective = 'social_assistance'">
+                <i class="fas fa-hands-helping"></i>
+                <span>S. Assistencial</span>
               </button>
             </div>
             <input type="hidden" name="objective" [(ngModel)]="newAppointment.objective" required>

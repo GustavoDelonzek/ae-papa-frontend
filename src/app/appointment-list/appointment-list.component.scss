@@ -628,6 +628,31 @@ $pink-color: #ec4899;
       background-color: #f5f3ff;
       color: #8b5cf6;
     }
+
+    &.objective-project {
+      background-color: #f5f3ff;
+      color: #8b5cf6;
+    }
+
+    &.objective-research {
+      background-color: #fffbeb;
+      color: #f59e0b;
+    }
+
+    &.objective-visit {
+      background-color: #fef2f2;
+      color: #ef4444;
+    }
+
+    &.objective-mesa-brasil {
+      background-color: #fff7ed;
+      color: #f97316;
+    }
+
+    &.objective-social-assistance {
+      background-color: #f0fdfa;
+      color: #14b8a6;
+    }
   }
 }
 
@@ -1512,6 +1537,27 @@ $pink-color: #ec4899;
       background: #f9fafb;
       color: #374151;
       i { color: #6b7280; }
+    }
+
+    &.appt-obj-visit {
+      border-color: #ef4444;
+      background: #fef2f2;
+      color: #b91c1c;
+      i { color: #ef4444; }
+    }
+
+    &.appt-obj-mesa-brasil {
+      border-color: #f97316;
+      background: #fff7ed;
+      color: #c2410c;
+      i { color: #f97316; }
+    }
+
+    &.appt-obj-social-assistance {
+      border-color: #14b8a6;
+      background: #f0fdfa;
+      color: #0f766e;
+      i { color: #14b8a6; }
     }
   }
 }

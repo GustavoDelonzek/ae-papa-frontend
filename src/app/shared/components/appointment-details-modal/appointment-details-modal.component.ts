@@ -41,6 +41,12 @@ export class AppointmentDetailsModalComponent {
             'donation': 'Doação',
             'treatment': 'Tratamento',
             'exam': 'Exame',
+            'project': 'Projeto',
+            'research': 'Pesquisa',
+            'visit': 'Visita',
+            'mesa_brasil': 'Mesa Brasil',
+            'social_assistance': 'Sócio Assistencial',
+            'other': 'Outro',
             'consultation': 'Atendimento'
         };
         return map[objective] || objective;

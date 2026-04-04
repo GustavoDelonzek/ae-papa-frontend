@@ -1445,6 +1445,36 @@ $danger-color: #ef4444;
         color: #6b7280;
       }
     }
+
+    &.patient-appt-obj-visit {
+      border-color: #ef4444;
+      background: #fef2f2;
+      color: #b91c1c;
+
+      i {
+        color: #ef4444;
+      }
+    }
+
+    &.patient-appt-obj-mesa-brasil {
+      border-color: #f97316;
+      background: #fff7ed;
+      color: #c2410c;
+
+      i {
+        color: #f97316;
+      }
+    }
+
+    &.patient-appt-obj-social-assistance {
+      border-color: #14b8a6;
+      background: #f0fdfa;
+      color: #0f766e;
+
+      i {
+        color: #14b8a6;
+      }
+    }
   }
 }
 
