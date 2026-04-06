@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
-import { CaretakerService, Caretaker, PatientService, Patient } from '../services';
+import { CaretakerService, Caretaker, PatientService, Patient, AuthService } from '../services';
 import { SharedUtils } from '../core/utils/shared-utils';
 
 import { CommonModule } from '@angular/common';
@@ -8,6 +8,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { CaretakerFormModalComponent } from '../shared/components/caretaker-form-modal/caretaker-form-modal.component';
+import { DocumentListComponent } from '../document-list/document-list.component';
+import { DocumentUploadComponent } from '../document-upload/document-upload.component';
 
 @Component({
     selector: 'app-caretaker',
@@ -17,7 +19,9 @@ import { CaretakerFormModalComponent } from '../shared/components/caretaker-form
         FormsModule, 
         RouterModule,
         SidebarComponent,
-        CaretakerFormModalComponent
+        CaretakerFormModalComponent,
+        DocumentListComponent,
+        DocumentUploadComponent
     ],
     templateUrl: './caretaker.component.html',
     styleUrls: ['./caretaker.component.scss'],
@@ -39,14 +43,22 @@ export class CaretakerComponent implements OnInit {
     newRelationKinship: string = '';
     savingRelation: boolean = false;
 
+    showUploadModal = false;
+    currentUserId: number = 0;
+    @ViewChild('docList') docList: any;
+
     constructor(
         private route: ActivatedRoute,
         private router: Router,
         private caretakerService: CaretakerService,
-        private patientService: PatientService
+        private patientService: PatientService,
+        private authService: AuthService
     ) { }
 
     ngOnInit(): void {
+        const user = this.authService.getCurrentUser();
+        this.currentUserId = user?.id || 0;
+
         this.route.params.subscribe((params: Params) => {
             if (params['id']) {
                 this.caretakerId = parseInt(params['id'], 10);
@@ -230,5 +242,20 @@ export class CaretakerComponent implements OnInit {
         if (!id) return 'bg-blue';
         const colors = ['bg-blue', 'bg-green', 'bg-purple', 'bg-orange', 'bg-teal'];
         return colors[id % colors.length];
+    }
+
+    addDocument(): void {
+        this.showUploadModal = true;
+    }
+
+    closeUploadModal(): void {
+        this.showUploadModal = false;
+    }
+
+    onDocumentUploadSuccess(): void {
+        this.showUploadModal = false;
+        if (this.docList) {
+            this.docList.loadDocuments();
+        }
     }
 }

@@ -12,7 +12,9 @@ import { DocumentUpload } from '../core/models/document.model';
   styleUrls: ['./document-upload.component.scss']
 })
 export class DocumentUploadComponent {
-  @Input() patientId!: number;
+  // - [x] Update `DocumentListComponent` to accept `@Input() caregiverId` and filter by it.
+  @Input() patientId?: number;
+  @Input() caregiverId?: number;
   @Input() user_id!: number;
   @Output() onClose = new EventEmitter<void>();
   @Output() onSuccess = new EventEmitter<void>();
@@ -93,6 +95,7 @@ export class DocumentUploadComponent {
     const uploadData: DocumentUpload = {
       file: this.selectedFile,
       patient_id: this.patientId,
+      caregiver_id: this.caregiverId,
       user_id: this.user_id,
       file_name: this.fileName.trim(),
       document_type: this.documentType.trim() || undefined,

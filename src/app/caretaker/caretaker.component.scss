@@ -41,17 +41,38 @@ $border-color: #e5e7eb;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        gap: 1rem;
+
+        @media (max-width: 640px) {
+            flex-direction: column;
+            align-items: flex-start;
+        }
 
         h1 {
             font-size: 2rem;
             font-weight: 700;
             color: $text-dark;
             margin: 0;
+
+            @media (max-width: 640px) {
+                font-size: 1.5rem;
+            }
         }
 
         .header-actions {
             display: flex;
             gap: 1rem;
+
+            @media (max-width: 640px) {
+                width: 100%;
+                
+                button {
+                    flex: 1;
+                    justify-content: center;
+                    padding: 0.6rem 1rem;
+                    font-size: 0.9rem;
+                }
+            }
         }
     }
 }
@@ -221,33 +242,39 @@ $border-color: #e5e7eb;
     }
 }
 
-// Info Card
-.info-card {
-    .card-header {
+// Shared Card Header Styles
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+
+    .icon-wrapper {
+        width: 40px;
+        height: 40px;
+        background-color: #f3e8ff;
+        color: $primary-color;
+        border-radius: 8px;
         display: flex;
         align-items: center;
-        gap: 1rem;
-        margin-bottom: 2rem;
+        justify-content: center;
 
-        .icon-wrapper {
-            width: 40px;
-            height: 40px;
-            background-color: #f3e8ff;
+        i {
+            font-size: 1.2rem;
             color: $primary-color;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin: 0;
-            color: $text-dark;
         }
     }
 
+    h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 0;
+        color: $text-dark;
+    }
+}
+
+// Info Card
+.info-card {
     .info-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -417,11 +444,28 @@ $border-color: #e5e7eb;
 }
 
 .timestamps {
-    margin-top: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid $border-color;
     font-size: 0.8rem;
     color: color.adjust($text-secondary, $lightness: 10%);
     display: flex;
-    gap: 1.5rem;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+
+    @media (max-width: 640px) {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+        text-align: center;
+    }
+
+    span {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
 }
 
 // Modals Overlay (Reimported/Redefined if needed or global)
@@ -442,10 +486,16 @@ $border-color: #e5e7eb;
 .modal-content {
     background: white;
     padding: 2rem;
-    border-radius: 12px;
-    width: 100%;
+    border-radius: 16px;
+    width: 90%;
     max-width: 500px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+    @media (max-width: 640px) {
+        padding: 1.5rem;
+    }
 
     h3 {
         margin-top: 0;
@@ -454,6 +504,7 @@ $border-color: #e5e7eb;
         display: flex;
         align-items: center;
         gap: 0.75rem;
+        font-size: 1.25rem;
 
         i {
             color: $primary-color;

@@ -16,7 +16,12 @@ export class DocumentService {
     const formData = new FormData();
 
     formData.append('file', documentData.file);
-    formData.append('patient_id', documentData.patient_id.toString());
+    if (documentData.caregiver_id) {
+      formData.append('caregiver_id', documentData.caregiver_id.toString());
+    } else if (documentData.patient_id) {
+      formData.append('patient_id', documentData.patient_id.toString());
+    }
+    
     formData.append('user_id', documentData.user_id.toString());
     formData.append('file_name', documentData.file_name);
 
@@ -41,6 +46,9 @@ export class DocumentService {
     if (filters) {
       if (filters.patient_id) {
         params = params.set('patient_id', filters.patient_id.toString());
+      }
+      if (filters.caregiver_id) {
+        params = params.set('caregiver_id', filters.caregiver_id.toString());
       }
       if (filters.document_type) {
         params = params.set('document_type', filters.document_type);

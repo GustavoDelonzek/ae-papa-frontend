@@ -34,7 +34,7 @@
         </header>
 
         <div class="caretaker-grid">
-            <!-- Left Column: Profile & Personal Info -->
+            <!-- Left Column: Profile, Personal Info & Documents -->
             <div class="left-column">
                 <!-- Profile Card -->
                 <section class="card profile-card">
@@ -45,7 +45,7 @@
                         </div>
                         <div class="profile-details">
                             <h2>{{ caretakerData.full_name }}</h2>
-                            <p class="role-text">Cuidador Certificado</p>
+                            <p class="role-text">Cuidador</p>
 
                             <div class="badges-row">
                                 <span class="badge-soft-purple">
@@ -89,12 +89,18 @@
                     </div>
                 </section>
 
-                <div class="timestamps">
-                    <span><i class="far fa-calendar-check"></i> Cadastrado em: {{ formatDate(caretakerData.created_at!)
-                        }}</span>
-                    <span *ngIf="caretakerData.updated_at"><i class="fas fa-sync-alt"></i> Atualizado em: {{
-                        formatDate(caretakerData.updated_at) }}</span>
-                </div>
+                <!-- Documents Section (Now inside left-column for alignment) -->
+                <section class="card documents-card">
+                    <div class="card-header">
+                        <div class="icon-wrapper">
+                            <i class="fas fa-folder-open"></i>
+                        </div>
+                        <h3>Documentos do Cuidador</h3>
+                    </div>
+
+                    <app-document-list #docList [caregiverId]="caretakerId" (onUploadClick)="addDocument()">
+                    </app-document-list>
+                </section>
             </div>
 
             <!-- Right Column: Patients -->
@@ -138,8 +144,20 @@
                 </section>
             </div>
         </div>
+
+        <div class="timestamps">
+            <span><i class="far fa-calendar-check"></i> Cadastrado em: {{ formatDate(caretakerData.created_at!)
+                }}</span>
+            <span *ngIf="caretakerData.updated_at"><i class="fas fa-sync-alt"></i> Atualizado em: {{
+                formatDate(caretakerData.updated_at) }}</span>
+        </div>
     </ng-container>
 </div>
+
+<!-- Document Upload Modal -->
+<app-document-upload *ngIf="showUploadModal" [caregiverId]="caretakerId" [user_id]="currentUserId"
+    (onClose)="closeUploadModal()" (onSuccess)="onDocumentUploadSuccess()">
+</app-document-upload>
 
 <!-- Edit Modal -->
 <app-caretaker-form-modal [visible]="showEditModal" [caretaker]="caretakerData" (close)="closeEditModal()"

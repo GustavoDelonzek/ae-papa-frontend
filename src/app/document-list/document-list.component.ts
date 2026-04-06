@@ -27,7 +27,10 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrls: ['./document-list.component.scss']
 })
 export class DocumentListComponent implements OnInit, OnDestroy {
-  @Input() patientId!: number;
+  // - [x] Update `DocumentListComponent` to accept `@Input() caregiverId` and filter by it.
+  // - [/] Update `DocumentUploadComponent` to accept `@Input() caregiverId` and send it during upload.
+  @Input() patientId?: number;
+  @Input() caregiverId?: number;
   @Output() onUploadClick = new EventEmitter<void>();
 
   documents: Document[] = [];
@@ -72,7 +75,8 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     const formattedEndDate = SharedUtils.formatDateForAPI(this.endDate);
 
     return {
-      patient_id: this.patientId,
+      ...(this.patientId && { patient_id: this.patientId }),
+      ...(this.caregiverId && { caregiver_id: this.caregiverId }),
       per_page: this.perPage,
       page: page,
       ...(this.statusFilter && { status: this.statusFilter }),

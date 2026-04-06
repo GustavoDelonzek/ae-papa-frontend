@@ -157,13 +157,10 @@ export class PatientComponent implements OnInit {
             ...c,
             kinship: c.pivot?.kinship || c.kinship || '',
             patient_id: this.patientId,
-            // Mock contacts if not present
-            contacts: c.contacts || [
-              { type: 'phone', value: '(11) 98765-4321', is_primary: true },
-              { type: 'email', value: 'email@exemplo.com', is_primary: true },
-              { type: 'phone', value: '(11) 91234-5678', is_primary: false }
-            ]
+            // Map contacts from caregiver if present
+            contacts: c.contacts || []
           }));
+          this.applyCaretakerFilters();
         }
 
         this.loading = false;
@@ -357,11 +354,31 @@ export class PatientComponent implements OnInit {
   loadCaretakers(): void {
     this.loadingCaretakers = true;
 
-    this.caretakerService.getCaretakers(1, 100).subscribe({
+    // Use current patientId as a formal filter for the API
+    const filters = { patient_id: this.patientId };
+
+    this.caretakerService.getCaretakers(1, 100, filters).subscribe({
       next: (response: any) => {
-        this.caretakers = (response.data || []).filter(
-          (caretaker: Caretaker) => caretaker.patient_id === this.patientId
-        );
+        const rawCaretakers = response.data || [];
+        
+        // Robust filtering to ensure we capture all relationship types (Direct, N:N Patients, and Pivot)
+        this.caretakers = rawCaretakers.filter((caretaker: Caretaker) => {
+          const isDirectLink = caretaker.patient_id === this.patientId;
+          const isInPatientsArray = caretaker.patients?.some(p => p.id === this.patientId);
+          const hasPivotData = caretaker.pivot?.patient_id === this.patientId;
+          
+          return isDirectLink || isInPatientsArray || hasPivotData;
+        }).map((c: Caretaker) => {
+          // Ensure kinship is correctly mapped from pivot if available
+          const kinshipFromPivot = c.pivot?.kinship;
+          const kinshipFromPatientsArray = c.patients?.find(p => p.id === this.patientId)?.kinship;
+          
+          return {
+            ...c,
+            kinship: kinshipFromPivot || kinshipFromPatientsArray || c.kinship || ''
+          };
+        });
+
         this.applyCaretakerFilters();
         this.loadingCaretakers = false;
       },

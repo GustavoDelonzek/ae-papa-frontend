@@ -100,6 +100,7 @@ export class CaretakerService {
       params = params.set('birth_year', (filters.birth_year || filters.birthYear).toString());
     }
 
+    if (filters.patient_id) params = params.set('patient_id', filters.patient_id.toString());
     if (filters.sort_by) params = params.set('sort_by', filters.sort_by);
     if (filters.sort_order) params = params.set('sort_order', filters.sort_order);
 
