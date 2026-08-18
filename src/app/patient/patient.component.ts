@@ -97,7 +97,6 @@ export class PatientComponent implements OnInit {
   appointmentErrorMessage = '';
 
   objectiveFilter: string = '';
-  minAppointmentDate: string = this.getTodayISODate();
 
   // Appointment Details Modal
   showDetailsModal = false;
@@ -580,15 +579,6 @@ export class PatientComponent implements OnInit {
       return;
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    parsedDate.setHours(0, 0, 0, 0);
-
-    if (parsedDate < today) {
-      this.appointmentErrorMessage = 'A data do atendimento não pode ser anterior a hoje.';
-      return;
-    }
-
     this.savingAppointment = true;
     this.appointmentErrorMessage = '';
 
@@ -783,26 +773,8 @@ export class PatientComponent implements OnInit {
     return contact ? contact.value : null;
   }
 
-  private getTodayISODate(): string {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
   private isInvalidDate(date: string | Date): boolean {
     const parsed = date instanceof Date ? date : SharedUtils.parseDate(date);
     return isNaN(parsed.getTime());
-  }
-
-  private isDateBeforeToday(date: string | Date): boolean {
-    if (this.isInvalidDate(date)) return false;
-    const parsed = date instanceof Date ? date : SharedUtils.parseDate(date);
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    parsed.setHours(0, 0, 0, 0);
-    return parsed < today;
   }
 }
