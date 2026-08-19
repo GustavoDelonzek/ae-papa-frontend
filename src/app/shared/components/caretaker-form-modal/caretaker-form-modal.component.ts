@@ -1,6 +1,8 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CaretakerService, Caretaker, CaretakerResponse, PatientService, Patient } from '../../../services';
 import { SharedUtils } from '../../../core/utils/shared-utils';
+import { Observable, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -56,6 +58,7 @@ export class CaretakerFormModalComponent implements OnChanges {
     searchResults: Patient[] = [];
     selectedPatient: Patient | null = null;
     private patientSearchTimeout: any;
+    private originalKinship: string = '';
 
     currentCaretaker: Caretaker = {
         full_name: '',
@@ -81,6 +84,7 @@ export class CaretakerFormModalComponent implements OnChanges {
             if (this.caretaker) {
                 this.isEditing = true;
                 this.currentCaretaker = { ...this.caretaker };
+                this.originalKinship = this.caretaker.kinship || '';
                 if (this.currentCaretaker.birth_date) {
                     const date = SharedUtils.parseDate(this.currentCaretaker.birth_date);
                     if (!isNaN(date.getTime())) {
@@ -186,6 +190,10 @@ export class CaretakerFormModalComponent implements OnChanges {
         return !this.patientId && !this.isEditing;
     }
 
+    get showKinshipField(): boolean {
+        return !this.isEditing || !!this.patientId;
+    }
+
     resetForm(): void {
         this.currentCaretaker = {
             full_name: '',
@@ -197,6 +205,7 @@ export class CaretakerFormModalComponent implements OnChanges {
             patient_id: this.patientId || undefined
         };
         this.errorMessage = '';
+        this.originalKinship = '';
         this.selectedPatient = null;
         this.searchCpf = '';
         this.showPatientSearch = false;
@@ -214,16 +223,12 @@ export class CaretakerFormModalComponent implements OnChanges {
         this.isSaving = true;
         this.errorMessage = '';
 
-        const formattedData = {
-            ...this.currentCaretaker,
-            birth_date: SharedUtils.formatDateForAPI(this.currentCaretaker.birth_date)
-        };
-
-        const payload: any = { ...formattedData };
-        if (!payload.rg) delete payload.rg;
+        const payload = this.buildPayload();
 
         const request = this.isEditing && this.currentCaretaker.id
-            ? this.caretakerService.updateCaretaker(this.currentCaretaker.id, payload)
+            ? this.caretakerService.updateCaretaker(this.currentCaretaker.id, payload).pipe(
+                switchMap(response => this.syncPatientRelation().pipe(switchMap(() => of(response))))
+            )
             : this.caretakerService.createCaretaker(payload);
 
         request.subscribe({
@@ -235,15 +240,46 @@ export class CaretakerFormModalComponent implements OnChanges {
             error: (error: any) => {
                 console.error('Erro ao salvar cuidador:', error);
                 this.isSaving = false;
-                if (error.status === 409) {
+                if (error?.status === 409) {
                     this.errorMessage = 'CPF já cadastrado.';
-                } else if (error.status === 422) {
-                    this.handleValidationErrors(error.error.errors);
+                } else if (error?.status === 422) {
+                    this.handleValidationErrors(error?.error?.errors);
                 } else {
                     this.errorMessage = 'Erro ao salvar cuidador. Tente novamente.';
                 }
             }
         });
+    }
+
+    private buildPayload(): any {
+        const c = this.currentCaretaker;
+
+        const payload: any = {
+            full_name: c.full_name,
+            cpf: c.cpf,
+            birth_date: SharedUtils.toApiWriteDate(c.birth_date),
+            gender: c.gender
+        };
+
+        if (c.rg) payload.rg = c.rg;
+        if (c.education_level) payload.education_level = c.education_level;
+
+        if (!this.isEditing) {
+            payload.patient_id = c.patient_id;
+            payload.kinship = c.kinship;
+        }
+
+        return payload;
+    }
+
+    private syncPatientRelation(): Observable<any> {
+        const kinship = this.currentCaretaker.kinship;
+
+        if (!this.patientId || !this.currentCaretaker.id || !kinship || kinship === this.originalKinship) {
+            return of(null);
+        }
+
+        return this.caretakerService.updatePatientRelation(this.currentCaretaker.id, this.patientId, kinship);
     }
 
     validateForm(): boolean {
@@ -262,15 +298,19 @@ export class CaretakerFormModalComponent implements OnChanges {
 
         if (!this.isEditing) {
             if (!c.patient_id) { this.errorMessage = 'Selecione um paciente'; return false; }
-            if (!c.kinship) { this.errorMessage = 'Parentesco é obrigatório'; return false; }
+        }
+
+        if (this.showKinshipField && !c.kinship) {
+            this.errorMessage = 'Parentesco é obrigatório';
+            return false;
         }
 
         return true;
     }
 
     handleValidationErrors(errors: any): void {
-        if (errors.cpf) this.errorMessage = `CPF: ${errors.cpf[0]}`;
-        else if (errors.full_name) this.errorMessage = `Nome: ${errors.full_name[0]}`;
+        if (errors?.cpf?.[0]) this.errorMessage = `CPF: ${errors.cpf[0]}`;
+        else if (errors?.full_name?.[0]) this.errorMessage = `Nome: ${errors.full_name[0]}`;
         else this.errorMessage = 'Dados inválidos. Verifique os campos.';
     }
 

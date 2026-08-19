@@ -1,6 +1,6 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService, UserService, User } from '../services';
+import { UserService, User } from '../services';
 
 interface UserCreateData {
   name: string;
@@ -58,18 +58,11 @@ export class UserRegisterComponent implements OnInit {
 
   constructor(
     private router: Router,
-    @Inject(AuthService) private authService: AuthService,
     private userService: UserService,
     private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser || currentUser.role !== 'admin') {
-      this.router.navigate(['/']);
-      return;
-    }
-
     this.loadUsers();
   }
 
@@ -102,7 +95,6 @@ export class UserRegisterComponent implements OnInit {
 
       this.userService.createUser(this.userData).subscribe({
         next: (response) => {
-          console.log('Usuário cadastrado com sucesso:', response);
           this.isSubmitting = false;
           this.toastService.success('Usuário cadastrado com sucesso!');
 

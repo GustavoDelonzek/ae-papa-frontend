@@ -22,7 +22,7 @@ export interface Patient {
   status?: string;
   socioeconomic_profile?: SocioeconomicProfile;
   caregivers?: Caretaker[];
-  clinical_records?: ClinicalRecord[];
+  clinical_record?: ClinicalRecord;
   contacts?: PatientContact[];
   addresses?: Address[];
 }

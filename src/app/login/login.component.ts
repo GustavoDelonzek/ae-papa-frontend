@@ -69,8 +69,6 @@ export class LoginComponent implements OnInit {
       this.authService.login(this.loginData.email, this.loginData.password)
         .subscribe({
           next: (response) => {
-            console.log('Login realizado com sucesso:', response);
-
             // Salvar dados de autenticação
             this.authService.setAuthData(response.user, response.token);
 

@@ -43,7 +43,7 @@ export class SharedUtils {
     };
   }
 
-  static formatDateForAPI(date: any): string {
+  static toApiWriteDate(date: any): string {
     if (!date) return '';
 
     let d: Date;
@@ -71,6 +71,23 @@ export class SharedUtils {
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
     return `${month}-${day}-${year}`;
+  }
+
+  static toApiFilterDate(date: any): string {
+    if (!date) return '';
+
+    if (typeof date === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+      const [day, month, year] = date.split('/');
+      return `${year}-${month}-${day}`;
+    }
+
+    const d = date instanceof Date ? date : this.parseDate(date);
+    if (isNaN(d.getTime())) return '';
+
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   /**

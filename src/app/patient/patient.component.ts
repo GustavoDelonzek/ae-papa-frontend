@@ -323,18 +323,6 @@ export class PatientComponent implements OnInit {
     this.onFileSelected(event);
   }
 
-  deleteDocument(document: any): void {
-    if (confirm(`Tem certeza que deseja deletar o documento "${document.name}"?`)) {
-      // TODO: Implementar deleção real no backend
-      console.log('Documento deletado:', document.name);
-    }
-  }
-
-  downloadDocument(documentName: string): void {
-    // TODO: Implementar download real do backend
-    console.log('Baixar documento:', documentName);
-  }
-
   addDocument(): void {
     this.showUploadModal = true;
   }
@@ -582,7 +570,7 @@ export class PatientComponent implements OnInit {
     this.savingAppointment = true;
     this.appointmentErrorMessage = '';
 
-    const formattedDate = SharedUtils.formatDateForAPI(this.newAppointment.date);
+    const formattedDate = SharedUtils.toApiWriteDate(this.newAppointment.date);
 
     const appointmentData: AppointmentCreate = {
       ...this.newAppointment,
@@ -626,7 +614,6 @@ export class PatientComponent implements OnInit {
   }
 
   viewAppointment(appointmentId: number): void {
-    console.log('Viewing appointment:', appointmentId);
     const appointment = this.appointments.find(a => a.id === appointmentId);
     if (appointment) {
       // Ensure patient data is attached if missing (since we are in patient context)
@@ -646,7 +633,6 @@ export class PatientComponent implements OnInit {
   onEditAppointmentDetails(appointment: Appointment): void {
     this.closeDetailsModal();
     // Logic to edit appointment if needed, maybe open edit modal?
-    console.log('Edit appointment from details', appointment);
   }
 
   viewCaretaker(caretakerId: number): void {

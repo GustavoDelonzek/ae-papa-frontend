@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PatientService, Patient } from '../services';
 import { SharedUtils } from '../core/utils/shared-utils';
 
@@ -81,12 +81,18 @@ export class PatientListComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private patientService: PatientService
   ) { }
 
   ngOnInit(): void {
     this.generateBirthYearOptions();
     this.loadPatients();
+
+    if (this.route.snapshot.queryParamMap.get('novo') !== null) {
+      this.openModal();
+      this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
+    }
   }
 
   generateBirthYearOptions(): void {
@@ -125,12 +131,9 @@ export class PatientListComponent implements OnInit, OnDestroy {
       filters.sort_order = this.sortDirection;
     }
 
-    console.log('Sending filters to backend:', filters);
-
     this.patientService.getPatients(page, this.perPage, filters).subscribe({
       next: (response) => {
         this.patients = response.data || [];
-        console.log('Patients loaded:', this.patients);
         this.filteredPatients = [...this.patients];
         this.paginationMeta = response.meta || {};
         this.totalPages = this.paginationMeta.last_page || 0;

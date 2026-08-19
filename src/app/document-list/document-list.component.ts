@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angu
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, Subscription, timer } from 'rxjs';
-import { switchMap, takeUntil } from 'rxjs/operators';
+import { switchMap, take, takeUntil } from 'rxjs/operators';
 import { Document } from '../core/models/document.model';
 import { DocumentService } from '../services/document.service';
 import { SharedUtils } from '../core/utils/shared-utils';
@@ -11,6 +11,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
+
+const MAX_POLLING_ATTEMPTS = 20;
 
 @Component({
   selector: 'app-document-list',
@@ -71,8 +73,8 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   private getFilters(page: number) {
-    const formattedStartDate = SharedUtils.formatDateForAPI(this.startDate);
-    const formattedEndDate = SharedUtils.formatDateForAPI(this.endDate);
+    const formattedStartDate = SharedUtils.toApiFilterDate(this.startDate);
+    const formattedEndDate = SharedUtils.toApiFilterDate(this.endDate);
 
     return {
       ...(this.patientId && { patient_id: this.patientId }),
@@ -127,6 +129,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       this.isPollingActive = true;
       
       this.pollingSubscription = timer(2500, 2500).pipe(
+        take(MAX_POLLING_ATTEMPTS),
         takeUntil(this.destroy$),
         switchMap(() => this.documentService.listDocuments(this.getFilters(page)))
       ).subscribe({
@@ -138,7 +141,8 @@ export class DocumentListComponent implements OnInit, OnDestroy {
             this.stopPolling();
           }
         },
-        error: () => this.stopPolling()
+        error: () => this.stopPolling(),
+        complete: () => this.stopPolling()
       });
     } else if (!hasPending && this.isPollingActive) {
       this.stopPolling();
@@ -149,6 +153,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     this.isPollingActive = false;
     if (this.pollingSubscription) {
       this.pollingSubscription.unsubscribe();
+      this.pollingSubscription = undefined;
     }
   }
 

@@ -4,6 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { AuthService } from '../services';
+import { API_URL } from '../../consts';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -16,8 +17,7 @@ export class AuthInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const token = this.authService.getToken();
 
-    // Adicionar token ao header se existir
-    if (token) {
+    if (token && this.isApiRequest(req.url)) {
       req = req.clone({
         headers: req.headers.set('Authorization', `Bearer ${token}`)
       });
@@ -43,5 +43,17 @@ export class AuthInterceptor implements HttpInterceptor {
         return throwError(() => error);
       })
     );
+  }
+
+  private isApiRequest(url: string): boolean {
+    if (!/^https?:\/\//i.test(url)) {
+      return true;
+    }
+
+    try {
+      return new URL(url).origin === new URL(API_URL).origin;
+    } catch {
+      return false;
+    }
   }
 }

@@ -259,7 +259,7 @@ export class HomeComponent implements OnInit {
   }
 
   navigateToNewPatient(): void {
-    this.router.navigate(['/paciente']);
+    this.router.navigate(['/lista-pacientes'], { queryParams: { novo: 1 } });
   }
 
   navigateToCaretakers(): void {
@@ -301,6 +301,8 @@ export class HomeComponent implements OnInit {
 
         const todayMD = `${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
+        const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
         const mapped = allPatients
           .filter(p => !!p.birth_date)
           .map(p => {
@@ -309,13 +311,13 @@ export class HomeComponent implements OnInit {
             const day = parseInt(parts[2], 10);
 
             // Calculate days until this birthday this year (or next year if already passed)
-            const thisYear = today.getFullYear();
+            const thisYear = todayStart.getFullYear();
             let birthday = new Date(thisYear, month - 1, day);
-            if (birthday < today) {
+            if (birthday < todayStart) {
               birthday = new Date(thisYear + 1, month - 1, day);
             }
 
-            const diffMs = birthday.getTime() - today.setHours(0, 0, 0, 0);
+            const diffMs = birthday.getTime() - todayStart.getTime();
             const daysUntil = Math.round(diffMs / (1000 * 60 * 60 * 24));
             const birthdayMD = `${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const isToday = birthdayMD === todayMD;
@@ -371,14 +373,7 @@ export class HomeComponent implements OnInit {
   }
 
   private toDateKey(date: string | Date | null | undefined): string {
-    if (!date) return '';
-    const parsed = date instanceof Date ? date : SharedUtils.parseDate(date);
-    if (isNaN(parsed.getTime())) return '';
-
-    const year = parsed.getFullYear();
-    const month = String(parsed.getMonth() + 1).padStart(2, '0');
-    const day = String(parsed.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return SharedUtils.toApiFilterDate(date);
   }
 
   canViewObservations(): boolean {

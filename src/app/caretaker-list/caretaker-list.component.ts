@@ -116,8 +116,6 @@ export class CaretakerListComponent implements OnInit, OnDestroy {
       filters.sort_order = this.sortDirection;
     }
 
-    console.log('Sending filters to backend (Caretakers):', filters);
-
     this.caretakerService.getCaretakers(page, this.perPage, filters).subscribe({
       next: (response: CaretakersListResponse) => {
         this.caretakers = response.data || [];

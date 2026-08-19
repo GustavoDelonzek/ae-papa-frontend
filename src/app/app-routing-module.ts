@@ -1,42 +1,30 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { LoginComponent } from './login/login.component';
-import { HomeComponent } from './home/home.component';
-import { PatientComponent } from './patient/patient.component';
-import { PatientListComponent } from './patient-list/patient-list.component';
-import { CaretakerListComponent } from './caretaker-list/caretaker-list.component';
-import { CaretakerComponent } from './caretaker/caretaker.component';
+import { Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
-import { AppointmentListComponent } from './appointment-list/appointment-list.component';
-import { UserRegisterComponent } from './user-register/user-register.component';
-import { ReportsComponent } from './reports/reports.component';
-import { StatisticsComponent } from './statistics/statistics.component';
+import { roleGuard } from './guards/role.guard';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
+  {
+    path: 'login',
+    loadComponent: () => import('./login/login.component').then(m => m.LoginComponent)
+  },
   {
     path: '',
-    component: HomeComponent,
+    loadComponent: () => import('./home/home.component').then(m => m.HomeComponent),
     canActivate: [AuthGuard]
   },
   {
     path: 'estatisticas',
-    component: StatisticsComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'paciente',
-    component: PatientComponent,
+    loadComponent: () => import('./statistics/statistics.component').then(m => m.StatisticsComponent),
     canActivate: [AuthGuard]
   },
   {
     path: 'paciente/:id',
-    component: PatientComponent,
+    loadComponent: () => import('./patient/patient.component').then(m => m.PatientComponent),
     canActivate: [AuthGuard]
   },
   {
     path: 'lista-pacientes',
-    component: PatientListComponent,
+    loadComponent: () => import('./patient-list/patient-list.component').then(m => m.PatientListComponent),
     canActivate: [AuthGuard]
   },
   {
@@ -46,32 +34,26 @@ export const routes: Routes = [
   },
   {
     path: 'registro-usuario',
-    component: UserRegisterComponent,
-    canActivate: [AuthGuard]
+    loadComponent: () => import('./user-register/user-register.component').then(m => m.UserRegisterComponent),
+    canActivate: [AuthGuard, roleGuard(['admin'])]
   },
   {
     path: 'relatorios',
-    component: ReportsComponent,
+    loadComponent: () => import('./reports/reports.component').then(m => m.ReportsComponent),
     canActivate: [AuthGuard]
   },
   {
     path: 'lista-cuidadores',
-    component: CaretakerListComponent,
+    loadComponent: () => import('./caretaker-list/caretaker-list.component').then(m => m.CaretakerListComponent),
     canActivate: [AuthGuard]
   },
   {
     path: 'cuidador/:id',
-    component: CaretakerComponent,
+    loadComponent: () => import('./caretaker/caretaker.component').then(m => m.CaretakerComponent),
     canActivate: [AuthGuard]
   },
   {
     path: '**',
-    redirectTo: '/login'
+    redirectTo: ''
   }
 ];
-
-@NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
-})
-export class AppRoutingModule { }

@@ -121,8 +121,6 @@ export class AppointmentListComponent implements OnInit {
       filters.sort_order = this.sortDirection;
     }
 
-    console.log('Sending filters to backend (Appointments):', filters);
-
     this.appointmentService.listAppointments(page, 15, filters).subscribe({
       next: (response: any) => {
         this.appointments = response.data;
@@ -366,7 +364,7 @@ export class AppointmentListComponent implements OnInit {
     this.submitting = true;
 
     // Converter a data suportando string ou objeto Date do Material UI
-    let formattedDate = SharedUtils.formatDateForAPI(this.appointmentDate);
+    let formattedDate = SharedUtils.toApiWriteDate(this.appointmentDate);
 
     const appointmentData: AppointmentCreate = {
       patient_id: this.selectedPatient.id!,

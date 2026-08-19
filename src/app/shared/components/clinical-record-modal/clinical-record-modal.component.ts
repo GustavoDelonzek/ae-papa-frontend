@@ -161,7 +161,7 @@ export class ClinicalRecordModalComponent implements OnInit {
 
         const payload = {
             ...this.currentRecord,
-            diagnosis_date: SharedUtils.formatDateForAPI(this.currentRecord.diagnosis_date),
+            diagnosis_date: SharedUtils.toApiWriteDate(this.currentRecord.diagnosis_date),
             patient_id: this.patientId
         };
 

@@ -73,10 +73,10 @@
                     </div>
                 </div>
 
-                <div class="form-group" *ngIf="!isEditing">
+                <div class="form-group" *ngIf="showKinshipField">
                     <label>Parentesco/Relação *</label>
                     <select name="kinship" class="form-control" [(ngModel)]="currentCaretaker.kinship"
-                        [required]="!isEditing">
+                        [required]="showKinshipField">
                         <option value="" disabled selected>Selecione...</option>
                         <option value="son">Filho</option>
                         <option value="daughter">Filha</option>

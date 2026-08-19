@@ -206,14 +206,14 @@ export class PatientFormModalComponent implements OnInit {
 
         const patientPayload: any = {
             ...this.currentPatient,
-            birth_date: SharedUtils.formatDateForAPI(this.currentPatient.birth_date)
+            birth_date: SharedUtils.toApiWriteDate(this.currentPatient.birth_date)
         };
         if (!patientPayload.rg) delete patientPayload.rg;
 
         delete patientPayload.contacts;
         delete patientPayload.addresses;
         delete patientPayload.caregivers;
-        delete patientPayload.clinical_records;
+        delete patientPayload.clinical_record;
         delete patientPayload.socioeconomic_profile;
 
         let request: Observable<any>;
@@ -339,14 +339,14 @@ export class PatientFormModalComponent implements OnInit {
     private upsertPatient(): Observable<number | null> {
         const patientPayload: any = {
             ...this.currentPatient,
-            birth_date: SharedUtils.formatDateForAPI(this.currentPatient.birth_date)
+            birth_date: SharedUtils.toApiWriteDate(this.currentPatient.birth_date)
         };
 
         if (!patientPayload.rg) delete patientPayload.rg;
         delete patientPayload.contacts;
         delete patientPayload.addresses;
         delete patientPayload.caregivers;
-        delete patientPayload.clinical_records;
+        delete patientPayload.clinical_record;
         delete patientPayload.socioeconomic_profile;
 
         const request = this.currentPatient.id
@@ -416,8 +416,8 @@ export class PatientFormModalComponent implements OnInit {
     handleError(error: any) {
         console.error('Erro:', error);
         this.isSaving = false;
-        if (error.status === 422) {
-            this.handleValidationErrors(error.error.errors);
+        if (error?.status === 422) {
+            this.handleValidationErrors(error?.error?.errors);
         } else {
             this.errorMessage = 'Erro ao salvar. Tente novamente.';
         }
@@ -446,8 +446,8 @@ export class PatientFormModalComponent implements OnInit {
     }
 
     handleValidationErrors(errors: any): void {
-        if (errors.cpf) this.errorMessage = `CPF: ${errors.cpf[0]}`;
-        else if (errors.full_name) this.errorMessage = `Nome: ${errors.full_name[0]}`;
+        if (errors?.cpf?.[0]) this.errorMessage = `CPF: ${errors.cpf[0]}`;
+        else if (errors?.full_name?.[0]) this.errorMessage = `Nome: ${errors.full_name[0]}`;
         else this.errorMessage = 'Dados inválidos. Verifique os campos.';
     }
 

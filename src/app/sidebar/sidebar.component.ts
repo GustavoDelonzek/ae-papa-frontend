@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../services';
 
 interface MenuItem {
@@ -20,8 +20,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './sidebar.html',
-  styleUrls: ['./sidebar.scss'],
-  providers: [AuthService]
+  styleUrls: ['./sidebar.scss']
 })
 export class SidebarComponent implements OnInit {
   isAdmin: boolean = false;
@@ -86,7 +85,7 @@ export class SidebarComponent implements OnInit {
     }
   ];
 
-  constructor(@Inject(AuthService) private authService: AuthService) { }
+  constructor(private authService: AuthService) { }
 
   ngOnInit(): void {
     this.isAdmin = this.authService.isAdmin();

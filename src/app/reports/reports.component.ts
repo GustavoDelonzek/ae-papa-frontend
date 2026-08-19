@@ -117,8 +117,8 @@ export class ReportsComponent implements OnInit {
 
     return {
       columns,
-      start_date: SharedUtils.formatDateForAPI(this.period.from),
-      end_date: SharedUtils.formatDateForAPI(this.period.to),
+      start_date: SharedUtils.toApiWriteDate(this.period.from),
+      end_date: SharedUtils.toApiWriteDate(this.period.to),
       detail_level: this.detailLevel === 'Completo' ? 'complete' : 'resumed',
       format: this.fileFormat.toLowerCase() as 'pdf' | 'xlsx' | 'csv'
     };

@@ -86,7 +86,6 @@ export class CaretakerService {
 
     if (filters.search && filters.search.trim()) {
       params = params.set('search', filters.search.trim());
-      params = params.set('full_name', filters.search.trim());
     }
 
     if (filters.gender) params = params.set('gender', filters.gender);
