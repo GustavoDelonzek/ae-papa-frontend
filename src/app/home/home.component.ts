@@ -12,6 +12,9 @@ import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { RouterModule } from '@angular/router';
 
+const UPCOMING_BIRTHDAYS_WINDOW_DAYS = 62;
+const MAX_UPCOMING_BIRTHDAYS = 6;
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -330,16 +333,16 @@ export class HomeComponent implements OnInit {
             };
           });
 
-        // Sort by days until birthday; today first, then ascending
-        mapped.sort((a, b) => a.daysUntil - b.daysUntil);
+        const upcoming = mapped.filter(b => b.daysUntil <= UPCOMING_BIRTHDAYS_WINDOW_DAYS);
 
-        // Deduplicate by name (patient might appear in both months if near boundary)
+        upcoming.sort((a, b) => a.daysUntil - b.daysUntil);
+
         const seen = new Set<string>();
-        this.upcomingBirthdays = mapped.filter(b => {
+        this.upcomingBirthdays = upcoming.filter(b => {
           if (seen.has(b.name)) return false;
           seen.add(b.name);
           return true;
-        }).slice(0, 6);
+        }).slice(0, MAX_UPCOMING_BIRTHDAYS);
 
         this.loadingBirthdays = false;
       },
