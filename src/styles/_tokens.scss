@@ -1,0 +1,57 @@
+:root {
+  --bg: #f4f2f5;
+  --surface: #fefdff;
+  --border: #e0dbe4;
+  --border-strong: #d6d0dc;
+  --hairline: #efecf2;
+
+  --text: #1e1823;
+  --text-muted: #655c6e;
+  --text-faint: #9a91a4;
+
+  --nav-bg: #241c2b;
+  --nav-icon: #8f8398;
+  --nav-active-bg: rgba(255, 255, 255, 0.14);
+  --brand-soft: #7a52a8;
+
+  --accent: #5b2d8c;
+  --accent-soft: #ece4f5;
+  --accent-strong: #3f1d66;
+
+  --warn: #7d6427;
+  --warn-bg: #f5efdf;
+  --warn-border: #e6dbc0;
+  --danger: #b0463c;
+  --danger-bg: #f8e8e6;
+  --danger-border: #eccdc8;
+  --ok: #2c6b50;
+  --ok-bg: #e5f0e9;
+
+  --r-card: 10px;
+  --r-control: 8px;
+  --r-chip: 16px;
+
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-7: 28px;
+  --sp-8: 32px;
+
+  --pad-card: 16px;
+  --pad-row: 12px;
+  --gap-block: 20px;
+  --pad-content: 28px;
+
+  --nav-w: 64px;
+  --shadow-overlay: 0 24px 60px -30px rgba(30, 24, 35, 0.5);
+}
+
+@media (max-width: 1023px) {
+  :root {
+    --nav-w: 0px;
+    --pad-content: 16px;
+  }
+}

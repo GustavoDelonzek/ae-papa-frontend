@@ -4,12 +4,12 @@
   <div class="documents-filter-bar">
     <div class="search-input-wrapper">
       <i class="fas fa-search"></i>
-      <input type="text" placeholder="Buscar documento..." [(ngModel)]="searchTerm" (keyup.enter)="applyFilters()">
+      <input type="text" class="ae-field" placeholder="Buscar documento..." [(ngModel)]="searchTerm" (keyup.enter)="applyFilters()">
     </div>
 
     <div class="filter-dropdown">
       <i class="far fa-file-alt"></i>
-      <select [(ngModel)]="selectedType" (change)="applyFilters()">
+      <select class="ae-field" [(ngModel)]="selectedType" (change)="applyFilters()">
         <option value="" disabled selected hidden>Tipo de Documento</option>
         <option value="">Todos</option>
         <option value="exam">Exame</option>
@@ -24,7 +24,7 @@
 
     <div class="filter-dropdown">
       <i class="fas fa-filter"></i>
-      <select [(ngModel)]="statusFilter" (change)="applyFilters()">
+      <select class="ae-field" [(ngModel)]="statusFilter" (change)="applyFilters()">
         <option value="" disabled selected hidden>Status</option>
         <option value="">Todos</option>
         <option value="pending">Pendente</option>
@@ -44,39 +44,39 @@
         <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-date-range-picker #picker></mat-date-range-picker>
       </mat-form-field>
-      
+
       <button class="btn-clear-date" *ngIf="startDate || endDate" (click)="clearDates()" title="Limpar Período">
         <i class="fas fa-times"></i>
       </button>
     </div>
 
-    <button class="btn-upload" (click)="uploadNewDocument()">
+    <button class="ae-btn ae-btn--ghost btn-upload" (click)="uploadNewDocument()">
       <i class="fas fa-cloud-upload-alt"></i> Upload
     </button>
   </div>
 
   <!-- Loading State -->
-  <div class="loading-container" *ngIf="loading">
+  <div class="ae-empty loading-state" *ngIf="loading">
     <div class="loading-spinner"></div>
     <p>Carregando documentos...</p>
   </div>
 
   <!-- Error State -->
-  <div class="error-container" *ngIf="errorMessage && !loading">
+  <div class="ae-empty error-state" *ngIf="errorMessage && !loading">
     <i class="fas fa-exclamation-circle"></i>
     <p>{{ errorMessage }}</p>
-    <button class="btn-retry" (click)="loadDocuments()">Tentar novamente</button>
+    <button class="ae-btn ae-btn--ghost" (click)="loadDocuments()">Tentar novamente</button>
   </div>
 
   <!-- Empty State -->
-  <div class="empty-state" *ngIf="!loading && !errorMessage && documents.length === 0">
+  <div class="ae-empty" *ngIf="!loading && !errorMessage && documents.length === 0">
     <i class="far fa-folder-open"></i>
     <p>Nenhum documento encontrado.</p>
   </div>
 
   <!-- Document List -->
   <div class="document-list-container" *ngIf="!loading && !errorMessage && documents.length > 0">
-    <div class="document-card" *ngFor="let doc of documents; trackBy: trackById">
+    <div class="ae-card document-card" *ngFor="let doc of documents; trackBy: trackById">
       <!-- Icon -->
       <div class="doc-icon-wrapper">
         <div class="file-icon" [ngClass]="getFileTypeClass(doc.mime_type)">
@@ -91,7 +91,7 @@
           <h3>{{ doc.file_name }}</h3>
         </div>
         <div class="doc-meta">
-          <span class="meta-item"><i class="far fa-calendar"></i> {{ formatDate(doc.created_at) }}</span>
+          <span class="meta-item"><i class="far fa-calendar"></i> <span class="mono">{{ formatDate(doc.created_at) }}</span></span>
           <span class="meta-item" *ngIf="doc.document_type"><i class="fas fa-tag"></i> {{ getDocumentTypeText(doc.document_type) }}</span>
           <span class="meta-item author" *ngIf="doc.description">{{ doc.description }}</span>
         </div>
@@ -99,7 +99,7 @@
 
       <!-- Status -->
       <div class="doc-status">
-        <span class="status-badge" [ngClass]="getStatusClass(doc.status)">
+        <span class="ae-chip status-badge" [ngClass]="getStatusClass(doc.status)">
           {{ getStatusText(doc.status) | uppercase }}
         </span>
       </div>

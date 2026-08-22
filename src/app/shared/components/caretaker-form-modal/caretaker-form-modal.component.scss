@@ -1,11 +1,5 @@
 @use 'sass:color';
 // Variables
-$primary-color: #6a307d;
-$text-color: #333;
-$text-muted: #6b7280;
-$border-color: #e5e7eb;
-$danger-color: #ef4444;
-$success-color: #10b981;
 
 .modal-overlay {
     position: fixed;
@@ -13,7 +7,7 @@ $success-color: #10b981;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(30, 24, 35, 0.3);
     z-index: 1000;
     display: flex;
     align-items: center;
@@ -23,21 +17,20 @@ $success-color: #10b981;
 }
 
 .modal-content {
-    background: white;
+    background: var(--surface);
     width: 90%;
     max-width: 550px;
     max-height: 90vh;
     border-radius: 12px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--shadow-overlay);
     overflow: hidden;
     animation: slideUp 0.3s ease-out;
     display: flex;
     flex-direction: column;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
 
     .modal-header {
         padding: 1.5rem 1.5rem 1rem 1.5rem;
-        border-bottom: 1px solid $border-color;
+        border-bottom: 1px solid var(--border);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -48,19 +41,19 @@ $success-color: #10b981;
             margin: 0;
             font-size: 1.25rem;
             font-weight: 600;
-            color: $text-color;
+            color: var(--text);
         }
 
         .btn-close {
             background: none;
             border: none;
             font-size: 1.25rem;
-            color: $text-muted;
+            color: var(--text-muted);
             cursor: pointer;
             transition: color 0.2s;
 
             &:hover {
-                color: $danger-color;
+                color: var(--danger);
             }
         }
     }
@@ -73,29 +66,6 @@ $success-color: #10b981;
 
     .form-group {
         margin-bottom: 1.25rem;
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: $text-color;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 0.625rem;
-            border: 1px solid $border-color;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-
-            &:focus {
-                outline: none;
-                border-color: $primary-color;
-                box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
-            }
-        }
     }
 
     .form-row {
@@ -122,7 +92,7 @@ $success-color: #10b981;
         .search-icon {
             position: absolute;
             left: 12px;
-            color: $text-muted;
+            color: var(--text-muted);
             font-size: 0.9rem;
         }
 
@@ -136,14 +106,14 @@ $success-color: #10b981;
             right: 8px;
             background: none;
             border: none;
-            color: $text-muted;
+            color: var(--text-muted);
             cursor: pointer;
             padding: 4px 8px;
             border-radius: 4px;
 
             &:hover {
-                color: $danger-color;
-                background: rgba($danger-color, 0.1);
+                color: var(--danger);
+                background: var(--danger-bg);
             }
         }
     }
@@ -153,10 +123,10 @@ $success-color: #10b981;
         top: 100%;
         left: 0;
         right: 0;
-        background: white;
-        border: 1px solid $border-color;
+        background: var(--surface);
+        border: 1px solid var(--border);
         border-radius: 8px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow-overlay);
         max-height: 200px;
         overflow-y: auto;
         z-index: 10;
@@ -166,7 +136,7 @@ $success-color: #10b981;
         .dropdown-empty {
             padding: 1rem;
             text-align: center;
-            color: $text-muted;
+            color: var(--text-muted);
             font-size: 0.9rem;
         }
 
@@ -179,14 +149,14 @@ $success-color: #10b981;
             transition: background 0.15s;
 
             &:hover {
-                background: #f3f4f6;
+                background: var(--bg);
             }
 
             .patient-avatar {
                 width: 32px;
                 height: 32px;
                 border-radius: 50%;
-                background: $primary-color;
+                background: var(--accent);
                 color: white;
                 display: flex;
                 align-items: center;
@@ -202,13 +172,13 @@ $success-color: #10b981;
 
                 .patient-name {
                     font-weight: 500;
-                    color: $text-color;
+                    color: var(--text);
                     font-size: 0.9rem;
                 }
 
                 .patient-cpf {
                     font-size: 0.75rem;
-                    color: $text-muted;
+                    color: var(--text-muted);
                     font-family: monospace;
                 }
             }
@@ -221,14 +191,14 @@ $success-color: #10b981;
         gap: 0.5rem;
         margin-top: 0.5rem;
         padding: 0.5rem 0.75rem;
-        background: rgba($success-color, 0.1);
-        color: color.adjust($success-color, $lightness: -10%);
+        background: var(--ok-bg);
+        color: var(--ok);
         border-radius: 6px;
         font-size: 0.85rem;
         font-weight: 500;
 
         i {
-            color: $success-color;
+            color: var(--ok);
         }
     }
 
@@ -238,56 +208,10 @@ $success-color: #10b981;
         gap: 1rem;
         margin-top: 2rem;
 
-        button {
-            padding: 0.625rem 1.25rem;
-            border-radius: 8px;
-            font-weight: 500;
-            cursor: pointer;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-
-            &.btn-cancel {
-                background: white;
-                border: 1px solid $border-color;
-                color: $text-color;
-
-                &:hover {
-                    background: #f3f4f6;
-                }
-            }
-
-            &.btn-submit {
-                background: $primary-color;
-                color: white;
-                border: none;
-                min-width: 100px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-
-                &:hover {
-                    background: color.adjust($primary-color, $lightness: -5%);
-                    transform: translateY(-1px);
-                    box-shadow: 0 4px 6px -1px rgba($primary-color, 0.2);
-                }
-
-                &:disabled {
-                    opacity: 0.7;
-                    cursor: not-allowed;
-                    transform: none;
-                }
-            }
+        .ae-btn--primary {
+            min-width: 100px;
+            justify-content: center;
         }
-    }
-
-    .alert-error {
-        margin-top: 1rem;
-        padding: 0.75rem;
-        background-color: #fef2f2;
-        color: $danger-color;
-        border-radius: 6px;
-        font-size: 0.9rem;
-        border: 1px solid rgba($danger-color, 0.2);
     }
 }
 

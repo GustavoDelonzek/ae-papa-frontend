@@ -1,49 +1,14 @@
-@use 'sass:color';
-// Variables
-$primary-color: #6a307d;
-$primary-dark: #4a2157;
-$primary-light: #f3e5f5;
-$text-dark: #1f2937;
-$text-secondary: #6b7280;
-$bg-color: #f8f9fa;
-$card-bg: #ffffff;
-$border-color: #e5e7eb;
-$success-color: #10b981;
-$danger-color: #ef4444;
-$blue-color: #3b82f6;
-$pink-color: #ec4899;
-
-// Mixins
-@mixin card-style {
-  background: $card-bg;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  border: 1px solid $border-color;
-}
-
 @mixin flex-center {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-// Host styles
 :host {
   display: block;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  color: $text-dark;
-  background-color: $bg-color;
+  color: var(--text);
+  background-color: var(--bg);
   min-height: 100vh;
-}
-
-.caretaker-list-container {
-  padding: 30px;
-  margin-left: 260px; // Match Sidebar
-
-  @media (max-width: 768px) {
-    margin-left: 0;
-    padding: 1rem;
-  }
 }
 
 // Header
@@ -63,78 +28,35 @@ $pink-color: #ec4899;
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
-    color: $text-secondary;
+    color: var(--text-muted);
     font-weight: 500;
     font-size: 0.9rem;
     transition: color 0.2s;
 
     &:hover {
-      color: $primary-color;
+      color: var(--accent);
     }
   }
 
   .header-main-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-
     @media (max-width: 640px) {
       flex-direction: column;
       align-items: flex-start;
       gap: 1rem;
-    }
-
-    .title-section {
-      h1 {
-        font-size: 2rem;
-        font-weight: 700;
-        color: $text-dark;
-        margin: 0 0 0.25rem 0;
-        letter-spacing: -0.025em;
-      }
-
-      .subtitle {
-        color: $text-secondary;
-        margin: 0;
-        font-size: 1rem;
-      }
-    }
-
-    .btn-primary {
-      background: $primary-color;
-      border: none;
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border-radius: 999px; // Pill shape
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
-      box-shadow: 0 4px 6px -1px rgba($primary-color, 0.3);
-      transition: all 0.2s;
-
-      &:hover {
-        background: color.adjust($primary-color, $lightness: -5%);
-        transform: translateY(-1px);
-        box-shadow: 0 6px 8px -1px rgba($primary-color, 0.4);
-      }
     }
   }
 }
 
 // Filters
 .filters-container {
-  background: white;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: var(--r-card) var(--r-card) 0 0;
   padding: 1.5rem;
-  border-radius: 16px 16px 0 0;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  @include card-style;
-  border-bottom: none;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
 }
 
 .search-wrapper {
@@ -147,35 +69,12 @@ $pink-color: #ec4899;
   i {
     position: absolute;
     left: 16px;
-    color: $text-secondary;
+    color: var(--text-faint);
     pointer-events: none;
   }
 
-  input {
-    width: 100%;
-    padding: 1rem 1rem 1rem 3rem;
-    border-radius: 999px;
-    border: 1px solid $border-color;
-    background: #f9fafb;
-    font-size: 0.95rem;
-    transition: all 0.2s;
-    outline: none;
-
-    &:focus {
-      border-color: $primary-color;
-      background: white;
-      box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
-    }
-  }
-
-  .count-badge {
-    white-space: nowrap;
-    background: $primary-light;
-    color: $primary-color;
-    padding: 0.5rem 1rem;
-    border-radius: 999px;
-    font-size: 0.85rem;
-    font-weight: 600;
+  .ae-field {
+    padding-left: 3rem;
   }
 }
 
@@ -199,29 +98,17 @@ $pink-color: #ec4899;
     display: inline-flex;
     align-items: center;
 
-    select {
+    select.ae-field {
       appearance: none;
-      background: white;
-      border: 1px solid $border-color;
+      width: auto;
       padding: 0 2rem 0 2.2rem; // Left padding for icon, Right for arrow
-      border-radius: 999px;
-      font-size: 0.9rem;
       height: 40px;
-      color: $text-dark;
-      outline: none;
       cursor: pointer;
-      font-family: inherit;
-      transition: all 0.2s;
-
-      &:hover {
-        background: #f9fafb;
-        border-color: color.adjust($border-color, $lightness: -10%);
-      }
 
       &.active-select {
-        background: $primary-light;
-        border-color: $primary-light;
-        color: $primary-color;
+        background: var(--accent-soft);
+        border-color: var(--accent-soft);
+        color: var(--accent);
         font-weight: 500;
       }
     }
@@ -229,7 +116,7 @@ $pink-color: #ec4899;
     .input-icon {
       position: absolute;
       left: 1rem;
-      color: $text-secondary;
+      color: var(--text-faint);
       font-size: 0.9rem;
       pointer-events: none;
     }
@@ -237,86 +124,46 @@ $pink-color: #ec4899;
     .select-arrow {
       position: absolute;
       right: 1rem;
-      color: $text-secondary;
+      color: var(--text-faint);
       font-size: 0.8rem;
       pointer-events: none;
-    }
-  }
-
-  .btn-clear {
-    background: none;
-    border: none;
-    color: $text-secondary;
-    cursor: pointer;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-left: auto;
-
-    &:hover {
-      color: $danger-color;
     }
   }
 }
 
 // Table Card
 .table-card {
-  @include card-style;
   border-top: none;
-  border-radius: 0 0 16px 16px; // Bottom part
-  overflow: hidden; // For rounded corners
-  padding: 0 1.5rem 1.5rem 1.5rem; // Padding for table
-  background: white;
+  border-radius: 0 0 var(--r-card) var(--r-card);
+  overflow: hidden;
+  padding: 0 1.5rem 1.5rem 1.5rem;
 }
 
 .custom-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-
   thead th {
-    text-align: left;
-    padding: 1rem 0;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: $text-secondary;
-    letter-spacing: 0.05em;
-    border-bottom: 1px solid $border-color;
     cursor: pointer;
     user-select: none;
 
-    &:hover {
-      color: $primary-color;
+    &.text-right {
+      text-align: right;
     }
 
     i {
       margin-left: 0.25rem;
     }
 
-    &.text-right {
-      text-align: right;
+    .fa-sort {
+      color: var(--text-faint);
+    }
+
+    .fa-sort-up,
+    .fa-sort-down {
+      color: var(--accent);
     }
   }
 
   tbody tr {
-    transition: background 0.1s;
     cursor: pointer;
-
-    &:hover {
-      background: #f9fafb;
-    }
-
-    td {
-      padding: 1.25rem 0;
-      border-bottom: 1px solid #f3f4f6;
-      vertical-align: middle;
-    }
-
-    &:last-child td {
-      border-bottom: none;
-    }
   }
 }
 
@@ -334,14 +181,9 @@ $pink-color: #ec4899;
     font-weight: 700;
     font-size: 0.9rem;
 
-    &.bg-blue {
-      background: #e0f2fe;
-      color: #0369a1;
-    }
-
     &.bg-purple {
-      background: #f3e8ff; // purple-100
-      color: #7e22ce; // purple-700
+      background: #f3e8ff;
+      color: #7e22ce;
     }
   }
 
@@ -351,20 +193,19 @@ $pink-color: #ec4899;
 
     .name {
       font-weight: 600;
-      color: $text-dark;
+      color: var(--text);
       font-size: 0.95rem;
     }
 
     .id {
       font-size: 0.75rem;
-      color: $text-secondary;
+      color: var(--text-muted);
     }
   }
 }
 
 .cpf-text {
-  font-family: monospace;
-  color: $text-secondary;
+  color: var(--text-muted);
   font-size: 0.9rem;
 }
 
@@ -375,13 +216,13 @@ $pink-color: #ec4899;
 
   .years {
     font-weight: 600;
-    color: $text-dark;
+    color: var(--text);
     font-size: 0.95rem;
   }
 
   .year-born {
     font-size: 0.8rem;
-    color: $text-secondary;
+    color: var(--text-muted);
   }
 }
 
@@ -398,14 +239,14 @@ $pink-color: #ec4899;
   }
 
   &.female {
-    background: #fce7f3; // Pink-100
-    color: #be185d; // Pink-700
+    background: #fce7f3;
+    color: #be185d;
   }
 }
 
 .kinship-text {
   font-weight: 500;
-  color: $text-dark;
+  color: var(--text);
   font-size: 0.9rem;
 }
 
@@ -416,21 +257,21 @@ $pink-color: #ec4899;
     background: none;
     border: none;
     cursor: pointer;
-    color: $blue-color; // default edit blue
+    color: var(--accent);
     font-size: 1rem;
     padding: 0.5rem;
     border-radius: 50%;
     transition: background 0.2s;
 
     &:hover {
-      background: #eff6ff;
+      background: var(--accent-soft);
     }
 
     &.delete {
-      color: $danger-color;
+      color: var(--danger);
 
       &:hover {
-        background: #fef2f2;
+        background: var(--danger-bg);
       }
     }
   }
@@ -442,11 +283,11 @@ $pink-color: #ec4899;
   justify-content: space-between;
   align-items: center;
   padding-top: 1.5rem;
-  border-top: 1px solid $border-color;
+  border-top: 1px solid var(--border);
 
   .showing-text {
     font-size: 0.85rem;
-    color: $text-secondary;
+    color: var(--text-muted);
   }
 
   .pagination-controls {
@@ -458,16 +299,16 @@ $pink-color: #ec4899;
       height: 32px;
       border-radius: 50%;
       border: none;
-      background: white;
-      color: $text-secondary;
+      background: var(--surface);
+      color: var(--text-muted);
       cursor: pointer;
       @include flex-center;
       font-size: 0.8rem;
       transition: all 0.2s;
 
       &:hover:not(:disabled) {
-        background: $bg-color;
-        color: $primary-color;
+        background: var(--bg);
+        color: var(--accent);
       }
 
       &:disabled {
@@ -478,19 +319,18 @@ $pink-color: #ec4899;
   }
 }
 
-// Loading & Empty
-.loading-state,
-.empty-state {
+// Loading
+.loading-state {
   padding: 3rem;
   @include flex-center;
   flex-direction: column;
-  color: $text-secondary;
+  color: var(--text-muted);
 
   .spinner {
     width: 30px;
     height: 30px;
-    border: 3px solid #e5e7eb;
-    border-top-color: $primary-color;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
     border-radius: 50%;
     animation: spin 1s linear infinite;
   }

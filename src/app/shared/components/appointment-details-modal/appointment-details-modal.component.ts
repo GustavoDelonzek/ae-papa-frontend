@@ -14,6 +14,7 @@ import { AuthService } from '../../../services/auth.service';
 export class AppointmentDetailsModalComponent {
     @Input() visible: boolean = false;
     @Input() appointment: Appointment | null = null;
+    @Input() showEditAction: boolean = false;
     @Output() close = new EventEmitter<void>();
     @Output() edit = new EventEmitter<Appointment>();
 

@@ -1,29 +1,6 @@
-@use 'sass:color';
-// ============================================
-// Login Page - Modern Design System
-// ============================================
-
-// Design Tokens
-$primary-color: #4fd1c7;
-$primary-dark: #3ba99c;
-$primary-darker: #2e8b7d;
-$text-dark: #1a1a2e;
-$text-muted: #6b7280;
-$background-light: #f8fafc;
-$white: #ffffff;
-$error-color: #ef4444;
-$border-color: #e2e8f0;
-$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-$border-radius-sm: 8px;
-$border-radius-md: 12px;
-$border-radius-lg: 16px;
 $transition-fast: 0.15s ease;
 $transition-normal: 0.3s ease;
 
-// Reset
 * {
   box-sizing: border-box;
   margin: 0;
@@ -36,14 +13,12 @@ $transition-normal: 0.3s ease;
   height: 100vh;
 }
 
-// Main Container
 .login-container {
   display: flex;
   min-height: 100vh;
   height: 100vh;
   width: 100vw;
-  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  background-color: $background-light;
+  background-color: var(--bg);
   position: fixed;
   top: 0;
   left: 0;
@@ -54,7 +29,6 @@ $transition-normal: 0.3s ease;
   border: none;
 }
 
-// Left Panel - Image Background
 .login-left {
   flex: 1;
   position: relative;
@@ -81,20 +55,18 @@ $transition-normal: 0.3s ease;
   width: 100%;
   height: 100%;
   background: linear-gradient(135deg,
-      rgba($primary-color, 0.65) 0%,
-      rgba($primary-dark, 0.7) 100%);
+      rgba(91, 45, 140, 0.65) 0%,
+      rgba(63, 29, 102, 0.72) 100%);
   z-index: 2;
 }
 
-// Right Panel - Form
 .login-right {
   flex: 0 0 520px;
-  background: $white;
+  background: var(--surface);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 48px;
-  box-shadow: $shadow-xl;
   position: relative;
   z-index: 10;
 }
@@ -104,7 +76,6 @@ $transition-normal: 0.3s ease;
   max-width: 380px;
 }
 
-// Logo
 .logo-container {
   text-align: center;
   margin-bottom: 32px;
@@ -115,30 +86,27 @@ $transition-normal: 0.3s ease;
   width: auto;
   margin: 0 auto;
   display: block;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
 }
 
-// Header
 .login-header {
   text-align: center;
   margin-bottom: 36px;
 }
 
 .login-title {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
-  color: $text-dark;
+  color: var(--text);
   margin-bottom: 8px;
   letter-spacing: -0.5px;
 }
 
 .login-subtitle {
   font-size: 15px;
-  color: $text-muted;
+  color: var(--text-muted);
   line-height: 1.5;
 }
 
-// Form
 .login-form {
   display: flex;
   flex-direction: column;
@@ -150,75 +118,33 @@ $transition-normal: 0.3s ease;
   flex-direction: column;
 }
 
-.form-label {
-  display: block;
-  margin-bottom: 8px;
-  color: $text-dark;
-  font-weight: 600;
-  font-size: 14px;
-}
-
-// Input Wrapper with Icon
 .input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
+
+  .ae-field {
+    padding-left: 44px;
+
+    &.ng-invalid.ng-touched {
+      border-color: var(--danger);
+    }
+  }
+
+  &:focus-within .input-icon {
+    color: var(--accent);
+  }
 }
 
 .input-icon {
   position: absolute;
   left: 16px;
-  color: $text-muted;
-  font-size: 16px;
+  color: var(--text-faint);
+  font-size: 15px;
   z-index: 1;
   transition: color $transition-fast;
 }
 
-.form-control {
-  width: 100%;
-  padding: 14px 16px 14px 48px;
-  border: 2px solid $border-color;
-  border-radius: $border-radius-md;
-  font-size: 15px;
-  color: $text-dark;
-  background-color: $background-light;
-  transition: all $transition-fast;
-
-  &::placeholder {
-    color: color.adjust($border-color, $lightness: -10%);
-  }
-
-  &:hover {
-    border-color: color.adjust($border-color, $lightness: -10%);
-  }
-
-  &:focus {
-    outline: none;
-    border-color: $primary-color;
-    background-color: $white;
-    box-shadow: 0 0 0 4px rgba($primary-color, 0.15);
-
-    &+.input-icon,
-    &~.input-icon {
-      color: $primary-color;
-    }
-  }
-
-  &.ng-invalid.ng-touched {
-    border-color: $error-color;
-
-    &:focus {
-      box-shadow: 0 0 0 4px rgba($error-color, 0.15);
-    }
-  }
-}
-
-// Focus state for icon when input is focused
-.input-wrapper:focus-within .input-icon {
-  color: $primary-color;
-}
-
-// Password Toggle
 .password-toggle {
   position: absolute;
   right: 14px;
@@ -226,27 +152,26 @@ $transition-normal: 0.3s ease;
   border: none;
   padding: 8px;
   cursor: pointer;
-  color: $text-muted;
-  font-size: 16px;
-  transition: color $transition-fast;
+  color: var(--text-faint);
+  font-size: 15px;
+  transition: color $transition-fast, background-color $transition-fast;
   border-radius: 6px;
 
   &:hover {
-    color: $primary-color;
-    background-color: rgba($primary-color, 0.1);
+    color: var(--accent);
+    background-color: var(--accent-soft);
   }
 
   &:focus {
     outline: none;
-    color: $primary-color;
+    color: var(--accent);
   }
 }
 
-// Field Error
 .field-error {
   margin-top: 6px;
   font-size: 13px;
-  color: $error-color;
+  color: var(--danger);
   display: flex;
   align-items: center;
   gap: 4px;
@@ -258,63 +183,31 @@ $transition-normal: 0.3s ease;
     justify-content: center;
     width: 16px;
     height: 16px;
-    background-color: $error-color;
-    color: $white;
+    background-color: var(--danger);
+    color: #fff;
     border-radius: 50%;
     font-size: 10px;
     font-weight: bold;
   }
 }
 
-// Submit Button
-.btn-entrar {
+.login-submit {
   width: 100%;
-  padding: 16px 24px;
-  background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
-  border: none;
-  border-radius: $border-radius-md;
-  color: $white;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all $transition-normal;
-  margin-top: 8px;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 10px;
-  box-shadow: 0 4px 14px 0 rgba($primary-color, 0.4);
+  padding: 13px 24px;
+  font-size: 15px;
+  margin-top: 8px;
 
   .btn-icon {
-    font-size: 18px;
-  }
-
-  &:hover:not(:disabled) {
-    background: linear-gradient(135deg, $primary-dark 0%, $primary-darker 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px 0 rgba($primary-color, 0.5);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0);
-  }
-
-  &:disabled {
-    background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
-    cursor: not-allowed;
-    box-shadow: none;
+    font-size: 15px;
   }
 
   .btn-loading {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
   }
 }
-
-// ============================================
-// Responsiveness
-// ============================================
 
 @media (max-width: 1024px) {
   .login-right {
@@ -342,10 +235,9 @@ $transition-normal: 0.3s ease;
     width: 100%;
     order: 2;
     padding: 40px 24px;
-    box-shadow: none;
-    border-radius: $border-radius-lg $border-radius-lg 0 0;
+    border-radius: 16px 16px 0 0;
     margin-top: -24px;
-    background: $white;
+    background: var(--surface);
     align-items: flex-start;
     justify-content: flex-start;
   }
@@ -391,18 +283,12 @@ $transition-normal: 0.3s ease;
     font-size: 22px;
   }
 
-  .form-control {
-    padding: 14px 14px 14px 44px;
+  .input-wrapper .ae-field {
+    padding-left: 40px;
     font-size: 16px; // Prevents iOS zoom
-  }
-
-  .btn-entrar {
-    padding: 14px 20px;
-    font-size: 15px;
   }
 }
 
-// Small height screens
 @media (max-height: 700px) and (min-width: 769px) {
   .logo-image {
     height: 120px;

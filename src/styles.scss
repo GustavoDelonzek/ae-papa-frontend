@@ -1,19 +1,19 @@
-/* You can add global styles to this file, and also import other style files */
+@use 'styles/tokens';
+@use 'styles/typography';
+@use 'styles/primitives';
 
 .patient-list-container,
 .patient-page-container,
 .caretaker-list-container,
 .caretaker-page-container {
-    padding: 2rem;
-    margin-left: 260px; // Sidebar width (260px)
-    background-color: #f3f4f6;
+    padding: var(--pad-content);
+    margin-left: var(--nav-w);
+    background-color: var(--bg);
     min-height: 100vh;
     transition: margin-left 0.3s ease;
 
-    @media (max-width: 768px) {
-        margin-left: 0;
-        padding: 1rem;
-        padding-top: 80px;
+    @media (max-width: 1023px) {
+        padding-top: 72px;
     }
 }
 
@@ -24,24 +24,24 @@
     .mdc-notched-outline__leading,
     .mdc-notched-outline__notch,
     .mdc-notched-outline__trailing {
-        border-color: #e5e7eb !important;
+        border-color: var(--border-strong) !important;
     }
 
     .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline__leading,
     .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline__notch,
     .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline__trailing {
-        border-color: #6a307d !important; /* Deep Purple */
+        border-color: var(--accent) !important;
     }
 
     .mdc-text-field--focused .mdc-notched-outline__leading,
     .mdc-text-field--focused .mdc-notched-outline__notch,
     .mdc-text-field--focused .mdc-notched-outline__trailing {
-        border-color: #6a307d !important;
+        border-color: var(--accent) !important;
         border-width: 2px !important;
     }
 
     .mat-mdc-text-field-wrapper {
-        background-color: #f9fafb !important;
+        background-color: var(--surface) !important;
         border-radius: 8px;
         padding-left: 12px !important;
         padding-right: 4px !important;
@@ -67,7 +67,7 @@
 
     input.mat-mdc-input-element {
         font-size: 14px !important;
-        color: #333 !important;
+        color: var(--text) !important;
         margin-top: 0 !important;
         height: 100%;
     }
@@ -80,7 +80,7 @@
         display: inline-flex;
         justify-content: center;
         align-items: center;
-        color: #6a307d;
+        color: var(--accent);
         padding: 0;
         width: 38px;
         height: 38px;
@@ -94,35 +94,35 @@
     }
 
     .mdc-floating-label {
-        color: #6b7280;
+        color: var(--text-muted);
         font-weight: 500;
     }
 
     .mat-date-range-input-separator {
-        color: #6b7280;
+        color: var(--text-muted);
         margin: 0 4px;
     }
 }
 
 /* Standard Global Empty States */
 .empty-state-box {
-    background-color: #f9fafb;
-    border: 1px dashed #d1d5db;
-    border-radius: 8px;
+    background-color: var(--surface);
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--r-card);
     padding: 2.5rem 1.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    color: #6b7280;
+    color: var(--text-muted);
     box-sizing: border-box;
     width: 100%;
 
     i {
         font-size: 2.2rem;
         margin-bottom: 0.75rem;
-        color: #9ca3af;
+        color: var(--text-faint);
     }
 
     p {
@@ -140,10 +140,10 @@
 
 /* Secure Image Loading Skeleton (Shimmer Effect) */
 .secure-image-loading {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background: linear-gradient(90deg, var(--hairline) 25%, var(--border) 50%, var(--hairline) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
-    color: transparent !important; /* Hides alt text while loading */
+    color: transparent !important;
 }
 
 @keyframes shimmer {

@@ -11,7 +11,7 @@
     <div class="error-state" *ngIf="errorMessage && !loading">
         <i class="fas fa-exclamation-triangle"></i>
         <span>{{ errorMessage }}</span>
-        <button class="btn-back" (click)="goBack()">Voltar à lista</button>
+        <button class="ae-btn ae-btn--ghost" (click)="goBack()">Voltar à lista</button>
     </div>
 
     <!-- Content -->
@@ -21,12 +21,12 @@
                 <i class="fas fa-arrow-left"></i> Voltar à lista
             </div>
             <div class="header-main">
-                <h1>Detalhes do Cuidador</h1>
+                <h1 class="ae-title-page">Detalhes do Cuidador</h1>
                 <div class="header-actions">
-                    <button class="btn-outline-danger" (click)="deleteCaretaker()">
+                    <button class="ae-btn ae-btn--danger" (click)="deleteCaretaker()">
                         <i class="far fa-trash-alt"></i> Excluir
                     </button>
-                    <button class="btn-primary" (click)="openEditModal()">
+                    <button class="ae-btn ae-btn--ghost" (click)="openEditModal()">
                         <i class="fas fa-pen"></i> Editar
                     </button>
                 </div>
@@ -37,21 +37,21 @@
             <!-- Left Column: Profile, Personal Info & Documents -->
             <div class="left-column">
                 <!-- Profile Card -->
-                <section class="card profile-card">
+                <section class="ae-card profile-card">
                     <div class="profile-content">
                         <div class="avatar-large">
                             <i class="fas fa-hand-holding-heart"></i>
                             <div class="status-dot"></div>
                         </div>
                         <div class="profile-details">
-                            <h2>{{ caretakerData.full_name }}</h2>
-                            <p class="role-text">Cuidador</p>
+                            <h2 class="ae-title-block">{{ caretakerData.full_name }}</h2>
+                            <p class="role-text ae-text-muted">Cuidador</p>
 
                             <div class="badges-row">
-                                <span class="badge-soft-purple">
+                                <span class="ae-chip ae-chip--accent">
                                     <i class="fas fa-id-badge"></i> ID: {{ caretakerData.id }}
                                 </span>
-                                <span class="badge-outline">
+                                <span class="ae-chip ae-chip--neutral">
                                     <i class="fas"
                                         [ngClass]="caretakerData.gender === 'M' ? 'fa-mars' : 'fa-venus'"></i>
                                     {{ getGenderText() }}
@@ -62,40 +62,40 @@
                 </section>
 
                 <!-- Personal Info Card -->
-                <section class="card info-card">
+                <section class="ae-card info-card">
                     <div class="card-header">
                         <div class="icon-wrapper">
                             <i class="fas fa-info"></i>
                         </div>
-                        <h3>Informações Pessoais</h3>
+                        <h3 class="ae-title-block">Informações Pessoais</h3>
                     </div>
                     <div class="info-grid">
                         <div class="info-item">
-                            <label><i class="far fa-calendar"></i> NASCIMENTO</label>
-                            <span>{{ formatDate(caretakerData.birth_date) }}</span>
+                            <label class="ae-label"><i class="far fa-calendar"></i> NASCIMENTO</label>
+                            <span class="mono">{{ formatDate(caretakerData.birth_date) }}</span>
                         </div>
                         <div class="info-item">
-                            <label><i class="fas fa-birthday-cake"></i> IDADE</label>
-                            <span>{{ getCaretakerAge() }} anos</span>
+                            <label class="ae-label"><i class="fas fa-birthday-cake"></i> IDADE</label>
+                            <span class="mono">{{ getCaretakerAge() }} anos</span>
                         </div>
                         <div class="info-item">
-                            <label><i class="fas fa-fingerprint"></i> CPF</label>
-                            <span>{{ formatCPF(caretakerData.cpf) }}</span>
+                            <label class="ae-label"><i class="fas fa-fingerprint"></i> CPF</label>
+                            <span class="mono">{{ formatCPF(caretakerData.cpf) }}</span>
                         </div>
                         <div class="info-item">
-                            <label><i class="far fa-id-card"></i> RG</label>
-                            <span class="italic">{{ caretakerData.rg || 'Não informado' }}</span>
+                            <label class="ae-label"><i class="far fa-id-card"></i> RG</label>
+                            <span class="italic" [class.ae-text-faint]="!caretakerData.rg">{{ caretakerData.rg || 'Não informado' }}</span>
                         </div>
                     </div>
                 </section>
 
                 <!-- Documents Section (Now inside left-column for alignment) -->
-                <section class="card documents-card">
+                <section class="ae-card documents-card">
                     <div class="card-header">
                         <div class="icon-wrapper">
                             <i class="fas fa-folder-open"></i>
                         </div>
-                        <h3>Documentos do Cuidador</h3>
+                        <h3 class="ae-title-block">Documentos do Cuidador</h3>
                     </div>
 
                     <app-document-list #docList [caregiverId]="caretakerId" (onUploadClick)="addDocument()">
@@ -105,13 +105,13 @@
 
             <!-- Right Column: Patients -->
             <div class="right-column">
-                <section class="card patients-card">
+                <section class="ae-card patients-card">
                     <div class="card-header-row">
                         <div class="header-title">
                             <i class="fas fa-users"></i>
-                            <h3>Atendidos</h3>
+                            <h3 class="ae-title-block">Atendidos</h3>
                         </div>
-                        <button class="btn-sm-primary" (click)="openRelationModal()">
+                        <button class="ae-btn ae-btn--primary" (click)="openRelationModal()">
                             <i class="fas fa-plus"></i> Vincular
                         </button>
                     </div>
@@ -125,7 +125,7 @@
                             <div class="patient-details">
                                 <h4>{{ p.full_name }}</h4>
                                 <div class="sub-details">
-                                    <span class="badget-id">ID: {{ p.id }}</span>
+                                    <span class="badget-id mono">ID: {{ p.id }}</span>
                                     <span class="separator">•</span>
                                     <span class="kinship-text"><i class="fas fa-heart"></i> {{ getKinshipText(p.kinship)
                                         }}</span>
@@ -138,18 +138,18 @@
                         </div>
                     </div>
 
-                    <div class="empty-state" *ngIf="!caretakerData.patients?.length">
+                    <div class="ae-empty" *ngIf="!caretakerData.patients?.length">
                         <p>Nenhum paciente vinculado.</p>
                     </div>
                 </section>
             </div>
         </div>
 
-        <div class="timestamps">
-            <span><i class="far fa-calendar-check"></i> Cadastrado em: {{ formatDate(caretakerData.created_at!)
-                }}</span>
-            <span *ngIf="caretakerData.updated_at"><i class="fas fa-sync-alt"></i> Atualizado em: {{
-                formatDate(caretakerData.updated_at) }}</span>
+        <div class="timestamps ae-text-faint">
+            <span><i class="far fa-calendar-check"></i> Cadastrado em: <span class="mono">{{ formatDate(caretakerData.created_at!)
+                }}</span></span>
+            <span *ngIf="caretakerData.updated_at"><i class="fas fa-sync-alt"></i> Atualizado em: <span class="mono">{{
+                formatDate(caretakerData.updated_at) }}</span></span>
         </div>
     </ng-container>
 </div>
@@ -170,10 +170,10 @@
         <h3><i class="fas fa-link"></i> Vincular Atendido</h3>
 
         <div class="form-group">
-            <label>Selecione o Atendido</label>
+            <label class="ae-field-label">Selecione o Atendido</label>
             <div *ngIf="loadingPatients" class="loading-inline"><i class="fas fa-spinner fa-spin"></i> Carregando...
             </div>
-            <select *ngIf="!loadingPatients" [(ngModel)]="newRelationPatientId" class="form-control">
+            <select *ngIf="!loadingPatients" [(ngModel)]="newRelationPatientId" class="ae-field">
                 <option [ngValue]="null" disabled selected>Selecione...</option>
                 <option *ngFor="let p of allPatients" [ngValue]="p.id">
                     {{ p.full_name }} (CPF: {{ p.cpf }})
@@ -185,8 +185,8 @@
         </div>
 
         <div class="form-group">
-            <label>Grau de Parentesco / Relação</label>
-            <select [(ngModel)]="newRelationKinship" class="form-control">
+            <label class="ae-field-label">Grau de Parentesco / Relação</label>
+            <select [(ngModel)]="newRelationKinship" class="ae-field">
                 <option value="" disabled selected>Selecione...</option>
                 <option value="son">Filho</option>
                 <option value="daughter">Filha</option>
@@ -207,8 +207,8 @@
         </div>
 
         <div class="modal-actions">
-            <button class="btn-cancel" (click)="closeRelationModal()">Cancelar</button>
-            <button class="btn-save" (click)="saveRelation()"
+            <button class="ae-btn ae-btn--ghost" (click)="closeRelationModal()">Cancelar</button>
+            <button class="ae-btn ae-btn--primary" (click)="saveRelation()"
                 [disabled]="!newRelationPatientId || !newRelationKinship || savingRelation">
                 <span *ngIf="savingRelation"><i class="fas fa-spinner fa-spin"></i></span>
                 <span *ngIf="!savingRelation">Salvar</span>

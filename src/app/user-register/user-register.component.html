@@ -9,24 +9,23 @@
       </div>
     </div>
 
-    <div class="header-main-row">
+    <div class="header-main-row ae-page-header">
       <div class="title-section">
-        <h1>Usuários do Sistema</h1>
-        <p class="subtitle">Gerencie os usuários cadastrados no sistema.</p>
+        <h1 class="ae-title-page">Usuários do Sistema</h1>
+        <p class="subtitle ae-page-header__subtitle">Gerencie os usuários cadastrados no sistema.</p>
       </div>
-      <button class="btn-primary" (click)="openCreateModal()">
+      <button class="ae-btn ae-btn--primary" (click)="openCreateModal()">
         <i class="fas fa-user-plus"></i> Novo Usuário
       </button>
     </div>
   </header>
 
-
-
-  <div class="filters-container">
+  <div class="filters-container ae-card">
     <div class="search-wrapper">
       <i class="fas fa-search"></i>
       <input
         type="text"
+        class="ae-field"
         placeholder="Buscar por nome, email ou perfil..."
         [ngModel]="searchTerm"
         (ngModelChange)="onSearch($event)"
@@ -34,16 +33,16 @@
       <button *ngIf="searchTerm" class="clear-btn" (click)="clearSearch()" title="Limpar busca">
         <i class="fas fa-times"></i>
       </button>
-      <span class="count-badge" *ngIf="totalItems > 0">{{ totalItems }} usuários encontrados</span>
+      <span class="count-badge ae-chip ae-chip--neutral" *ngIf="totalItems > 0"><span class="mono">{{ totalItems }}</span> usuários encontrados</span>
     </div>
   </div>
 
-  <div class="table-card">
+  <div class="table-card ae-card ae-card--flush">
     <div class="loading-state" *ngIf="loading">
       <div class="spinner"></div>
     </div>
 
-    <table class="custom-table" *ngIf="!loading">
+    <table class="custom-table ae-table" *ngIf="!loading">
       <thead>
         <tr>
           <th (click)="onSort('name')">NOME <i class="fas fa-sort" *ngIf="sortColumn !== 'name'"></i><i class="fas" [ngClass]="sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down'" *ngIf="sortColumn === 'name'"></i></th>
@@ -64,16 +63,16 @@
           </td>
           <td class="email-text">{{ user.email || '-' }}</td>
           <td>
-            <span class="role-pill" [class.admin]="user.role === 'admin'" [class.clinical]="user.role === 'clinical'" [class.reception]="user.role === 'reception'" [class.social_worker]="user.role === 'social_worker'">
+            <span class="role-pill ae-chip" [class.admin]="user.role === 'admin'" [class.clinical]="user.role === 'clinical'" [class.reception]="user.role === 'reception'" [class.social_worker]="user.role === 'social_worker'" [class.ae-chip--accent]="user.role === 'admin'" [class.ae-chip--neutral]="user.role !== 'admin'">
               {{ getRoleLabel(user.role) }}
             </span>
           </td>
-          <td>{{ formatDate(user.created_at) }}</td>
+          <td class="mono">{{ formatDate(user.created_at) }}</td>
         </tr>
       </tbody>
     </table>
 
-    <div class="empty-state" *ngIf="!loading && paginatedUsers.length === 0">
+    <div class="ae-empty" *ngIf="!loading && paginatedUsers.length === 0">
       <i class="fas fa-users-slash"></i>
       <p>Nenhum usuário encontrado com os filtros selecionados.</p>
     </div>
@@ -111,13 +110,13 @@
 
     <form class="user-form premium-form" (ngSubmit)="onSubmit(userForm)" #userForm="ngForm" novalidate>
       <div class="form-group">
-        <label for="name" class="form-label">Nome Completo</label>
+        <label for="name" class="form-label ae-field-label">Nome Completo</label>
         <div class="input-icon-wrapper">
           <input
             type="text"
             id="name"
             name="name"
-            class="form-control"
+            class="form-control ae-field"
             [(ngModel)]="userData.name"
             required
             #name="ngModel"
@@ -130,13 +129,13 @@
       </div>
 
       <div class="form-group">
-        <label for="email" class="form-label">E-mail Profissional</label>
+        <label for="email" class="form-label ae-field-label">E-mail Profissional</label>
         <div class="input-icon-wrapper">
           <input
             type="email"
             id="email"
             name="email"
-            class="form-control"
+            class="form-control ae-field"
             [(ngModel)]="userData.email"
             required
             email
@@ -151,12 +150,12 @@
       </div>
 
       <div class="form-group">
-        <label for="role" class="form-label">Perfil do Usuário</label>
+        <label for="role" class="form-label ae-field-label">Perfil do Usuário</label>
         <div class="input-icon-wrapper">
           <select
             id="role"
             name="role"
-            class="form-control"
+            class="form-control ae-field"
             [(ngModel)]="userData.role"
             required
             #role="ngModel"
@@ -169,13 +168,13 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label for="password" class="form-label">Senha</label>
+          <label for="password" class="form-label ae-field-label">Senha</label>
           <div class="input-icon-wrapper right-icon-only">
             <input
               [type]="showPassword ? 'text' : 'password'"
               id="password"
               name="password"
-              class="form-control"
+              class="form-control ae-field"
               [(ngModel)]="userData.password"
               required
               minlength="8"
@@ -189,13 +188,13 @@
         </div>
 
         <div class="form-group">
-          <label for="password_confirmation" class="form-label">Confirmar Senha</label>
+          <label for="password_confirmation" class="form-label ae-field-label">Confirmar Senha</label>
           <div class="input-icon-wrapper">
             <input
               type="password"
               id="password_confirmation"
               name="password_confirmation"
-              class="form-control with-icon"
+              class="form-control with-icon ae-field"
               [(ngModel)]="userData.password_confirmation"
               required
               #password_confirmation="ngModel"
@@ -228,8 +227,8 @@
       </div>
 
       <div class="form-actions premium-actions">
-        <button type="button" class="btn btn-text" (click)="closeCreateModal()">Cancelar</button>
-        <button type="submit" class="btn btn-primary" [disabled]="!userForm.form.valid || isSubmitting || userData.password !== userData.password_confirmation">
+        <button type="button" class="ae-btn ae-btn--ghost" (click)="closeCreateModal()">Cancelar</button>
+        <button type="submit" class="ae-btn ae-btn--primary" [disabled]="!userForm.form.valid || isSubmitting || userData.password !== userData.password_confirmation">
           <span *ngIf="isSubmitting" class="submitting-spinner"><i class="fas fa-circle-notch fa-spin"></i> Cadastrando...</span>
           <span *ngIf="!isSubmitting"><i class="fas fa-check"></i> Cadastrar Usuário</span>
         </button>

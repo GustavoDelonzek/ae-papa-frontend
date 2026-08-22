@@ -29,7 +29,7 @@
 
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Data do Diagnóstico</label>
+                            <label class="ae-field-label">Data do Diagnóstico</label>
                             <mat-form-field class="custom-mat-form-field">
                                 <input matInput [matDatepicker]="pickerDiag" name="diagnosis_date"
                                     [(ngModel)]="currentRecord.diagnosis_date" [max]="maxDiagnosisDate" required placeholder="DD/MM/AAAA" appDateMask (click)="pickerDiag.open()">
@@ -39,22 +39,22 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Estágio da Doença</label>
-                            <select name="disease_stage" class="form-control" [(ngModel)]="currentRecord.disease_stage">
+                            <label class="ae-field-label">Estágio da Doença</label>
+                            <select name="disease_stage" class="ae-field" [(ngModel)]="currentRecord.disease_stage">
                                 <option value="" disabled selected>Selecione o estágio</option>
                                 <option *ngFor="let stage of stageOptions" [value]="stage">{{ stage }}</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label>Médico Responsável</label>
-                            <input type="text" name="responsible_doctor" class="form-control"
+                            <label class="ae-field-label">Médico Responsável</label>
+                            <input type="text" name="responsible_doctor" class="ae-field"
                                 placeholder="Dr. Nome Sobrenome" [(ngModel)]="currentRecord.responsible_doctor">
                         </div>
 
                         <div class="form-group">
-                            <label>Unidade de Saúde</label>
-                            <input type="text" name="health_unit_location" class="form-control"
+                            <label class="ae-field-label">Unidade de Saúde</label>
+                            <input type="text" name="health_unit_location" class="ae-field"
                                 placeholder="Nome da Unidade" [(ngModel)]="currentRecord.health_unit_location">
                         </div>
                     </div>
@@ -218,8 +218,8 @@
                         <i class="fas fa-notes-medical"></i> PLANO TERAPÊUTICO
                     </h3>
                     <div class="form-group">
-                        <label>Descrição e Observações</label>
-                        <textarea class="form-control" rows="5" name="medications_usage"
+                        <label class="ae-field-label">Descrição e Observações</label>
+                        <textarea class="ae-field" rows="5" name="medications_usage"
                             placeholder="Liste os medicamentos atuais, dosagens e horários de administração..."
                             [(ngModel)]="currentRecord.medications_usage"></textarea>
                     </div>
@@ -233,15 +233,15 @@
                     </span>
                     <span class="spacer"></span>
 
-                    <button type="button" class="btn-cancel" (click)="onClose()">Cancelar</button>
-                    <button type="submit" class="btn-submit" [disabled]="isSaving">
+                    <button type="button" class="ae-btn ae-btn--ghost" (click)="onClose()">Cancelar</button>
+                    <button type="submit" class="ae-btn ae-btn--primary" [disabled]="isSaving">
                         <span *ngIf="!isSaving"><i class="fas fa-save"></i> Salvar Registros</span>
                         <span *ngIf="isSaving"><i class="fas fa-spinner fa-spin"></i></span>
                     </button>
                 </div>
             </form>
 
-            <div class="alert-error" *ngIf="errorMessage">
+            <div class="ae-alert ae-alert--danger" *ngIf="errorMessage">
                 {{ errorMessage }}
             </div>
         </div>

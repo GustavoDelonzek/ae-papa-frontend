@@ -30,7 +30,7 @@
                             </label>
                         </div>
                         <div class="other-input" *ngIf="incomeSourceData.category === 'Outros'">
-                            <input type="text" name="income_other" class="form-control" placeholder="Especifique..."
+                            <input type="text" name="income_other" class="ae-field" placeholder="Especifique..."
                                 [(ngModel)]="incomeSourceData.other">
                         </div>
                     </div>
@@ -73,18 +73,18 @@
                         <!-- Right Column: Stats Box -->
                         <div class="right-col stats-box">
                             <div class="stat-input-group">
-                                <label>Nº de cômodos</label>
+                                <label class="ae-field-label">Nº de cômodos</label>
                                 <div class="input-wrapper">
-                                    <input type="number" name="number_of_rooms" class="form-control"
+                                    <input type="number" name="number_of_rooms" class="ae-field"
                                         [(ngModel)]="currentProfile.number_of_rooms" min="1" step="1" placeholder="0"
                                         (keydown)="onlyNumbers($event)">
                                     <i class="fas fa-door-open input-icon"></i>
                                 </div>
                             </div>
                             <div class="stat-input-group">
-                                <label>Nº de Pessoas</label>
+                                <label class="ae-field-label">Nº de Pessoas</label>
                                 <div class="input-wrapper">
-                                    <input type="number" name="number_of_residents" class="form-control"
+                                    <input type="number" name="number_of_residents" class="ae-field"
                                         [(ngModel)]="currentProfile.number_of_residents" min="1" step="1"
                                         placeholder="0" (keydown)="onlyNumbers($event)">
                                     <i class="fas fa-users input-icon"></i>
@@ -145,9 +145,9 @@
                 <!-- Footer Actions -->
                 <div class="modal-footer">
                     <div class="left-action">
-                        <button type="button" class="btn-cancel" (click)="onClose()">Cancelar</button>
+                        <button type="button" class="ae-btn ae-btn--ghost" (click)="onClose()">Cancelar</button>
                     </div>
-                    <button type="submit" class="btn-submit" [disabled]="isSaving">
+                    <button type="submit" class="ae-btn ae-btn--primary" [disabled]="isSaving">
                         <span *ngIf="!isSaving">Salvar Ficha <i class="fas fa-save"></i></span>
                         <span *ngIf="isSaving"><i class="fas fa-spinner fa-spin"></i></span>
                     </button>
@@ -155,7 +155,7 @@
 
             </form>
 
-            <div class="alert-error" *ngIf="errorMessage">
+            <div class="ae-alert ae-alert--danger" *ngIf="errorMessage">
                 {{ errorMessage }}
             </div>
         </div>

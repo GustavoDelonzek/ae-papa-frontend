@@ -10,25 +10,25 @@
       </div>
     </div>
 
-    <div class="header-main-row">
+    <div class="header-main-row ae-page-header">
       <div class="title-section">
-        <h1>
+        <h1 class="ae-title-page">
           Atendidos
-          <span class="inactive-mode-badge" *ngIf="showInactive">
+          <span class="inactive-mode-badge ae-chip ae-chip--warn" *ngIf="showInactive">
             <i class="fas fa-archive"></i> Inativos
           </span>
         </h1>
-        <p class="subtitle">
+        <p class="subtitle ae-page-header__subtitle">
           <ng-container *ngIf="!showInactive">Gerencie os atendidos e seus atendimentos.</ng-container>
           <ng-container *ngIf="showInactive">Exibindo atendidos desativados (soft delete).</ng-container>
         </p>
       </div>
-      <div class="header-actions">
-        <button class="btn-toggle-inactive" [class.active]="showInactive" (click)="toggleInactiveView()">
+      <div class="header-actions ae-page-header__actions">
+        <button class="btn-toggle-inactive ae-btn ae-btn--ghost" [class.active]="showInactive" (click)="toggleInactiveView()">
           <i class="fas" [class.fa-eye]="!showInactive" [class.fa-eye-slash]="showInactive"></i>
           {{ showInactive ? 'Ver ativos' : 'Ver inativos' }}
         </button>
-        <button class="btn-primary" (click)="openModal()" *ngIf="!showInactive">
+        <button class="ae-btn ae-btn--primary" (click)="openModal()" *ngIf="!showInactive">
           <i class="fas fa-plus"></i> Novo Atendido
         </button>
       </div>
@@ -39,9 +39,9 @@
   <div class="filters-container">
     <div class="search-wrapper">
       <i class="fas fa-search"></i>
-      <input type="text" placeholder="Buscar por nome, CPF ou ID..." [(ngModel)]="searchTerm"
+      <input type="text" class="ae-field" placeholder="Buscar por nome, CPF ou ID..." [(ngModel)]="searchTerm"
         (ngModelChange)="onSearch($event)">
-      <span class="count-badge" *ngIf="totalItems > 0">{{ totalItems }} registros encontrados</span>
+      <span class="count-badge ae-chip ae-chip--neutral" *ngIf="totalItems > 0"><span class="mono">{{ totalItems }}</span> registros encontrados</span>
     </div>
 
     <div class="filters-row">
@@ -50,7 +50,7 @@
         <!-- Gender Filter (Select) -->
         <div class="select-wrapper">
           <i class="far fa-user-circle input-icon"></i>
-          <select [(ngModel)]="genderFilter" (change)="onFilterChange()" [class.active-select]="genderFilter">
+          <select class="ae-field" [(ngModel)]="genderFilter" (change)="onFilterChange()" [class.active-select]="genderFilter">
             <option [ngValue]="null" disabled selected>Gênero</option>
             <option [ngValue]="null">Todos</option>
             <option value="M">Masculino</option>
@@ -62,7 +62,7 @@
         <!-- Age Filter (Select) -->
         <div class="select-wrapper">
           <i class="fas fa-birthday-cake input-icon"></i>
-          <select [(ngModel)]="ageFilter" (change)="onFilterChange()" [class.active-select]="ageFilter">
+          <select class="ae-field" [(ngModel)]="ageFilter" (change)="onFilterChange()" [class.active-select]="ageFilter">
             <option value="" disabled selected>Faixa Etária</option>
             <option value="">Todas</option>
             <option value="20-30">20 - 30 anos</option>
@@ -75,7 +75,7 @@
         <!-- Birth Year Filter (Select) -->
         <div class="select-wrapper">
           <i class="fas fa-calendar input-icon"></i>
-          <select [(ngModel)]="birthYearFilter" (change)="onFilterChange()" [class.active-select]="birthYearFilter">
+          <select class="ae-field" [(ngModel)]="birthYearFilter" (change)="onFilterChange()" [class.active-select]="birthYearFilter">
             <option value="" disabled selected>Ano de Nascimento</option>
             <option value="">Todos</option>
             <option *ngFor="let year of birthYearOptions" [value]="year.toString()">{{ year }}</option>
@@ -85,19 +85,19 @@
 
       </div>
 
-      <button class="btn-clear" (click)="clearFilters()" *ngIf="hasActiveFilters()">
+      <button class="ae-btn ae-btn--ghost" (click)="clearFilters()" *ngIf="hasActiveFilters()">
         <i class="fas fa-times"></i> Limpar Filters
       </button>
     </div>
   </div>
 
   <!-- Content Table -->
-  <div class="table-card">
+  <div class="table-card ae-card ae-card--flush">
     <div class="loading-state" *ngIf="loading">
       <div class="spinner"></div>
     </div>
 
-    <table class="custom-table" *ngIf="!loading">
+    <table class="custom-table ae-table" *ngIf="!loading">
       <thead>
         <tr>
           <th (click)="onSort('full_name')">NOME <i class="fas fa-sort" *ngIf="sortColumn !== 'full_name'"></i><i
@@ -122,17 +122,17 @@
               <div class="info">
                 <span class="name">
                   {{ patient.full_name || 'Sem nome' }}
-                  <span class="badge-inactive" *ngIf="patient.status === 'Inactive'">Inativo</span>
+                  <span class="badge-inactive ae-chip ae-chip--neutral" *ngIf="patient.status === 'Inactive'">Inativo</span>
                 </span>
                 <span class="id">ID: #{{ patient.id || '---' }}</span>
               </div>
             </div>
           </td>
-          <td class="cpf-text">{{ formatCPF(patient.cpf) }}</td>
+          <td class="cpf-text mono">{{ formatCPF(patient.cpf) }}</td>
           <td>
             <div class="age-cell">
-              <span class="years">{{ getPatientAge(patient.birth_date) }} anos</span>
-              <span class="year-born" *ngIf="getPatientYear(patient.birth_date)">({{ getPatientYear(patient.birth_date) }})</span>
+              <span class="years mono">{{ getPatientAge(patient.birth_date) }} anos</span>
+              <span class="year-born mono" *ngIf="getPatientYear(patient.birth_date)">({{ getPatientYear(patient.birth_date) }})</span>
             </div>
           </td>
           <td>
@@ -155,7 +155,7 @@
       </tbody>
     </table>
 
-    <div class="empty-state" *ngIf="!loading && filteredPatients.length === 0">
+    <div class="ae-empty" *ngIf="!loading && filteredPatients.length === 0">
       <i class="fas fa-users-slash"></i>
       <p>Nenhum atendido encontrado com os filtros selecionados.</p>
     </div>

@@ -17,10 +17,10 @@
 
       <form class="login-form" (ngSubmit)="onSubmit()" #loginForm="ngForm">
         <div class="form-group">
-          <label for="email" class="form-label">Email</label>
+          <label for="email" class="ae-field-label">Email</label>
           <div class="input-wrapper">
             <i class="fas fa-envelope input-icon"></i>
-            <input type="email" id="email" name="email" class="form-control" [(ngModel)]="loginData.email" required
+            <input type="email" id="email" name="email" class="ae-field" [(ngModel)]="loginData.email" required
               email #email="ngModel" placeholder="seu@email.com" autocomplete="email">
           </div>
           <div *ngIf="email.invalid && email.touched" class="field-error">
@@ -30,10 +30,10 @@
         </div>
 
         <div class="form-group">
-          <label for="password" class="form-label">Senha</label>
+          <label for="password" class="ae-field-label">Senha</label>
           <div class="input-wrapper">
             <i class="fas fa-lock input-icon"></i>
-            <input [type]="showPassword ? 'text' : 'password'" id="password" name="password" class="form-control"
+            <input [type]="showPassword ? 'text' : 'password'" id="password" name="password" class="ae-field"
               [(ngModel)]="loginData.password" required #password="ngModel" placeholder="••••••••"
               autocomplete="current-password">
             <button type="button" class="password-toggle" (click)="togglePasswordVisibility()"
@@ -46,7 +46,7 @@
           </div>
         </div>
 
-        <button type="submit" class="btn-entrar" [disabled]="!loginForm.form.valid || isLoading">
+        <button type="submit" class="ae-btn ae-btn--primary login-submit" [disabled]="!loginForm.form.valid || isLoading">
           <span *ngIf="isLoading" class="btn-loading">
             <i class="fas fa-spinner fa-spin"></i>
             Entrando...

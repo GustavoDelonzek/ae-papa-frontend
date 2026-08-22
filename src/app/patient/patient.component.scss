@@ -1,55 +1,14 @@
-@use 'sass:color';
-// Variables
-$primary-color: #6a307d; // Design System Purple
-$primary-dark: #4a2157;
-$primary-light: #f3e5f5; // Very light purple for backgrounds
-$text-dark: #1f2937;
-$text-secondary: #6b7280;
-$bg-color: #f8f9fa; // Matching patient-list
-$card-bg: #ffffff;
-$border-color: #e5e7eb;
-$success-color: #10b981;
-$danger-color: #ef4444;
-
-// Mixins
-@mixin card-style {
-  background: $card-bg;
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid $border-color;
-}
-
 @mixin flex-center {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-// Global host styles
 :host {
   display: block;
-  background-color: $bg-color;
   min-height: 100vh;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  color: $text-dark;
+  color: var(--text);
 }
-
-/* Moved to global styles.scss to ensure layout works
-.patient-page-container {
-  display: flex;
-  flex-direction: column;
-  padding: 30px;
-  margin-left: 260px; // Sidebar width
-  min-height: 100vh;
-  margin-right: auto;
-
-  @media (max-width: 768px) {
-    margin-left: 0;
-    padding: 20px;
-    padding-top: 80px; // Space for mobile toggle
-  }
-}
-*/
 
 // Top Nav
 .top-nav {
@@ -63,12 +22,12 @@ $danger-color: #ef4444;
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
-    color: $text-secondary;
+    color: var(--text-muted);
     font-weight: 500;
     transition: color 0.2s;
 
     &:hover {
-      color: $primary-color;
+      color: var(--accent);
     }
 
     i {
@@ -78,41 +37,7 @@ $danger-color: #ef4444;
 
   .top-actions {
     display: flex;
-    gap: 1rem;
-
-    button {
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: all 0.2s;
-
-      &.btn-secondary {
-        background: white;
-        border: 1px solid $border-color;
-        color: $text-dark;
-
-        &:hover {
-          background: $bg-color;
-        }
-      }
-
-      &.btn-primary {
-        background: $primary-color;
-        border: none;
-        color: white;
-        box-shadow: 0 4px 6px -1px rgba($primary-color, 0.2);
-
-        &:hover {
-          background: color.mix(black, $primary-color, $weight: 5%);
-          transform: translateY(-1px);
-        }
-      }
-    }
+    gap: 0.75rem;
   }
 }
 
@@ -123,13 +48,13 @@ $danger-color: #ef4444;
   flex-direction: column;
   padding: 3rem;
   gap: 1rem;
-  color: $text-secondary;
+  color: var(--text-muted);
 
   .spinner {
     width: 40px;
     height: 40px;
-    border: 3px solid #e5e7eb;
-    border-top-color: $primary-color;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
     border-radius: 50%;
     animation: spin 1s linear infinite;
   }
@@ -137,9 +62,6 @@ $danger-color: #ef4444;
 
 // Profile Header Card
 .profile-header-card {
-  @include card-style;
-  background: linear-gradient(to right, #ffffff, #fdf4ff);
-  padding: 2rem;
   margin-bottom: 2rem;
 
   .profile-content {
@@ -161,9 +83,7 @@ $danger-color: #ef4444;
       width: 140px;
       height: 140px;
       border-radius: 50%;
-      overflow: visible; // Allow status indicator
       position: relative;
-      border: 4px solid $primary-light;
 
       img,
       .avatar-placeholder {
@@ -174,23 +94,20 @@ $danger-color: #ef4444;
       }
 
       .avatar-placeholder {
-        background: $primary-color;
-        color: white;
+        background: var(--accent);
+        color: #fff;
         @include flex-center;
         font-size: 3rem;
-        font-weight: bold;
+        font-weight: 700;
       }
 
       .photo-overlay {
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        inset: 0;
         background: rgba(0, 0, 0, 0.4);
         border-radius: 50%;
         @include flex-center;
-        color: white;
+        color: #fff;
         font-size: 1.5rem;
         opacity: 0;
         transition: opacity 0.2s;
@@ -205,18 +122,6 @@ $danger-color: #ef4444;
       &:hover .photo-overlay:not(.uploading) {
         opacity: 1;
       }
-
-      .status-indicator {
-        position: absolute;
-        bottom: 8px;
-        right: 8px;
-        width: 20px;
-        height: 20px;
-        background: $success-color;
-        border: 3px solid white;
-        border-radius: 50%;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
     }
 
     .avatar-inactive {
@@ -226,17 +131,6 @@ $danger-color: #ef4444;
   }
 
   .badge-inactive {
-    display: inline-flex;
-    align-items: center;
-    background: #fee2e2;
-    color: #b91c1c;
-    border: 1px solid #fca5a5;
-    border-radius: 999px;
-    padding: 0.1rem 0.6rem;
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04e;
     margin-left: 0.75rem;
     vertical-align: middle;
   }
@@ -249,48 +143,19 @@ $danger-color: #ef4444;
       margin-bottom: 2rem;
 
       h1 {
-        font-size: 2rem;
+        font-size: 24px;
         font-weight: 700;
-        color: $text-dark;
-        margin: 0 0 0.5rem 0;
-        letter-spacing: -0.025em;
-      }
-
-      .tags {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-
-        .tag {
-          padding: 0.25rem 0.75rem;
-          border-radius: 999px;
-          font-size: 0.75rem;
-          font-weight: 700;
-          text-transform: uppercase;
-        }
-
-        .tag-red {
-          background: #fee2e2;
-          color: #991b1b;
-        }
-
-        .tag-yellow {
-          background: #fef3c7;
-          color: #92400e;
-        }
-
-        .tag-green {
-          background: #d1fae5;
-          color: #065f46;
-        }
+        color: var(--text);
+        margin: 0;
       }
     }
 
     .profile-stats-row {
       display: flex;
       gap: 3rem;
-      border-top: 1px solid $border-color;
+      border-top: 1px solid var(--border);
       padding-top: 1.5rem;
+      color: var(--text-muted);
 
       @media (max-width: 640px) {
         flex-wrap: wrap;
@@ -306,7 +171,7 @@ $danger-color: #ef4444;
         .stat-label {
           font-size: 0.75rem;
           font-weight: 600;
-          color: $text-secondary;
+          color: var(--text-faint);
           text-transform: uppercase;
           letter-spacing: 0.05em;
         }
@@ -314,7 +179,7 @@ $danger-color: #ef4444;
         .stat-value {
           font-size: 1rem;
           font-weight: 600;
-          color: $text-dark;
+          color: var(--text-muted);
         }
       }
     }
@@ -322,93 +187,51 @@ $danger-color: #ef4444;
 }
 
 // Page Tabs
-// Page Tabs - Folder Style
 .page-tabs {
   display: flex;
-  gap: 0.5rem;
-  border-bottom: none;
-  margin-bottom: 0;
-  padding-left: 1rem;
+  gap: var(--sp-2);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 var(--sp-2);
 
   @media (max-width: 640px) {
     overflow-x: auto;
-    padding-bottom: 0.5rem;
-    gap: 0.5rem;
   }
 
   .tab-btn {
     background: transparent;
     border: none;
-    padding: 0.75rem 1.5rem;
-    font-size: 0.95rem;
+    border-bottom: 2px solid transparent;
+    padding: 12px 16px;
+    font-size: 13.5px;
     font-weight: 500;
-    color: $text-secondary;
+    color: var(--text-muted);
     cursor: pointer;
-    position: relative;
     white-space: nowrap;
-    border-radius: 16px 16px 0 0;
-    transition: all 0.2s;
-    background-color: #ececf6;
-    border: 1px solid transparent;
-    margin-bottom: -1px;
-    opacity: 1;
-    color: #6b7280;
+    transition: color 0.15s ease, border-color 0.15s ease;
 
     &:hover {
-      color: $primary-color;
-      background-color: #d1d5db; // Slightly darker on hover
+      color: var(--text);
     }
 
     &.active {
-      color: $primary-color;
       font-weight: 700;
-      background-color: white; // Active tab is white
-      border: 1px solid $border-color;
-      border-bottom-color: white; // Merge with content
-      z-index: 2; // Sit above content border
-      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.02); // Very subtle lift
-      opacity: 1;
-
-      // Visual connection to content area
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: -2px; // Overlap content border
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: white; // Hide content border
-      }
-
-      // Removed purple top accent as requested
+      color: var(--text);
+      border-bottom-color: var(--accent);
     }
   }
 }
 
-// Tab Contents Area - White Card
-// Tab Contents Area - White Card
+// Tab Contents Area
 .tab-content-area {
-  background: white;
-  border-radius: 16px; // Uniform rounded corners
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  border: 1px solid $border-color;
-  padding: 2rem;
+  padding: var(--sp-6) 0;
   min-height: 400px;
-  position: relative;
-  z-index: 1;
-
-  .details-tab,
-  .documents-tab,
-  .caretaker-tab,
-  .appointments-tab {
-    animation: fadeIn 0.3s ease-in-out;
-  }
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(5px);
+    transform: translateY(10px);
   }
 
   to {
@@ -417,23 +240,34 @@ $danger-color: #ef4444;
   }
 }
 
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 // Tab Contents
 .section-title {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: $text-dark;
   margin-bottom: 1rem;
 
   i {
-    color: $primary-color;
+    color: var(--accent);
   }
 }
 
 .info-section {
   margin-bottom: 2.5rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .info-grid {
@@ -453,55 +287,51 @@ $danger-color: #ef4444;
   }
 
   .info-section {
-    margin-bottom: 0; // Remove margin since grid handles gap
+    margin-bottom: 0;
     height: 100%;
     display: flex;
     flex-direction: column;
 
     .info-grid {
-      // Since they are now in half-width columns, maybe force 1 column inside or keep auto-fit?
-      // Auto-fit 280px might be too wide for half screen. 
-      // Let's adjust minmax for this context or leave as is.
-      grid-template-columns: 1fr; // Stack cards vertically inside the column to look clean
+      grid-template-columns: 1fr;
     }
   }
 }
 
 .info-card {
-  @include card-style;
-  border: 1px solid $border-color; // Keep border but lighter?
-  box-shadow: none; // Remove shadow to flat it out inside the white card
-  padding: 1.5rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
   position: relative;
   min-height: 100px;
-  background: white; // Or slightly off-white?
-  transition: all 0.2s;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 
-  // Make it clearer it's an inner card
   &:hover {
-    border-color: $primary-color; // Highlight border on hover instead of lift
-    background: #fdf4ff; // Very light purple on hover
-    transform: none; // No lift
-    box-shadow: none;
+    border-color: var(--accent);
+    background: var(--accent-soft);
   }
 
-  label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: $text-secondary;
-    text-transform: uppercase;
+  label.ae-label {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
     margin-bottom: 0.5rem;
-    letter-spacing: 0.05em;
   }
 
   .value {
     font-size: 1.1rem;
     font-weight: 600;
-    color: $text-dark;
+    color: var(--text);
     word-break: break-all;
+
+    &.ae-text-faint {
+      color: var(--text-faint);
+    }
   }
 
   .card-icon {
@@ -510,30 +340,17 @@ $danger-color: #ef4444;
     top: 50%;
     transform: translateY(-50%);
     font-size: 2rem;
-    color: color.mix(white, $text-secondary, $weight: 30%);
+    color: var(--border-strong);
     pointer-events: none;
-  }
-
-  .badge-primary {
-    background-color: $primary-color;
-    color: white;
-    font-size: 0.65rem;
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin-left: 8px;
-    vertical-align: middle;
-    text-transform: uppercase;
-    font-weight: 700;
   }
 
   .sub-value {
     font-size: 0.9rem;
-    color: $text-secondary;
+    color: var(--text-muted);
     margin-top: 4px;
     font-weight: 500;
 
     &.cep {
-      font-family: monospace;
       margin-top: 2px;
     }
 
@@ -545,55 +362,92 @@ $danger-color: #ef4444;
   }
 }
 
-// Caretaker Tab Styles
+// Caretaker & Appointments Tab Headers
 .caretaker-header-actions,
 .appointments-header-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+}
 
-  h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 0;
+// Filters Bar (Caretaker + Appointments tabs)
+.filters-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.filters-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  .filter-group {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+    flex: 1;
+  }
+
+  .select-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+
+    select.ae-field {
+      appearance: none;
+      width: auto;
+      padding: 0 2rem 0 2.2rem;
+      height: 40px;
+      cursor: pointer;
+
+      &.active-select {
+        background: var(--accent-soft);
+        border-color: var(--accent-soft);
+        color: var(--accent);
+        font-weight: 500;
+      }
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      color: var(--text-faint);
+      font-size: 0.9rem;
+      pointer-events: none;
+    }
+
+    .select-arrow {
+      position: absolute;
+      right: 1rem;
+      color: var(--text-faint);
+      font-size: 0.8rem;
+      pointer-events: none;
+    }
   }
 }
 
-.btn-primary-small {
-  background: $primary-color;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  @include flex-center;
-  gap: 0.5rem;
-  transition: background 0.2s;
-
-  &:hover {
-    background: color.mix(black, $primary-color, $weight: 5%);
-  }
-}
-
+// Caretaker Tab — Card Grid
 .caretaker-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
 
   .caretaker-card-new {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
-    border: 1px solid #e5e7eb;
+    transition: border-color 0.2s;
 
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      border-color: var(--accent);
     }
 
     .card-header {
@@ -606,24 +460,22 @@ $danger-color: #ef4444;
         width: 48px;
         height: 48px;
         border-radius: 50%;
-        background: #f3f4f6; // fallback
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 600;
         font-size: 1.1rem;
-        color: #4b5563;
         margin-right: 1rem;
         flex-shrink: 0;
 
         &.prof {
-          background-color: #f3e8ff; // light purple
-          color: #7e22ce; // purple-700
+          background-color: var(--accent-soft);
+          color: var(--accent);
         }
 
         &.familiar {
-          background-color: #ffedd5; // orange-100
-          color: #c2410c; // orange-700
+          background-color: var(--warn-bg);
+          color: var(--warn);
         }
       }
 
@@ -631,11 +483,11 @@ $danger-color: #ef4444;
         display: flex;
         flex-direction: column;
         flex: 1;
-        min-width: 0; // for truncation to work
+        min-width: 0;
 
         .name {
           font-weight: 600;
-          color: #111827;
+          color: var(--text);
           font-size: 1.05rem;
           white-space: nowrap;
           overflow: hidden;
@@ -652,13 +504,13 @@ $danger-color: #ef4444;
           align-self: flex-start;
 
           &.prof {
-            background-color: #7e22ce;
-            color: white;
+            background-color: var(--accent);
+            color: #fff;
           }
 
           &.familiar {
-            background-color: #fef3c7;
-            color: #92400e;
+            background-color: var(--warn-bg);
+            color: var(--warn);
           }
         }
       }
@@ -669,23 +521,23 @@ $danger-color: #ef4444;
         right: -0.5rem;
         display: flex;
         gap: 0.25rem;
-        opacity: 0; // hide by default
+        opacity: 0;
         transition: opacity 0.2s;
 
         button {
           background: none;
           border: none;
-          color: #9ca3af;
+          color: var(--text-faint);
           cursor: pointer;
           padding: 0.25rem;
           transition: color 0.2s;
 
           &:hover {
-            color: #4b5563;
+            color: var(--text-muted);
           }
 
           &.delete:hover {
-            color: #ef4444;
+            color: var(--danger);
           }
         }
       }
@@ -703,14 +555,14 @@ $danger-color: #ef4444;
       .info-row {
         display: flex;
         align-items: center;
-        color: #6b7280;
+        color: var(--text-muted);
         font-size: 0.9rem;
 
         i {
           width: 20px;
           text-align: center;
           margin-right: 0.75rem;
-          color: #9ca3af;
+          color: var(--text-faint);
         }
 
         span {
@@ -727,99 +579,32 @@ $danger-color: #ef4444;
   }
 }
 
-.caretaker-card-item {
-  @include card-style;
-  overflow: hidden;
-  cursor: pointer;
-
-  .card-header {
-    background: #f8fafc;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid $border-color;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    .name {
-      font-weight: 600;
-      color: $text-dark;
-    }
-
-    .actions {
-      display: flex;
-      gap: 0.5rem;
-
-      button {
-        background: none;
-        border: none;
-        color: $text-secondary;
-        cursor: pointer;
-        padding: 4px;
-        border-radius: 4px;
-
-        &:hover {
-          background: #e2e8f0;
-          color: $primary-color;
-        }
-
-        &.delete:hover {
-          color: $danger-color;
-        }
-      }
-    }
-  }
-
-  .card-body {
-    padding: 1.25rem;
-
-    .detail-row {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 0.5rem;
-      color: $text-secondary;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      i {
-        color: $text-secondary;
-        width: 16px;
-      }
-    }
-  }
-}
-
-// Appointments List
+// Appointments Tab — List
 .appointments-list {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 
   .appointment-item {
-    @include card-style;
-    padding: 0;
     display: flex;
     align-items: center;
-    transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
+    transition: border-color 0.2s;
 
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border-color: var(--accent);
     }
 
     .date-badge {
-      background: $primary-light;
-      color: $primary-color;
+      background: var(--accent-soft);
+      color: var(--accent);
       padding: 1rem;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       min-width: 100px;
-      border-right: 1px solid $border-color;
+      border-right: 1px solid var(--border);
       align-self: stretch;
 
       .day {
@@ -836,7 +621,7 @@ $danger-color: #ef4444;
 
       .year {
         font-size: 0.75rem;
-        color: color.mix(white, $primary-dark, $weight: 40%);
+        opacity: 0.75;
       }
     }
 
@@ -848,11 +633,12 @@ $danger-color: #ef4444;
         margin: 0 0 0.5rem 0;
         font-size: 1.1rem;
         font-weight: 600;
+        color: var(--text);
       }
 
       .obs {
-        margin: 0 0 0.75rem 0;
-        color: $text-secondary;
+        margin: 0;
+        color: var(--text-muted);
         font-size: 0.9rem;
         display: -webkit-box;
         -webkit-line-clamp: 2;
@@ -860,45 +646,11 @@ $danger-color: #ef4444;
         -webkit-box-orient: vertical;
         overflow: hidden;
       }
-
-      .status-tag {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 999px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-
-        &.scheduled {
-          background: #e0f2fe;
-          color: #0369a1;
-        }
-
-        &.confirmed {
-          background: #dcfce7;
-          color: #15803d;
-        }
-
-        &.completed {
-          background: #f3f4f6;
-          color: #374151;
-        }
-
-        &.cancelled {
-          background: #fee2e2;
-          color: #b91c1c;
-        }
-
-        &.pending {
-          background: #fef3c7;
-          color: #b45309;
-        }
-      }
     }
 
     .appt-actions {
       padding: 1rem;
-      border-left: 1px solid $border-color;
+      border-left: 1px solid var(--border);
       align-self: stretch;
       display: flex;
       align-items: center;
@@ -909,149 +661,51 @@ $danger-color: #ef4444;
         border-radius: 50%;
         border: none;
         background: transparent;
-        color: $text-secondary;
+        color: var(--text-muted);
         cursor: pointer;
         @include flex-center;
 
         &:hover {
-          background: $bg-color;
-          color: $primary-color;
+          background: var(--bg);
+          color: var(--accent);
         }
       }
     }
   }
 }
 
-// Fade in animation
-.fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-// Modal Styles overrides (simplified)
+// ----------------------------------------------------
+// "Novo Atendimento" modal (local to this screen)
+// ----------------------------------------------------
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(30, 24, 35, 0.3);
   z-index: 1000;
   @include flex-center;
   backdrop-filter: blur(2px);
 }
 
-.modal-content {
-  background: white;
-  width: 90%;
-  max-width: 500px;
-  border-radius: 12px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+.patient-appt-backdrop {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.patient-appt-modal {
+  display: flex;
+  width: 95%;
+  max-width: 860px;
+  height: min(90vh, 680px);
+  max-height: 90vh;
+  background: var(--surface);
+  border-radius: 16px;
   overflow: hidden;
   animation: slideUp 0.3s ease-out;
 
-  .modal-header {
-    padding: 1.25rem;
-    border-bottom: 1px solid $border-color;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #f9fafb;
-
-    h2 {
-      margin: 0;
-      font-size: 1.25rem;
-      font-weight: 600;
-    }
-
-    .btn-close {
-      background: none;
-      border: none;
-      font-size: 1.25rem;
-      color: $text-secondary;
-      cursor: pointer;
-
-      &:hover {
-        color: $danger-color;
-      }
-    }
-  }
-
-  .modal-body {
-    padding: 1.5rem;
-  }
-
-  .form-group {
-    margin-bottom: 1.25rem;
-
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: $text-dark;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 0.625rem;
-      border: 1px solid $border-color;
-      border-radius: 8px;
-      font-size: 0.95rem;
-
-      &:focus {
-        outline: none;
-        border-color: $primary-color;
-        box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
-      }
-    }
-  }
-
-  .modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 2rem;
-
-    button {
-      padding: 0.625rem 1.25rem;
-      border-radius: 8px;
-      font-weight: 500;
-      cursor: pointer;
-
-      &.btn-cancel {
-        background: white;
-        border: 1px solid $border-color;
-      }
-
-      &.btn-submit {
-        background: $primary-color;
-        color: white;
-        border: none;
-
-        &:disabled {
-          opacity: 0.7;
-          cursor: not-allowed;
-        }
-      }
-    }
+  @media (max-width: 700px) {
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    border-radius: 0;
   }
 }
 
@@ -1067,35 +721,10 @@ $danger-color: #ef4444;
   }
 }
 
-// Patient appointment modal redesign (visual match with appointments list modal)
-.patient-appt-backdrop {
-  animation: fadeIn 0.2s ease-out;
-}
-
-.patient-appt-modal {
-  display: flex;
-  width: 95%;
-  max-width: 860px;
-  height: min(90vh, 680px);
-  max-height: 90vh;
-  background: white;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.08);
-  animation: slideUp 0.3s ease-out;
-
-  @media (max-width: 700px) {
-    flex-direction: column;
-    width: 100%;
-    height: 100vh;
-    border-radius: 0;
-  }
-}
-
 .patient-appt-sidebar {
   width: 260px;
   min-width: 260px;
-  background: linear-gradient(160deg, #6a307d 0%, #7c3aed 100%);
+  background: linear-gradient(160deg, var(--accent) 0%, #7c3aed 100%);
   padding: 28px 24px;
   display: flex;
   flex-direction: column;
@@ -1123,7 +752,7 @@ $danger-color: #ef4444;
 
     i {
       font-size: 22px;
-      color: white;
+      color: #fff;
     }
   }
 
@@ -1131,7 +760,7 @@ $danger-color: #ef4444;
     margin: 0 0 4px;
     font-size: 18px;
     font-weight: 700;
-    color: white;
+    color: #fff;
   }
 
   p {
@@ -1165,7 +794,7 @@ $danger-color: #ef4444;
     }
 
     .patient-appt-summary-value {
-      color: white;
+      color: #fff;
       font-weight: 500;
     }
   }
@@ -1201,6 +830,10 @@ $danger-color: #ef4444;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    &.ae-text-faint {
+      color: var(--text-faint);
+    }
   }
 }
 
@@ -1248,7 +881,7 @@ $danger-color: #ef4444;
   align-items: center;
   justify-content: space-between;
   padding: 20px 28px;
-  border-bottom: 1px solid $border-color;
+  border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 
   .patient-appt-main-title {
@@ -1258,20 +891,20 @@ $danger-color: #ef4444;
 
     .patient-appt-title-icon {
       font-size: 20px;
-      color: $primary-color;
+      color: var(--accent);
     }
 
     h2 {
       margin: 0 0 2px;
       font-size: 17px;
       font-weight: 700;
-      color: $text-dark;
+      color: var(--text);
     }
 
     p {
       margin: 0;
       font-size: 13px;
-      color: $text-secondary;
+      color: var(--text-muted);
     }
   }
 }
@@ -1280,8 +913,8 @@ $danger-color: #ef4444;
   width: 34px;
   height: 34px;
   border: none;
-  background: #f3f4f6;
-  color: $text-secondary;
+  background: var(--bg);
+  color: var(--text-muted);
   border-radius: 8px;
   cursor: pointer;
   display: flex;
@@ -1291,8 +924,8 @@ $danger-color: #ef4444;
   flex-shrink: 0;
 
   &:hover {
-    background: #e5e7eb;
-    color: $text-dark;
+    background: var(--border);
+    color: var(--text);
   }
 }
 
@@ -1310,7 +943,7 @@ $danger-color: #ef4444;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #d1d5db;
+    background: var(--border-strong);
     border-radius: 4px;
   }
 }
@@ -1319,16 +952,8 @@ $danger-color: #ef4444;
   margin-bottom: 20px;
 }
 
-.patient-appt-field-label {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #374151;
-}
-
 .patient-appt-required {
-  color: $danger-color;
+  color: var(--danger);
   margin-left: 2px;
 }
 
@@ -1336,47 +961,6 @@ $danger-color: #ef4444;
   position: relative;
   display: flex;
   align-items: center;
-
-  .patient-appt-input-icon {
-    position: absolute;
-    left: 13px;
-    color: $text-secondary;
-    font-size: 14px;
-    pointer-events: none;
-  }
-}
-
-.patient-appt-input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 10px 14px;
-  border: 1.5px solid $border-color;
-  border-radius: 10px;
-  font-size: 14px;
-  color: $text-dark;
-  background: white;
-  font-family: inherit;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  outline: none;
-
-  &:focus {
-    border-color: $primary-color;
-    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
-  }
-
-  &:disabled {
-    background: #f9fafb;
-    color: $text-secondary;
-  }
-}
-
-.patient-appt-input-padded {
-  padding-left: 38px;
-}
-
-.patient-appt-textarea {
-  resize: vertical;
-  min-height: 90px;
 }
 
 .patient-appt-objective-grid {
@@ -1385,34 +969,36 @@ $danger-color: #ef4444;
   gap: 8px;
 }
 
+// Objective categories keep their literal brand colors — same 8-category
+// classification and palette already approved for the appointment-list modal.
 .patient-appt-obj-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
   padding: 12px 6px;
-  border: 1.5px solid $border-color;
+  border: 1.5px solid var(--border);
   border-radius: 10px;
-  background: white;
+  background: var(--surface);
   cursor: pointer;
   font-family: inherit;
   font-size: 12px;
   font-weight: 500;
-  color: $text-secondary;
+  color: var(--text-muted);
   transition: all 0.18s;
 
   i {
     font-size: 18px;
-    color: $text-secondary;
+    color: var(--text-muted);
   }
 
   &:hover {
     border-color: #c4b5fd;
     background: #faf5ff;
-    color: $primary-color;
+    color: var(--accent);
 
     i {
-      color: $primary-color;
+      color: var(--accent);
     }
   }
 
@@ -1438,12 +1024,12 @@ $danger-color: #ef4444;
     }
 
     &.patient-appt-obj-treatment {
-      border-color: #10b981;
+      border-color: var(--ok);
       background: #ecfdf5;
       color: #065f46;
 
       i {
-        color: #10b981;
+        color: var(--ok);
       }
     }
 
@@ -1458,22 +1044,22 @@ $danger-color: #ef4444;
     }
 
     &.patient-appt-obj-other {
-      border-color: #6b7280;
-      background: #f9fafb;
-      color: #374151;
+      border-color: var(--text-muted);
+      background: var(--bg);
+      color: var(--text);
 
       i {
-        color: #6b7280;
+        color: var(--text-muted);
       }
     }
 
     &.patient-appt-obj-visit {
-      border-color: #ef4444;
+      border-color: var(--danger);
       background: #fef2f2;
       color: #b91c1c;
 
       i {
-        color: #ef4444;
+        color: var(--danger);
       }
     }
 
@@ -1504,421 +1090,4 @@ $danger-color: #ef4444;
   justify-content: flex-end;
   gap: 10px;
   padding-top: 4px;
-}
-
-.patient-appt-btn-ghost {
-  padding: 10px 18px;
-  background: none;
-  border: 1.5px solid $border-color;
-  border-radius: 8px;
-  color: $text-secondary;
-  font-size: 14px;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover:not(:disabled) {
-    background: #f9fafb;
-    border-color: #9ca3af;
-    color: $text-dark;
-  }
-}
-
-.patient-appt-btn-submit {
-  padding: 10px 22px;
-  background: linear-gradient(135deg, #6a307d, #7c3aed);
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 4px 12px rgba($primary-color, 0.35);
-  transition: all 0.2s;
-
-  &:hover:not(:disabled) {
-    background: linear-gradient(135deg, #4a2590, #6d28d9);
-    box-shadow: 0 6px 16px rgba($primary-color, 0.45);
-    transform: translateY(-1px);
-  }
-
-  &:disabled {
-    background: #d1d5db;
-    box-shadow: none;
-    cursor: not-allowed;
-    transform: none;
-  }
-}
-
-// ----------------------------------------------------
-// Clinical Records Tab Styles
-// ----------------------------------------------------
-.clinical-records-tab {
-  .records-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-
-    @media (max-width: 768px) {
-      flex-direction: column;
-      gap: 1rem;
-      align-items: stretch;
-    }
-
-    .search-group {
-      display: flex;
-      gap: 1rem;
-      flex: 1;
-
-      @media (max-width: 640px) {
-        flex-direction: column;
-      }
-
-      .input-icon-wrapper {
-        position: relative;
-        flex: 1;
-        max-width: 400px;
-
-        i {
-          position: absolute;
-          left: 12px;
-          top: 50%;
-          transform: translateY(-50%);
-          color: $text-secondary;
-        }
-
-        input {
-          padding-left: 36px;
-          width: 100%;
-        }
-      }
-
-      .filter-dropdowns {
-        display: flex;
-        gap: 0.8rem;
-
-        @media (max-width: 640px) {
-          overflow-x: auto;
-          padding-bottom: 0.5rem;
-        }
-
-        .btn-filter {
-          background: white;
-          border: 1px solid $border-color;
-          border-radius: 8px;
-          padding: 0.6rem 1rem;
-          color: $text-dark;
-          font-size: 0.9rem;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          cursor: pointer;
-          white-space: nowrap;
-
-          &:hover {
-            background: #f9fafb;
-            border-color: color.mix(black, $border-color, $weight: 10%);
-          }
-
-          i {
-            color: $text-secondary;
-          }
-        }
-      }
-    }
-
-    .btn-primary {
-      background: $primary-color;
-      border: none;
-      color: white;
-      padding: 0.7rem 1.25rem;
-      border-radius: 8px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
-      box-shadow: 0 4px 6px -1px rgba($primary-color, 0.2);
-
-      &:hover {
-        background: color.mix(black, $primary-color, $weight: 5%);
-      }
-    }
-  }
-
-  .table-container {
-    @include card-style;
-    background: white;
-    overflow-x: auto;
-
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-
-      th {
-        text-align: left;
-        padding: 1.25rem 1.5rem;
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: $text-secondary;
-        border-bottom: 1px solid $border-color;
-        letter-spacing: 0.05em;
-      }
-
-      td {
-        padding: 1.25rem 1.5rem;
-        border-bottom: 1px solid #f3f4f6;
-        color: $text-dark;
-        vertical-align: middle;
-      }
-
-      tr:last-child td {
-        border-bottom: none;
-      }
-
-      tr:hover td {
-        background-color: #f9fafb;
-      }
-
-      // Cells
-      .date-cell {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-weight: 500;
-        color: $text-dark;
-
-        i {
-          color: $text-secondary;
-        }
-      }
-
-      .doctor-cell {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-
-        .avatar-initials {
-          width: 32px;
-          height: 32px;
-          background: $primary-light;
-          color: $primary-color;
-          border-radius: 50%;
-          @include flex-center;
-          font-size: 0.75rem;
-          font-weight: 700;
-        }
-
-        .doc-name {
-          font-weight: 500;
-        }
-      }
-
-      .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        padding: 0.35rem 0.8rem;
-        border-radius: 999px;
-        font-size: 0.8rem;
-        font-weight: 600;
-
-        .status-dot {
-          font-size: 0.4rem;
-        }
-
-        &.status-neutral {
-          background: #f3f4f6;
-          color: #4b5563;
-
-          i {
-            color: #9ca3af;
-          }
-        }
-
-        &.status-success {
-          background: #dcfce7;
-          color: #15803d;
-
-          i {
-            color: #166534;
-          }
-        }
-
-        &.status-warning {
-          background: #fef9c3;
-          color: #854d0e;
-
-          i {
-            color: #a16207;
-          }
-        }
-
-        &.status-danger {
-          background: #fee2e2;
-          color: #991b1b;
-
-          i {
-            color: #b91c1c;
-          }
-        }
-      }
-
-      .actions-cell {
-        text-align: right;
-
-        .btn-icon {
-          width: 32px;
-          height: 32px;
-          border-radius: 8px;
-          border: none;
-          background: transparent;
-          color: $text-secondary;
-          cursor: pointer;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          transition: all 0.2s;
-          margin-left: 0.25rem;
-
-          &:hover {
-            background: $primary-light;
-            color: $primary-color;
-          }
-        }
-      }
-
-      .empty-state-row {
-        text-align: center;
-        padding: 4rem 2rem;
-
-        .empty-content {
-          color: $text-secondary;
-
-          i {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-          }
-
-          p {
-            font-size: 1rem;
-            font-weight: 500;
-          }
-        }
-      }
-    }
-  }
-}
-
-// ==========================================
-// Ported Appointment Filters
-// ==========================================
-.filters-container {
-  background: white;
-  padding: 1.25rem 1.5rem;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e5e7eb;
-  margin-bottom: 1.5rem;
-
-  .filters-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-
-    .filter-group {
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      align-items: center;
-      flex: 1;
-    }
-
-    // Custom Select Wrapper
-    .select-wrapper {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-
-      select {
-        appearance: none;
-        background: white;
-        border: 1px solid #e5e7eb;
-        padding: 0 2rem 0 2.2rem;
-        border-radius: 999px;
-        font-size: 0.9rem;
-        height: 40px;
-        color: #1f2937;
-        outline: none;
-        cursor: pointer;
-        font-family: inherit;
-        transition: all 0.2s;
-
-        &:hover {
-          background: #f9fafb;
-          border-color: #d1d5db;
-        }
-
-        &.active-select {
-          background: #f3e5f5;
-          border-color: #f3e5f5;
-          color: #6a307d;
-          font-weight: 500;
-        }
-      }
-
-      .input-icon {
-        position: absolute;
-        left: 1rem;
-        color: #6b7280;
-        font-size: 0.9rem;
-        pointer-events: none;
-      }
-
-      .select-arrow {
-        position: absolute;
-        right: 1rem;
-        color: #6b7280;
-        font-size: 0.8rem;
-        pointer-events: none;
-      }
-    }
-
-    .btn-clear {
-      background: none;
-      border: 1px solid #e5e7eb;
-      background-color: white;
-      padding: 0 1rem;
-      height: 40px;
-      border-radius: 8px;
-      color: #6b7280;
-      cursor: pointer;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-left: auto;
-      font-weight: 500;
-      transition: all 0.2s;
-
-      &:hover {
-        color: #ef4444;
-        border-color: #ef4444;
-        background-color: #fef2f2;
-      }
-    }
-  }
 }

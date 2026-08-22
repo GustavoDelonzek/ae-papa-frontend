@@ -63,7 +63,7 @@ export class StatisticsComponent implements OnInit {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: '#111827',
+        backgroundColor: '#1e1823',
         padding: 12,
         cornerRadius: 8,
         displayColors: false
@@ -72,7 +72,7 @@ export class StatisticsComponent implements OnInit {
     scales: {
       y: {
         beginAtZero: true,
-        grid: { color: 'rgba(0,0,0,0.05)', drawTicks: false },
+        grid: { color: 'rgba(30, 24, 35, 0.06)', drawTicks: false },
         border: { display: false }
       },
       x: {
@@ -180,13 +180,13 @@ export class StatisticsComponent implements OnInit {
         type: 'line',
         label: 'Atendimentos Realizados',
         data: recentData,
-        borderColor: '#6a307d',
-        backgroundColor: 'rgba(91, 47, 168, 0.12)',
+        borderColor: '#5b2d8c',
+        backgroundColor: 'rgba(91, 45, 140, 0.12)',
         borderWidth: 3,
         tension: 0.45,
         fill: true,
         pointBackgroundColor: '#ffffff',
-        pointBorderColor: '#6a307d',
+        pointBorderColor: '#5b2d8c',
         pointRadius: 4,
         pointHoverRadius: 6,
       }];
@@ -199,13 +199,13 @@ export class StatisticsComponent implements OnInit {
         type: 'line',
         label: 'Novos Atendidos',
         data: recentData,
-        borderColor: '#10b981',
-        backgroundColor: 'rgba(16, 185, 129, 0.12)',
+        borderColor: '#7a52a8',
+        backgroundColor: 'rgba(122, 82, 168, 0.12)',
         borderWidth: 3,
         tension: 0.45,
         fill: true,
         pointBackgroundColor: '#ffffff',
-        pointBorderColor: '#10b981',
+        pointBorderColor: '#7a52a8',
         pointRadius: 4,
         pointHoverRadius: 6,
       }];

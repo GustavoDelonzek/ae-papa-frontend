@@ -10,12 +10,12 @@
       </div>
     </div>
 
-    <div class="header-main-row">
+    <div class="header-main-row ae-page-header">
       <div class="title-section">
-        <h1>Cuidadores</h1>
-        <p class="subtitle">Gerencie os cuidadores e seus vínculos.</p>
+        <h1 class="ae-title-page">Cuidadores</h1>
+        <p class="subtitle ae-page-header__subtitle">Gerencie os cuidadores e seus vínculos.</p>
       </div>
-      <button class="btn-primary" (click)="addCaretaker()">
+      <button class="ae-btn ae-btn--primary" (click)="addCaretaker()">
         <i class="fas fa-plus"></i> Novo Cuidador
       </button>
     </div>
@@ -25,9 +25,9 @@
   <div class="filters-container">
     <div class="search-wrapper">
       <i class="fas fa-search"></i>
-      <input type="text" placeholder="Buscar por nome, CPF ou ID..." [(ngModel)]="searchTerm"
+      <input type="text" class="ae-field" placeholder="Buscar por nome, CPF ou ID..." [(ngModel)]="searchTerm"
         (ngModelChange)="onSearch($event)">
-      <span class="count-badge" *ngIf="totalItems > 0">{{ totalItems }} registros encontrados</span>
+      <span class="count-badge ae-chip ae-chip--neutral" *ngIf="totalItems > 0"><span class="mono">{{ totalItems }}</span> registros encontrados</span>
     </div>
 
     <div class="filters-row">
@@ -36,7 +36,7 @@
         <!-- Gender Filter (Select) -->
         <div class="select-wrapper">
           <i class="far fa-user-circle input-icon"></i>
-          <select [(ngModel)]="genderFilter" (change)="onFilterChange()" [class.active-select]="genderFilter">
+          <select class="ae-field" [(ngModel)]="genderFilter" (change)="onFilterChange()" [class.active-select]="genderFilter">
             <option [ngValue]="null" disabled selected>Gênero</option>
             <option [ngValue]="null">Todos</option>
             <option value="M">Masculino</option>
@@ -48,7 +48,7 @@
         <!-- Age Filter (Select) -->
         <div class="select-wrapper">
           <i class="fas fa-birthday-cake input-icon"></i>
-          <select [(ngModel)]="ageFilter" (change)="onFilterChange()" [class.active-select]="ageFilter">
+          <select class="ae-field" [(ngModel)]="ageFilter" (change)="onFilterChange()" [class.active-select]="ageFilter">
             <option value="" disabled selected>Faixa Etária</option>
             <option value="">Todas</option>
             <option value="20-30">20 - 30 anos</option>
@@ -61,7 +61,7 @@
         <!-- Kinship Filter (Select) -->
         <div class="select-wrapper">
           <i class="fas fa-users input-icon"></i>
-          <select [(ngModel)]="kinshipFilter" (change)="onFilterChange()" [class.active-select]="kinshipFilter">
+          <select class="ae-field" [(ngModel)]="kinshipFilter" (change)="onFilterChange()" [class.active-select]="kinshipFilter">
             <option value="" disabled selected>Parentesco</option>
             <option value="">Todos</option>
             <option *ngFor="let kinship of kinshipOptions" [value]="kinship.value">{{ kinship.label }}</option>
@@ -72,7 +72,7 @@
         <!-- Birth Year Filter (Select) -->
         <div class="select-wrapper">
           <i class="fas fa-calendar input-icon"></i>
-          <select [(ngModel)]="birthYearFilter" (change)="onFilterChange()" [class.active-select]="birthYearFilter">
+          <select class="ae-field" [(ngModel)]="birthYearFilter" (change)="onFilterChange()" [class.active-select]="birthYearFilter">
             <option value="" disabled selected>Ano de Nascimento</option>
             <option value="">Todos</option>
             <option *ngFor="let year of birthYearOptions" [value]="year.toString()">{{ year }}</option>
@@ -82,19 +82,19 @@
 
       </div>
 
-      <button class="btn-clear" (click)="clearFilters()" *ngIf="hasActiveFilters()">
+      <button class="ae-btn ae-btn--ghost" (click)="clearFilters()" *ngIf="hasActiveFilters()">
         <i class="fas fa-times"></i> Limpar Filtros
       </button>
     </div>
   </div>
 
   <!-- Content Table -->
-  <div class="table-card">
+  <div class="table-card ae-card ae-card--flush">
     <div class="loading-state" *ngIf="loading">
       <div class="spinner"></div>
     </div>
 
-    <table class="custom-table" *ngIf="!loading">
+    <table class="custom-table ae-table" *ngIf="!loading">
       <thead>
         <tr>
           <th (click)="onSort('full_name')">NOME <i class="fas fa-sort" *ngIf="sortColumn !== 'full_name'"></i><i
@@ -122,11 +122,11 @@
               </div>
             </div>
           </td>
-          <td class="cpf-text">{{ formatCPF(caretaker.cpf) }}</td>
+          <td class="cpf-text mono">{{ formatCPF(caretaker.cpf) }}</td>
           <td>
             <div class="age-cell">
-              <span class="years">{{ getCaretakerAge(caretaker.birth_date) }} anos</span>
-              <span class="year-born" *ngIf="getCaretakerYear(caretaker.birth_date)">({{ getCaretakerYear(caretaker.birth_date) }})</span>
+              <span class="years mono">{{ getCaretakerAge(caretaker.birth_date) }} anos</span>
+              <span class="year-born mono" *ngIf="getCaretakerYear(caretaker.birth_date)">({{ getCaretakerYear(caretaker.birth_date) }})</span>
             </div>
           </td>
           <td>
@@ -149,7 +149,7 @@
       </tbody>
     </table>
 
-    <div class="empty-state" *ngIf="!loading && filteredCaretakers.length === 0">
+    <div class="ae-empty" *ngIf="!loading && filteredCaretakers.length === 0">
       <i class="fas fa-users-slash"></i>
       <p>Nenhum cuidador encontrado com os filtros selecionados.</p>
     </div>

@@ -1,11 +1,7 @@
 @use 'sass:color';
 // Variables
-$primary-color: #6a307d; // Purple consistent
 $primary-light: #f3e8ff;
-$text-dark: #1f2937;
-$text-sub: #6b7280;
-$border-color: #e5e7eb;
-$success-color: #10b981;
+$text-dark: var(--text);
 
 .modal-overlay {
     position: fixed;
@@ -13,7 +9,7 @@ $success-color: #10b981;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(30, 24, 35, 0.3);
     z-index: 9999;
     display: flex;
     justify-content: center;
@@ -24,25 +20,25 @@ $success-color: #10b981;
 }
 
 .modal-content {
-    background-color: #f9fafb; // Light gray bg
-    border-radius: 16px;
+    background-color: var(--bg); // outer modal shell
+    border-radius: 12px;
     width: 100%;
     max-width: 1000px;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--shadow-overlay);
     margin: auto;
 }
 
 .modal-header {
-    background: white;
+    background: var(--surface);
     padding: 1.5rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    border-bottom: 1px solid $border-color;
-    border-radius: 16px 16px 0 0;
+    border-bottom: 1px solid var(--border);
+    border-radius: 12px 12px 0 0;
 
     .header-content {
         display: flex;
@@ -58,7 +54,7 @@ $success-color: #10b981;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: $primary-color;
+        color: var(--accent);
         font-size: 1.25rem;
     }
 
@@ -71,8 +67,8 @@ $success-color: #10b981;
         }
 
         .patient-pill {
-            background: #f3f4f6;
-            color: $text-sub;
+            background: var(--hairline);
+            color: var(--text-muted);
             font-size: 0.85rem;
             padding: 0.25rem 0.75rem;
             border-radius: 6px;
@@ -85,12 +81,12 @@ $success-color: #10b981;
         background: none;
         border: none;
         font-size: 1.25rem;
-        color: #9ca3af;
+        color: var(--text-faint);
         cursor: pointer;
         padding: 0.25rem;
 
         &:hover {
-            color: #ef4444;
+            color: var(--danger);
         }
     }
 }
@@ -103,12 +99,11 @@ $success-color: #10b981;
 
 // Sections
 .section-container {
-    background: white;
+    background: var(--surface);
     border-radius: 12px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    border: 1px solid $border-color; // Added for visibility
+    border: 1px solid var(--border); // Added for visibility
 
     .section-title {
         font-size: 0.85rem;
@@ -122,7 +117,7 @@ $success-color: #10b981;
         gap: 0.5rem;
 
         i {
-            color: $primary-color;
+            color: var(--accent);
             font-size: 1rem;
             padding: 0.35rem;
             background: $primary-light;
@@ -141,8 +136,8 @@ $success-color: #10b981;
         }
 
         .badge-hint {
-            background: #f3f4f6;
-            color: $text-sub;
+            background: var(--hairline);
+            color: var(--text-muted);
             font-size: 0.75rem;
             padding: 0.25rem 0.5rem;
             border-radius: 4px;
@@ -162,38 +157,12 @@ $success-color: #10b981;
 .form-group {
     margin-bottom: 1rem; // Ensure spacing if not in grid
 
-    label {
-        display: block; // Ensures label sits ABOVE input
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #4b5563;
-        margin-bottom: 0.5rem;
-    }
-
-    .form-control {
-        width: 100%;
-        padding: 0.6rem 0.75rem;
-        border: 1px solid $border-color;
-        border-radius: 8px;
-        font-size: 0.95rem;
-        background: #fff;
-        box-sizing: border-box;
-        font-family: inherit; // Vital for Textarea to inherit font
-        transition: all 0.2s;
-
-        &:focus {
-            outline: none;
-            border-color: $primary-color;
-            box-shadow: 0 0 0 3px rgba(107, 33, 168, 0.1);
-        }
-    }
-
-    // Specific Overrides for Textarea
-    textarea.form-control {
+    // Specific Override for Textarea
+    textarea.ae-field {
         min-height: 120px;
         resize: vertical;
         line-height: 1.5;
-        display: block; // Defensively ensure block
+        display: block;
     }
 }
 
@@ -221,7 +190,7 @@ $success-color: #10b981;
 
         .toggle-subtitle {
             font-size: 0.75rem;
-            color: #9ca3af;
+            color: var(--text-faint);
         }
     }
 
@@ -245,7 +214,7 @@ $success-color: #10b981;
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #e5e7eb;
+            background-color: var(--border);
             transition: .4s;
             border-radius: 24px;
 
@@ -259,12 +228,11 @@ $success-color: #10b981;
                 background-color: white;
                 transition: .4s;
                 border-radius: 50%;
-                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
             }
         }
 
         input:checked+.slider {
-            background-color: $primary-color;
+            background-color: var(--accent);
         }
 
         input:checked+.slider:before {
@@ -287,54 +255,10 @@ $success-color: #10b981;
 
     .last-update {
         font-size: 0.8rem;
-        color: #9ca3af;
+        color: var(--text-faint);
         display: flex;
         align-items: center;
         gap: 0.4rem;
     }
 
-    .btn-cancel {
-        background: transparent;
-        border: none;
-        color: #6b7280;
-        font-weight: 600;
-        cursor: pointer;
-        padding: 0.75rem 1rem;
-
-        &:hover {
-            color: $text-dark;
-        }
-    }
-
-    .btn-submit {
-        background: $primary-color;
-        color: white;
-        border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        box-shadow: 0 4px 6px -1px rgba($primary-color, 0.2);
-
-        &:hover {
-            background-color: color.adjust($primary-color, $lightness: -5%);
-        }
-
-        &:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-    }
-}
-
-.alert-error {
-    margin-top: 1rem;
-    padding: 1rem;
-    background: #fef2f2;
-    color: #b91c1c;
-    border-radius: 8px;
-    text-align: center;
 }

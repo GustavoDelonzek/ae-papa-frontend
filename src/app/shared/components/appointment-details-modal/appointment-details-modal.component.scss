@@ -1,11 +1,4 @@
 // Variables
-$primary-color: #6a307d; // Brand Purple
-$primary-light: #f3e5f5;
-$text-main: #2c2e3e;
-$text-secondary: #6B7280;
-$border-color: #E5E7EB;
-$modal-bg: #F9FAFB;
-$white: #ffffff;
 
 .modal-overlay {
     position: fixed;
@@ -13,7 +6,7 @@ $white: #ffffff;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(30, 24, 35, 0.3);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -22,11 +15,11 @@ $white: #ffffff;
 }
 
 .modal-container {
-    background-color: $modal-bg;
+    background-color: var(--bg);
     border-radius: 12px;
     width: 100%;
     max-width: 600px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-overlay);
     animation: slideIn 0.3s ease-out;
     overflow: hidden;
     position: relative;
@@ -49,12 +42,12 @@ $white: #ffffff;
 
 // HEADER
 .modal-header {
-    background-color: $white;
+    background-color: var(--surface);
     padding: 20px 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid $border-color;
+    border-bottom: 1px solid var(--border);
 
     .title-area {
         display: flex;
@@ -64,8 +57,8 @@ $white: #ffffff;
         .icon-box {
             width: 36px;
             height: 36px;
-            background-color: $primary-light;
-            color: $primary-color;
+            background-color: var(--accent-soft);
+            color: var(--accent);
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -77,14 +70,14 @@ $white: #ffffff;
             margin: 0;
             font-size: 18px;
             font-weight: 700;
-            color: $text-main;
+            color: var(--text);
             display: flex;
             align-items: center;
             gap: 8px;
 
             .id-badge {
                 font-size: 14px;
-                color: $text-secondary;
+                color: var(--text-muted);
                 font-weight: 400;
             }
         }
@@ -93,14 +86,14 @@ $white: #ffffff;
     .close-btn {
         background: none;
         border: none;
-        color: $text-secondary;
+        color: var(--text-muted);
         font-size: 18px;
         cursor: pointer;
         padding: 4px;
         transition: color 0.2s;
 
         &:hover {
-            color: $text-main;
+            color: var(--text);
         }
     }
 }
@@ -115,17 +108,16 @@ $white: #ffffff;
 
 // PATIENT CARD
 .patient-card {
-    background: $white;
+    background: var(--surface);
     border-radius: 12px;
-    border: 1px solid $border-color;
+    border: 1px solid var(--border);
     display: flex;
     position: relative;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
     flex-shrink: 0; // Prevent shrinking if modal is short
 
     .card-left-border {
         width: 6px;
-        background-color: $primary-color;
+        background-color: var(--accent);
         flex-shrink: 0;
     }
 
@@ -145,7 +137,7 @@ $white: #ffffff;
                 margin: 0;
                 font-size: 18px;
                 font-weight: 700;
-                color: $text-main;
+                color: var(--text);
             }
 
             .patient-status {
@@ -162,7 +154,7 @@ $white: #ffffff;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             gap: 20px;
-            border-top: 1px solid #F3F4F6;
+            border-top: 1px solid var(--hairline);
             padding-top: 16px;
 
             .detail-item {
@@ -172,7 +164,7 @@ $white: #ffffff;
 
                 label {
                     font-size: 10px;
-                    color: $text-secondary;
+                    color: var(--text-muted);
                     font-weight: 700;
                     text-transform: uppercase;
                     letter-spacing: 0.5px;
@@ -180,7 +172,7 @@ $white: #ffffff;
 
                 span {
                     font-size: 14px;
-                    color: $text-main;
+                    color: var(--text);
                     font-weight: 500;
                 }
             }
@@ -204,12 +196,12 @@ $white: #ffffff;
             display: flex;
             align-items: center;
             gap: 8px;
-            color: $text-main;
+            color: var(--text);
             font-weight: 500;
             font-size: 14px;
 
             i {
-                color: $primary-color;
+                color: var(--accent);
                 font-size: 16px;
             }
         }
@@ -222,15 +214,15 @@ $white: #ffffff;
 
         label {
             font-size: 11px;
-            color: $text-secondary;
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-weight: 600;
         }
 
         .objective-badge {
-            background-color: $primary-light;
-            color: $primary-color;
+            background-color: var(--accent-soft);
+            color: var(--accent);
             padding: 6px 16px;
             border-radius: 8px;
             font-size: 13px;
@@ -245,7 +237,7 @@ $white: #ffffff;
                 width: 6px;
                 height: 6px;
                 border-radius: 50%;
-                background-color: $primary-color;
+                background-color: var(--accent);
                 opacity: 0.5;
             }
         }
@@ -254,21 +246,21 @@ $white: #ffffff;
 
 // OBSERVATIONS CARD
 .observations-card {
-    background: $white;
-    border: 1px solid $border-color;
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 12px;
     flex-shrink: 0; // Prevent shrinking
 
     .card-header-simple {
         padding: 16px 20px;
-        border-bottom: 1px solid $border-color;
+        border-bottom: 1px solid var(--border);
         display: flex;
         align-items: center;
         gap: 10px;
-        background-color: #ffffff;
+        background-color: var(--surface);
 
         i {
-            color: $text-secondary;
+            color: var(--text-muted);
             font-size: 14px;
         }
 
@@ -276,7 +268,7 @@ $white: #ffffff;
             margin: 0;
             font-size: 14px;
             font-weight: 600;
-            color: $text-main;
+            color: var(--text);
         }
     }
 
@@ -288,12 +280,12 @@ $white: #ffffff;
             margin: 0;
             font-size: 14px;
             line-height: 1.6;
-            color: #4B5563;
+            color: var(--text-muted);
             white-space: pre-wrap; // Preserve detailed text formatting
         }
 
         .placeholder-text {
-            color: $text-secondary;
+            color: var(--text-muted);
             font-style: italic;
             text-align: center;
             margin-top: 20px;
@@ -301,14 +293,14 @@ $white: #ffffff;
     }
 
     .card-footer-alert {
-        background-color: #FFFBEB; // Warning yellow bg
+        background-color: var(--warn-bg);
         padding: 12px 20px;
-        border-top: 1px solid #FCD34D;
+        border-top: 1px solid var(--warn-border);
         display: flex;
         align-items: center;
         gap: 12px;
         font-size: 13px;
-        color: #B45309;
+        color: var(--warn);
 
         i {
             font-size: 16px;
@@ -322,10 +314,10 @@ $white: #ffffff;
     justify-content: center;
     align-items: center;
     gap: 8px;
-    background-color: #F3F4F6;
+    background-color: var(--bg);
     padding: 10px;
     border-radius: 8px;
-    color: $text-secondary;
+    color: var(--text-muted);
     font-size: 11px;
     font-family: monospace;
 }
@@ -333,21 +325,9 @@ $white: #ffffff;
 // ACTIONS FOOTER
 .modal-footer {
     padding: 24px;
-    background-color: $white;
-    border-top: 1px solid $border-color;
+    background-color: var(--surface);
+    border-top: 1px solid var(--border);
     display: flex;
     justify-content: flex-end;
     gap: 12px;
-
-    .btn-primary-action {
-        background-color: $primary-color;
-        color: white;
-        transform: translateY(20px);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
 }

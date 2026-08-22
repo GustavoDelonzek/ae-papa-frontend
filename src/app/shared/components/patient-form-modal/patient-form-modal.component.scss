@@ -1,12 +1,7 @@
 @use 'sass:color';
 // Variables
-$primary-color: #6a307d; // Deep purple from the screenshot/theme
 $primary-light: #f3f0fa;
-$text-color: #333;
-$text-muted: #6b7280;
-$border-color: #e5e7eb;
-$danger-color: #ef4444;
-$success-color: #10b981;
+$text-muted-base: #655c6e; // mirrors var(--text-muted), for sass color math
 
 .modal-overlay {
     position: fixed;
@@ -14,7 +9,7 @@ $success-color: #10b981;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(30, 24, 35, 0.3);
     z-index: 1000;
     display: flex;
     align-items: center;
@@ -24,13 +19,13 @@ $success-color: #10b981;
 }
 
 .modal-content {
-    background: white;
+    background: var(--surface);
     width: 95%;
     max-width: 900px; // Wider for sidebar layout
     height: min(90vh, 760px);
     max-height: 90vh;
     border-radius: 12px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--shadow-overlay);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -57,8 +52,8 @@ $success-color: #10b981;
 // Left Sidebar
 .modal-sidebar {
     width: 280px;
-    background-color: #f9fafb;
-    border-right: 1px solid $border-color;
+    background-color: var(--bg);
+    border-right: 1px solid var(--border);
     padding: 24px;
     display: flex;
     flex-direction: column;
@@ -67,7 +62,7 @@ $success-color: #10b981;
     @media (max-width: 768px) {
         width: 100%;
         border-right: none;
-        border-bottom: 1px solid $border-color;
+        border-bottom: 1px solid var(--border);
         padding: 16px;
     }
 
@@ -77,7 +72,7 @@ $success-color: #10b981;
         .header-icon {
             width: 48px;
             height: 48px;
-            background-color: $primary-color;
+            background-color: var(--accent);
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -94,13 +89,13 @@ $success-color: #10b981;
             margin: 0;
             font-size: 18px;
             font-weight: 700;
-            color: $text-color;
+            color: var(--text);
         }
 
         p {
             margin: 4px 0 0;
             font-size: 14px;
-            color: $text-muted;
+            color: var(--text-muted);
         }
     }
 
@@ -128,7 +123,7 @@ $success-color: #10b981;
                 top: 28px;
                 bottom: -24px; // Connect to next step
                 width: 1px;
-                background-color: $border-color;
+                background-color: var(--border);
                 z-index: 0;
             }
 
@@ -138,9 +133,9 @@ $success-color: #10b981;
                 height: 28px;
                 min-width: 28px;
                 border-radius: 50%;
-                background-color: white;
-                border: 1px solid $border-color;
-                color: $text-muted;
+                background-color: var(--surface);
+                border: 1px solid var(--border);
+                color: var(--text-muted);
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -154,42 +149,42 @@ $success-color: #10b981;
                 .step-title {
                     font-size: 14px;
                     font-weight: 600;
-                    color: $text-muted;
+                    color: var(--text-muted);
                     display: block;
                     transition: all 0.3s;
                 }
 
                 .step-desc {
                     font-size: 12px;
-                    color: color.adjust($text-muted, $lightness: 20%);
+                    color: color.adjust($text-muted-base, $lightness: 20%);
                     display: block;
                 }
             }
 
             &.active {
                 .step-number {
-                    background-color: $primary-color;
-                    border-color: $primary-color;
+                    background-color: var(--accent);
+                    border-color: var(--accent);
                     color: white;
                 }
 
                 .step-content {
                     .step-title {
-                        color: $primary-color;
+                        color: var(--accent);
                     }
                 }
             }
 
             &.completed {
                 .step-number {
-                    background-color: $success-color;
-                    border-color: $success-color;
+                    background-color: var(--ok);
+                    border-color: var(--ok);
                     color: white;
                 }
 
                 .step-content {
                     .step-title {
-                        color: $text-color;
+                        color: var(--text);
                     }
                 }
             }
@@ -205,14 +200,14 @@ $success-color: #10b981;
         h4 {
             margin: 0 0 8px;
             font-size: 13px;
-            color: $primary-color;
+            color: var(--accent);
             font-weight: 600;
         }
 
         p {
             margin: 0;
             font-size: 12px;
-            color: color.adjust($text-muted, $lightness: -10%);
+            color: color.adjust($text-muted-base, $lightness: -10%);
             line-height: 1.4;
         }
     }
@@ -227,7 +222,7 @@ $success-color: #10b981;
 
     .main-header {
         padding: 24px 32px;
-        border-bottom: 1px solid $border-color;
+        border-bottom: 1px solid var(--border);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -236,19 +231,19 @@ $success-color: #10b981;
             margin: 0;
             font-size: 20px;
             font-weight: 600;
-            color: $text-color;
+            color: var(--text);
         }
 
         .btn-close {
             background: none;
             border: none;
             font-size: 20px;
-            color: $text-muted;
+            color: var(--text-muted);
             cursor: pointer;
             transition: color 0.2s;
 
             &:hover {
-                color: $danger-color;
+                color: var(--danger);
             }
         }
     }
@@ -262,51 +257,11 @@ $success-color: #10b981;
 
     .main-footer {
         padding: 20px 32px;
-        border-top: 1px solid $border-color;
+        border-top: 1px solid var(--border);
         display: flex;
         justify-content: flex-end;
         gap: 12px;
-        background-color: white;
-
-        button {
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-weight: 500;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-
-            &.btn-cancel {
-                background: white;
-                border: 1px solid $border-color;
-                color: $text-color;
-
-                &:hover {
-                    background: #f9fafb;
-                }
-            }
-
-            &.btn-submit {
-                background: $primary-color;
-                color: white;
-                border: none;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-
-                &:hover {
-                    background: color.adjust($primary-color, $lightness: -5%);
-                    transform: translateY(-1px);
-                    box-shadow: 0 4px 6px -1px rgba($primary-color, 0.2);
-                }
-
-                &:disabled {
-                    opacity: 0.6;
-                    cursor: not-allowed;
-                    transform: none;
-                }
-            }
-        }
+        background-color: var(--surface);
     }
 }
 
@@ -321,38 +276,9 @@ $success-color: #10b981;
 .form-group {
     margin-bottom: 20px;
 
-    label {
-        display: block;
-        margin-bottom: 8px;
-        font-size: 14px;
-        font-weight: 500;
-        color: $text-color;
-
-        .required {
-            color: $primary-color;
-            margin-left: 2px;
-        }
-    }
-
-    .form-control {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 12px;
-        border: 1px solid $border-color;
-        border-radius: 8px;
-        font-size: 14px;
-        transition: all 0.2s;
-        font-family: inherit;
-
-        &:focus {
-            outline: none;
-            border-color: $primary-color;
-            box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
-        }
-
-        &::placeholder {
-            color: #9ca3af;
-        }
+    .required {
+        color: var(--accent);
+        margin-left: 2px;
     }
 }
 
@@ -397,7 +323,7 @@ $success-color: #10b981;
     h4 {
         margin: 0 0 12px;
         font-size: 14px;
-        color: $primary-color;
+        color: var(--accent);
     }
 
     .form-row {
@@ -444,30 +370,11 @@ $success-color: #10b981;
                 input[type="checkbox"] {
                     width: 16px;
                     height: 16px;
-                    accent-color: $primary-color;
+                    accent-color: var(--accent);
                 }
             }
         }
 
-        .btn-add {
-            height: 42px;
-            padding: 0 16px;
-            background-color: $primary-color;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-
-            &:hover {
-                background-color: color.adjust($primary-color, $lightness: -5%);
-            }
-
-            &:disabled {
-                opacity: 0.5;
-                cursor: not-allowed;
-            }
-        }
     }
 }
 
@@ -481,8 +388,8 @@ $success-color: #10b981;
         align-items: center;
         justify-content: space-between;
         padding: 12px 16px;
-        background-color: white;
-        border: 1px solid $border-color;
+        background-color: var(--surface);
+        border: 1px solid var(--border);
         border-radius: 8px;
 
         .contact-info {
@@ -492,34 +399,34 @@ $success-color: #10b981;
 
             .contact-type-badge {
                 padding: 4px 8px;
-                background-color: #e5e7eb;
+                background-color: var(--border);
                 border-radius: 4px;
                 font-size: 11px;
                 font-weight: 600;
-                color: #4b5563;
+                color: var(--text-muted);
                 text-transform: uppercase;
 
                 &.primary {
-                    background-color: rgba($primary-color, 0.1);
-                    color: $primary-color;
+                    background-color: var(--accent-soft);
+                    color: var(--accent);
                 }
             }
 
             .contact-value {
                 font-weight: 500;
-                color: $text-color;
+                color: var(--text);
             }
         }
 
         .btn-remove {
             background: none;
             border: none;
-            color: $text-muted;
+            color: var(--text-muted);
             cursor: pointer;
             padding: 4px;
 
             &:hover {
-                color: $danger-color;
+                color: var(--danger);
             }
         }
     }
@@ -527,24 +434,11 @@ $success-color: #10b981;
     .empty-contacts {
         text-align: center;
         padding: 24px;
-        color: $text-muted;
+        color: var(--text-muted);
         font-size: 14px;
-        background-color: #f9fafb;
+        background-color: var(--bg);
         border-radius: 8px;
     }
-}
-
-.alert-error {
-    margin-bottom: 20px;
-    padding: 12px;
-    background-color: #fef2f2;
-    color: $danger-color;
-    border-radius: 8px;
-    font-size: 14px;
-    border: 1px solid rgba($danger-color, 0.2);
-    display: flex;
-    align-items: center;
-    gap: 8px;
 }
 
 @keyframes fadeIn {

@@ -1,18 +1,16 @@
 .stat-card-container {
-  background: #ffffff;
-  border-radius: 16px;
+  background: var(--surface);
+  border-radius: var(--r-card);
   padding: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
   display: flex;
   flex-direction: column;
   gap: 12px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease;
   height: auto;
-  border: 1px solid rgba(15, 23, 42, 0.04);
+  border: 1px solid var(--hairline);
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
   }
 
   .card-header {
@@ -30,20 +28,20 @@
       font-size: 1.15rem;
 
       &.purple-icon {
-        background: rgba(91, 47, 168, 0.1);
-        color: #6a307d;
+        background: var(--accent-soft);
+        color: var(--accent);
       }
       &.blue-icon {
-        background: rgba(59, 130, 246, 0.1);
-        color: #3b82f6;
+        background: var(--accent-soft);
+        color: var(--brand-soft);
       }
       &.orange-icon {
-        background: rgba(249, 115, 22, 0.1);
-        color: #f97316;
+        background: var(--warn-bg);
+        color: var(--warn);
       }
       &.green-icon {
-        background: rgba(16, 185, 129, 0.1);
-        color: #10b981;
+        background: var(--ok-bg);
+        color: var(--ok);
       }
     }
 
@@ -52,23 +50,23 @@
       align-items: center;
       gap: 4px;
       padding: 4px 10px;
-      border-radius: 20px;
+      border-radius: var(--r-chip);
       font-size: 0.75rem;
       font-weight: 700;
 
       &.trend-up {
-        background: rgba(16, 185, 129, 0.12);
-        color: #059669;
+        background: var(--ok-bg);
+        color: var(--ok);
       }
 
       &.trend-down {
-        background: rgba(239, 68, 68, 0.12);
-        color: #dc2626;
+        background: var(--danger-bg);
+        color: var(--danger);
       }
 
       &.trend-neutral {
-        background: rgba(107, 114, 128, 0.08);
-        color: #4b5563;
+        background: var(--bg);
+        color: var(--text-muted);
       }
     }
   }
@@ -82,21 +80,21 @@
     .stat-title {
       font-size: 0.9rem;
       font-weight: 600;
-      color: #374151;
+      color: var(--text);
       margin: 0;
     }
 
     .stat-value {
       font-size: 1.85rem;
       font-weight: 800;
-      color: #111827;
+      color: var(--text);
       line-height: 1.1;
       margin-top: 2px;
     }
 
     .stat-support {
       font-size: 0.8rem;
-      color: #90949d;
+      color: var(--text-faint);
       margin: 0;
       margin-top: 8px;
     }

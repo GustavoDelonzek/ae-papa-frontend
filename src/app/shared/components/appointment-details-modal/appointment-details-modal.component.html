@@ -84,7 +84,7 @@
         <div class="modal-footer actions-bar">
             <!-- <button class="btn-cancel" (click)="closeModal()">Fechar</button> -->
             <!-- Only show Edit/Action if relevant -->
-            <button class="btn-primary-action" (click)="onEdit()">
+            <button class="ae-btn ae-btn--primary" *ngIf="showEditAction" (click)="onEdit()">
                 <i class="fas fa-pen"></i> Editar Atendimento
             </button>
         </div>

@@ -3,46 +3,46 @@
 <div class="dashboard-container">
   <div class="dashboard-content">
     <!-- Header -->
-    <div class="dashboard-header">
+    <div class="dashboard-header ae-page-header">
       <div class="welcome-section">
-        <h1>Bem-vindo ao AEPAPA</h1>
-        <p class="subtitle">Visão geral do sistema de gerenciamento</p>
+        <h1 class="ae-title-page">Bem-vindo ao AEPAPA</h1>
+        <p class="ae-page-header__subtitle">Visão geral do sistema de gerenciamento</p>
       </div>
-      <div class="date-display">
+      <div class="date-display ae-page-header__actions">
         <i class="fas fa-calendar-alt"></i>
-        {{ getCurrentDateFormatted() }}
+        <span class="mono">{{ getCurrentDateFormatted() }}</span>
       </div>
     </div>
 
     <!-- Stats Cards -->
     <div class="stats-grid">
-      <div class="stat-card primary">
+      <div class="ae-card stat-card primary">
         <div class="stat-icon">
           <i class="fas fa-users"></i>
         </div>
         <div class="stat-content">
           <h3>{{ loading ? '...' : totalPatients }}</h3>
-          <p>Total de Atendidos</p>
+          <p class="ae-label">Total de Atendidos</p>
         </div>
       </div>
 
-      <div class="stat-card success">
+      <div class="ae-card stat-card success">
         <div class="stat-icon">
           <i class="fas fa-calendar-check"></i>
         </div>
         <div class="stat-content">
           <h3>{{ loading ? '...' : appointmentsToday }}</h3>
-          <p>Atendimentos Hoje</p>
+          <p class="ae-label">Atendimentos Hoje</p>
         </div>
       </div>
 
-      <div class="stat-card info">
+      <div class="ae-card stat-card info">
         <div class="stat-icon">
           <i class="fas fa-file-medical"></i>
         </div>
         <div class="stat-content">
           <h3>{{ loading ? '...' : pendingTasks }}</h3>
-          <p>Documentos</p>
+          <p class="ae-label">Documentos</p>
         </div>
       </div>
     </div>
@@ -52,7 +52,7 @@
       <!-- Left Section: Quick Actions & Recent -->
       <div class="left-section">
         <!-- Quick Actions - Role Based -->
-        <div class="card quick-actions">
+        <div class="ae-card ae-card--flush quick-actions">
           <div class="card-header">
             <i class="fas fa-bolt header-icon"></i>
             <h2>Ações Rápidas</h2>
@@ -61,42 +61,42 @@
 
             <!-- Admin Layout: 6 actions (3x2) -->
             <div class="actions-grid-new" *ngIf="isAdmin">
-              <div class="action-card-new" (click)="navigateToPatients()">
+              <div class="ae-card action-card-new" (click)="navigateToPatients()">
                 <div class="action-icon-new">
                   <i class="fas fa-users"></i>
                 </div>
                 <span class="action-label-new">Ver<br>Atendidos</span>
               </div>
 
-              <div class="action-card-new" (click)="navigateToAppointments()">
+              <div class="ae-card action-card-new" (click)="navigateToAppointments()">
                 <div class="action-icon-new">
                   <i class="fas fa-calendar-plus"></i>
                 </div>
                 <span class="action-label-new">Novo<br>Atendimento</span>
               </div>
 
-              <div class="action-card-new" (click)="navigateToCaretakers()">
+              <div class="ae-card action-card-new" (click)="navigateToCaretakers()">
                 <div class="action-icon-new">
                   <i class="fas fa-user-group"></i>
                 </div>
                 <span class="action-label-new">Ver<br>Cuidadores</span>
               </div>
 
-              <div class="action-card-new" (click)="navigateToReports()">
+              <div class="ae-card action-card-new" (click)="navigateToReports()">
                 <div class="action-icon-new">
                   <i class="fas fa-chart-bar"></i>
                 </div>
                 <span class="action-label-new">Gerar<br>Relatórios</span>
               </div>
 
-              <div class="action-card-new" (click)="navigateToStatistics()">
+              <div class="ae-card action-card-new" (click)="navigateToStatistics()">
                 <div class="action-icon-new">
                   <i class="fas fa-chart-line"></i>
                 </div>
                 <span class="action-label-new">Estatísticas</span>
               </div>
 
-              <div class="action-card-new" (click)="navigateToUserRegister()">
+              <div class="ae-card action-card-new" (click)="navigateToUserRegister()">
                 <div class="action-icon-new">
                   <i class="fas fa-user-cog"></i>
                 </div>
@@ -106,28 +106,28 @@
 
             <!-- Clinical Layout: 4 focused actions (2x2) -->
             <div class="actions-grid-new actions-grid-clinical" *ngIf="!isAdmin">
-              <div class="action-card-new" (click)="navigateToPatients()">
+              <div class="ae-card action-card-new" (click)="navigateToPatients()">
                 <div class="action-icon-new">
                   <i class="fas fa-users"></i>
                 </div>
                 <span class="action-label-new">Ver<br>Atendidos</span>
               </div>
 
-              <div class="action-card-new" (click)="navigateToAppointments()">
+              <div class="ae-card action-card-new" (click)="navigateToAppointments()">
                 <div class="action-icon-new">
                   <i class="fas fa-calendar-plus"></i>
                 </div>
                 <span class="action-label-new">Novo<br>Atendimento</span>
               </div>
 
-              <div class="action-card-new" (click)="navigateToNewPatient()">
+              <div class="ae-card action-card-new" (click)="navigateToNewPatient()">
                 <div class="action-icon-new">
                   <i class="fas fa-user-plus"></i>
                 </div>
                 <span class="action-label-new">Novo<br>Paciente</span>
               </div>
 
-              <div class="action-card-new" (click)="navigateToCaretakers()">
+              <div class="ae-card action-card-new" (click)="navigateToCaretakers()">
                 <div class="action-icon-new">
                   <i class="fas fa-user-group"></i>
                 </div>
@@ -139,7 +139,7 @@
         </div>
 
         <!-- Próximos Aniversariantes -->
-        <div class="card birthday-card">
+        <div class="ae-card ae-card--flush birthday-card">
           <div class="card-header">
             <i class="fas fa-birthday-cake header-icon"></i>
             <h2>Próximos Aniversariantes</h2>
@@ -167,7 +167,7 @@
                 </div>
                 <div class="birthday-info">
                   <span class="birthday-name">{{ b.name }}</span>
-                  <span class="birthday-date">{{ b.date }}</span>
+                  <span class="birthday-date mono">{{ b.date }}</span>
                 </div>
                 <div class="birthday-badge" [class.badge-today]="b.isToday">
                   {{ b.isToday ? '🎂 Hoje!' : b.daysUntil + (b.daysUntil === 1 ? ' dia' : ' dias') }}
@@ -182,7 +182,7 @@
 
       <!-- Right Section: Calendar -->
       <div class="right-section">
-        <div class="card calendar-card">
+        <div class="ae-card ae-card--flush calendar-card">
           <div class="card-header">
             <i class="fas fa-calendar-alt header-icon"></i>
             <h2>AGENDA</h2>
@@ -236,7 +236,7 @@
               <div class="selected-date-info" *ngIf="selectedDate">
                 <p class="date-text">
                   <i class="fas fa-calendar-day"></i>
-                  {{ getFormattedSelectedDate() }}
+                  <span class="mono">{{ getFormattedSelectedDate() }}</span>
                 </p>
                 <p class="events-text">
                   {{ loadingAppointments ? 'Carregando...' : (selectedAppointments.length === 0 ? 'Nenhum registro encontrado' : selectedAppointments.length + ' agendamento(s)') }}
@@ -260,11 +260,11 @@
               </div>
               <div class="alerts-list">
                 
-                <div *ngIf="loadingAppointments" class="loading-state-small" style="padding: 1rem; text-align: center;">
-                    <span style="color: #6b7280; font-size: 0.9rem;">Carregando...</span>
+                <div *ngIf="loadingAppointments" class="loading-state-small">
+                    <span>Carregando...</span>
                 </div>
 
-                <div *ngIf="!loadingAppointments && selectedAppointments.length === 0" class="no-alerts-state" style="padding: 1rem; text-align: center; color: #6b7280; font-size: 0.9rem;">
+                <div *ngIf="!loadingAppointments && selectedAppointments.length === 0" class="no-alerts-state">
                   Nenhum atendimento para o dia selecionado.
                 </div>
 
@@ -275,7 +275,7 @@
                     <span class="alert-title">{{ getObjectiveText(apt.objective) }}</span>
                     <span class="alert-description" *ngIf="apt.patient">Paciente: {{ apt.patient.full_name }}</span>
                     <span class="alert-description" *ngIf="!apt.patient">Paciente não identificado</span>
-                    <span class="alert-description">Data: {{ formatAppointmentDate(apt.date) }}</span>
+                    <span class="alert-description">Data: <span class="mono">{{ formatAppointmentDate(apt.date) }}</span></span>
                   </div>
                 </div>
                 

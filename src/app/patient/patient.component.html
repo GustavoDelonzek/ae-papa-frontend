@@ -8,7 +8,7 @@
     </div>
     <div class="top-actions">
       <!-- Clinical Record Button (Dynamic) -->
-      <button class="btn-primary" (click)="handleClinicalRecordAction()">
+      <button class="ae-btn ae-btn--primary" (click)="handleClinicalRecordAction()">
         <ng-container *ngIf="!existingClinicalRecord">
           <i class="fas fa-plus"></i> Adicionar Registro Clínico
         </ng-container>
@@ -17,11 +17,11 @@
         </ng-container>
       </button>
 
-      <button class="btn-secondary" (click)="openEditModal()">
+      <button class="ae-btn ae-btn--ghost" (click)="openEditModal()">
         <i class="fas fa-pen"></i> Editar Perfil
       </button>
 
-      <button class="btn-danger-outline" (click)="openDeactivateModal()" *ngIf="patientData?.status !== 'Inactive'">
+      <button class="ae-btn ae-btn--danger" (click)="openDeactivateModal()" *ngIf="patientData?.status !== 'Inactive'">
         <i class="fas fa-user-slash"></i> Desativar
       </button>
     </div>
@@ -38,13 +38,13 @@
     <div class="error-state">
       <i class="fas fa-exclamation-circle"></i>
       <p>{{ errorMessage }}</p>
-      <button class="btn-secondary" (click)="goBack()">Voltar</button>
+      <button class="ae-btn ae-btn--ghost" (click)="goBack()">Voltar</button>
     </div>
   </div>
 
   <div class="main-content" *ngIf="patientData && !loading">
     <!-- Profile Header Card -->
-    <div class="profile-header-card">
+    <div class="profile-header-card ae-card">
       <div class="profile-content">
         <div class="profile-image-container">
           <div class="profile-image" (click)="onPhotoClick()" style="cursor: pointer; position: relative;">
@@ -54,13 +54,13 @@
             <div class="avatar-placeholder" [class.avatar-inactive]="patientData.status === 'Inactive'" *ngIf="!patientData.profile_picture_url">
               <span>{{ patientData.full_name.charAt(0) }}</span>
             </div>
-            
+
             <!-- Upload Overlay -->
             <div class="photo-overlay" [class.uploading]="uploadingPhoto">
               <i class="fas" [ngClass]="uploadingPhoto ? 'fa-spinner fa-spin' : 'fa-camera'"></i>
             </div>
-            
-            <input type="file" id="profilePhotoInput" style="display: none;" 
+
+            <input type="file" id="profilePhotoInput" style="display: none;"
               accept="image/*" (change)="onFileSelected($event)">
           </div>
         </div>
@@ -69,14 +69,14 @@
           <div class="profile-name-row">
             <h1>
               {{ patientData.full_name }}
-              <span class="badge-inactive" *ngIf="patientData.status === 'Inactive'">Inativo</span>
+              <span class="badge-inactive ae-chip ae-chip--neutral" *ngIf="patientData.status === 'Inactive'">Inativo</span>
             </h1>
           </div>
 
           <div class="profile-stats-row">
             <div class="stat-item">
               <span class="stat-label">IDADE</span>
-              <span class="stat-value">{{ getPatientAge() }} anos</span>
+              <span class="stat-value mono">{{ getPatientAge() }} anos</span>
             </div>
             <div class="stat-item">
               <span class="stat-label">GÊNERO</span>
@@ -88,7 +88,7 @@
             </div>
             <div class="stat-item">
               <span class="stat-label">CPF</span>
-              <span class="stat-value">{{ formatCPF(patientData.cpf) }}</span>
+              <span class="stat-value mono">{{ formatCPF(patientData.cpf) }}</span>
             </div>
           </div>
         </div>
@@ -116,22 +116,22 @@
         <!-- Contact & Address Grid -->
         <div class="contacts-addresses-grid">
           <!-- Contacts Section -->
-          <section class="info-section">
-            <h2 class="section-title">
+          <section class="info-section ae-card">
+            <h2 class="section-title ae-title-block">
               <i class="fas fa-address-book"></i> Contatos
             </h2>
             <div class="info-grid">
               <ng-container *ngIf="patientData?.contacts?.length; else noContacts">
                 <ng-container *ngFor="let contact of patientData!.contacts">
                   <div class="info-card" *ngIf="contact.is_primary">
-                    <label>
+                    <label class="ae-label">
                       <i class="fas" [ngClass]="{
                     'fa-phone': contact.type === 'phone',
                     'fa-envelope': contact.type === 'email',
                     'fa-whatsapp': contact.type === 'whatsapp'
                   }"></i>
                       {{ contact.type | titlecase }}
-                      <span class="badge-primary">Principal</span>
+                      <span class="badge-primary ae-chip ae-chip--accent">Principal</span>
                     </label>
                     <div class="value">{{ contact.value }}</div>
                   </div>
@@ -147,17 +147,17 @@
           </section>
 
           <!-- Addresses Section -->
-          <section class="info-section">
-            <h2 class="section-title">
+          <section class="info-section ae-card">
+            <h2 class="section-title ae-title-block">
               <i class="fas fa-map-marker-alt"></i> Endereços
             </h2>
             <div class="info-grid">
               <ng-container *ngIf="patientData?.addresses?.length; else noAddresses">
                 <div class="info-card" *ngFor="let address of patientData!.addresses">
-                  <label>Localização</label>
+                  <label class="ae-label">Localização</label>
                   <div class="value">{{ address.street }}, {{ address.number }}</div>
                   <div class="sub-value">{{ address.neighborhood }} - {{ address.city }}</div>
-                  <div class="sub-value cep">CEP: {{ address.cep }}</div>
+                  <div class="sub-value cep mono">CEP: {{ address.cep }}</div>
                   <div class="sub-value ref" *ngIf="address.reference_point">Ref: {{ address.reference_point }}</div>
                 </div>
               </ng-container>
@@ -172,32 +172,32 @@
         </div>
 
         <!-- Registry History Section -->
-        <section class="info-section">
-          <h2 class="section-title">
+        <section class="info-section ae-card">
+          <h2 class="section-title ae-title-block">
             <i class="fas fa-history"></i> Histórico do Registro
           </h2>
           <div class="info-grid">
             <div class="info-card">
-              <label>DATA DE CADASTRO</label>
-              <div class="value">{{ formatDate(patientData.created_at || '') }}</div>
+              <label class="ae-label">DATA DE CADASTRO</label>
+              <div class="value mono">{{ formatDate(patientData.created_at || '') }}</div>
               <i class="far fa-calendar-alt card-icon"></i>
             </div>
             <div class="info-card">
-              <label>ÚLTIMA ATUALIZAÇÃO</label>
-              <div class="value">{{ formatDate(patientData.updated_at || '') }}</div>
+              <label class="ae-label">ÚLTIMA ATUALIZAÇÃO</label>
+              <div class="value mono">{{ formatDate(patientData.updated_at || '') }}</div>
               <i class="fas fa-history card-icon"></i>
             </div>
           </div>
         </section>
 
         <!-- Socioeconomic Context Section -->
-        <section class="info-section">
+        <section class="info-section ae-card">
           <div class="section-header"
             style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <h2 class="section-title" style="margin-bottom: 0;">
+            <h2 class="section-title ae-title-block" style="margin-bottom: 0;">
               <i class="fas fa-hand-holding-usd"></i> Perfil Socioeconômico
             </h2>
-            <button class="btn-primary-small" (click)="openSocioeconomicModal()">
+            <button class="ae-btn ae-btn--ghost" (click)="openSocioeconomicModal()">
               <i class="fas" [ngClass]="patientData.socioeconomic_profile ? 'fa-pen' : 'fa-plus'"></i>
               {{ patientData.socioeconomic_profile ? 'Editar' : 'Preencher' }}
             </button>
@@ -206,20 +206,20 @@
           <div class="info-grid" *ngIf="patientData?.socioeconomic_profile">
             <!-- Occupação (JSON or String) -->
             <div class="info-card">
-              <label>OCUPAÇÃO</label>
+              <label class="ae-label">OCUPAÇÃO</label>
               <div class="value">{{ getIncomeDisplay(patientData!.socioeconomic_profile!.income_source) }}</div>
             </div>
             <div class="info-card">
-              <label>MORADIA</label>
-              <div class="value">{{ patientData.socioeconomic_profile?.housing_ownership || 'Não informado' }}</div>
+              <label class="ae-label">MORADIA</label>
+              <div class="value" [class.ae-text-faint]="!patientData.socioeconomic_profile?.housing_ownership">{{ patientData.socioeconomic_profile?.housing_ownership || 'Não informado' }}</div>
             </div>
             <div class="info-card">
-              <label>CONSTRUÇÃO</label>
-              <div class="value">{{ patientData.socioeconomic_profile?.construction_type || 'Não informado' }}</div>
+              <label class="ae-label">CONSTRUÇÃO</label>
+              <div class="value" [class.ae-text-faint]="!patientData.socioeconomic_profile?.construction_type">{{ patientData.socioeconomic_profile?.construction_type || 'Não informado' }}</div>
             </div>
             <!-- Sanitation (JSON) -->
             <div class="info-card" style="grid-column: span 2;">
-              <label>SANEAMENTO</label>
+              <label class="ae-label">SANEAMENTO</label>
               <div class="value" style="font-size: 0.9rem;">
                 {{ getSanitationDisplay(patientData!.socioeconomic_profile!.sanitation_details) }}
               </div>
@@ -245,8 +245,8 @@
       <!-- CUIDADOR TAB -->
       <div *ngIf="activeTab === 'Cuidador'" class="caretaker-tab fade-in">
         <div class="caretaker-header-actions">
-          <h2>Cuidadores</h2>
-          <button class="btn-primary-small" (click)="addCaretaker()">
+          <h2 class="ae-title-block">Cuidadores</h2>
+          <button class="ae-btn ae-btn--ghost" (click)="addCaretaker()">
             <i class="fas fa-plus"></i> Novo Cuidador
           </button>
         </div>
@@ -258,7 +258,7 @@
                     <!-- Gender Filter -->
                     <div class="select-wrapper">
                         <i class="far fa-user-circle input-icon"></i>
-                        <select [(ngModel)]="caretakerGenderFilter" (change)="onCaretakerFilterChange()"
+                        <select class="ae-field" [(ngModel)]="caretakerGenderFilter" (change)="onCaretakerFilterChange()"
                             [class.active-select]="caretakerGenderFilter">
                             <option value="" disabled selected>Gênero</option>
                             <option value="">Todos</option>
@@ -271,7 +271,7 @@
                     <!-- Age Filter -->
                     <div class="select-wrapper">
                         <i class="fas fa-birthday-cake input-icon"></i>
-                        <select [(ngModel)]="caretakerAgeFilter" (change)="onCaretakerFilterChange()"
+                        <select class="ae-field" [(ngModel)]="caretakerAgeFilter" (change)="onCaretakerFilterChange()"
                             [class.active-select]="caretakerAgeFilter">
                             <option value="" disabled selected>Faixa Etária</option>
                             <option value="">Todas</option>
@@ -285,7 +285,7 @@
                     <!-- Kinship Filter -->
                     <div class="select-wrapper">
                         <i class="fas fa-users input-icon"></i>
-                        <select [(ngModel)]="caretakerKinshipFilter" (change)="onCaretakerFilterChange()"
+                        <select class="ae-field" [(ngModel)]="caretakerKinshipFilter" (change)="onCaretakerFilterChange()"
                             [class.active-select]="caretakerKinshipFilter">
                             <option value="" disabled selected>Parentesco</option>
                             <option value="">Todos</option>
@@ -298,7 +298,7 @@
                     </div>
                 </div>
 
-                <button class="btn-clear" (click)="clearCaretakerFilters()" *ngIf="hasActiveCaretakerFilters()">
+                <button class="ae-btn ae-btn--ghost" (click)="clearCaretakerFilters()" *ngIf="hasActiveCaretakerFilters()">
                     <i class="fas fa-times"></i> Limpar Filtros
                 </button>
             </div>
@@ -314,7 +314,7 @@
         </div>
 
         <div class="caretaker-grid" *ngIf="!loadingCaretakers && filteredCaretakers.length > 0">
-          <div class="caretaker-card-new" *ngFor="let caretaker of filteredCaretakers" (click)="viewCaretaker(caretaker.id!)">
+          <div class="caretaker-card-new ae-card" *ngFor="let caretaker of filteredCaretakers" (click)="viewCaretaker(caretaker.id!)">
             <div class="card-header">
               <div class="avatar-circle"
                 [ngClass]="{'familiar': caretaker.kinship !== 'professional_caregiver', 'prof': caretaker.kinship === 'professional_caregiver'}">
@@ -338,7 +338,7 @@
             <div class="card-body">
               <div class="info-row">
                 <i class="far fa-id-card"></i>
-                <span>{{ formatCPF(caretaker.cpf) }}</span>
+                <span class="mono">{{ formatCPF(caretaker.cpf) }}</span>
               </div>
 
               <div class="info-row" *ngIf="getPrimaryContact(caretaker.contacts, 'phone') as phone">
@@ -358,8 +358,8 @@
       <!-- ATENDIMENTOS TAB -->
       <div *ngIf="activeTab === 'consultas'" class="appointments-tab fade-in">
         <div class="appointments-header-actions">
-          <h2>Histórico de Atendimentos</h2>
-          <button class="btn-primary-small" (click)="openCreateAppointmentModal()">
+          <h2 class="ae-title-block">Histórico de Atendimentos</h2>
+          <button class="ae-btn ae-btn--ghost" (click)="openCreateAppointmentModal()">
             <i class="fas fa-plus"></i> Novo Atendimento
           </button>
         </div>
@@ -371,7 +371,7 @@
                     <!-- Objective Filter -->
                     <div class="select-wrapper">
                         <i class="fas fa-bullseye input-icon"></i>
-                        <select [(ngModel)]="objectiveFilter" (change)="onFilterChange()"
+                        <select class="ae-field" [(ngModel)]="objectiveFilter" (change)="onFilterChange()"
                             [class.active-select]="objectiveFilter">
                             <option value="" disabled selected>Objetivo</option>
                             <option value="">Todos</option>
@@ -390,7 +390,7 @@
 
                 </div>
 
-                <button class="btn-clear" (click)="clearFilters()" *ngIf="hasActiveFilters()">
+                <button class="ae-btn ae-btn--ghost" (click)="clearFilters()" *ngIf="hasActiveFilters()">
                     <i class="fas fa-times"></i> Limpar Filtros
                 </button>
             </div>
@@ -406,9 +406,9 @@
         </div>
 
         <div class="appointments-list" *ngIf="!loadingAppointments && appointments.length > 0">
-          <div class="appointment-item" *ngFor="let appointment of appointments"
+          <div class="appointment-item ae-card ae-card--flush" *ngFor="let appointment of appointments"
             (click)="viewAppointment(appointment.id!)">
-            <div class="date-badge">
+            <div class="date-badge mono">
               <span class="day">{{ formatAppointmentDate(appointment.date).split('/')[0] }}</span>
               <span class="month">{{ formatAppointmentDate(appointment.date).split('/')[1] }}</span>
               <span class="year">{{ formatAppointmentDate(appointment.date).split('/')[2] }}</span>
@@ -457,7 +457,7 @@
           </div>
           <div class="patient-appt-summary-text">
             <span class="patient-appt-summary-label">Atendido</span>
-            <span class="patient-appt-summary-value">{{ patientData?.full_name || 'Nao informado' }}</span>
+            <span class="patient-appt-summary-value" [class.ae-text-faint]="!patientData?.full_name">{{ patientData?.full_name || 'Nao informado' }}</span>
           </div>
         </div>
 
@@ -467,7 +467,7 @@
           </div>
           <div class="patient-appt-summary-text">
             <span class="patient-appt-summary-label">Data</span>
-            <span class="patient-appt-summary-value">{{ newAppointment.date || 'Nao definida' }}</span>
+            <span class="patient-appt-summary-value" [class.ae-text-faint]="!newAppointment.date">{{ newAppointment.date || 'Nao definida' }}</span>
           </div>
         </div>
 
@@ -477,7 +477,7 @@
           </div>
           <div class="patient-appt-summary-text">
             <span class="patient-appt-summary-label">Objetivo</span>
-            <span class="patient-appt-summary-value">{{ newAppointment.objective ? getObjectiveText(newAppointment.objective) : 'Nao definido' }}</span>
+            <span class="patient-appt-summary-value" [class.ae-text-faint]="!newAppointment.objective">{{ newAppointment.objective ? getObjectiveText(newAppointment.objective) : 'Nao definido' }}</span>
           </div>
         </div>
       </div>
@@ -508,12 +508,12 @@
       <div class="patient-appt-main-body">
         <form (ngSubmit)="createAppointment()" #appointmentForm="ngForm">
           <div class="patient-appt-field-group">
-            <label class="patient-appt-field-label">Atendido</label>
-            <input type="text" class="patient-appt-input" [value]="patientData?.full_name" disabled>
+            <label class="ae-field-label">Atendido</label>
+            <input type="text" class="ae-field" [value]="patientData?.full_name" disabled>
           </div>
 
           <div class="patient-appt-field-group">
-            <label class="patient-appt-field-label">Data do Atendimento <span class="patient-appt-required">*</span></label>
+            <label class="ae-field-label">Data do Atendimento <span class="patient-appt-required">*</span></label>
             <div class="patient-appt-input-wrapper custom-date-picker-wrapper">
               <mat-form-field class="custom-mat-form-field" style="width: 100%;">
                   <input matInput [matDatepicker]="pickerPatientApptModal" name="date"
@@ -525,7 +525,7 @@
           </div>
 
           <div class="patient-appt-field-group">
-            <label class="patient-appt-field-label">Objetivo <span class="patient-appt-required">*</span></label>
+            <label class="ae-field-label">Objetivo <span class="patient-appt-required">*</span></label>
             <div class="patient-appt-objective-grid">
               <button type="button" class="patient-appt-obj-card"
                 [class.patient-appt-obj-active]="newAppointment.objective === 'donation'"
@@ -580,20 +580,20 @@
           </div>
 
           <div class="patient-appt-field-group" *ngIf="canEditObservations()">
-            <label class="patient-appt-field-label">Observacoes</label>
-            <textarea name="observations" class="patient-appt-input patient-appt-textarea" rows="4"
+            <label class="ae-field-label">Observacoes</label>
+            <textarea name="observations" class="ae-field" rows="4"
               [(ngModel)]="newAppointment.observations"></textarea>
           </div>
 
           <div class="patient-appt-actions">
-            <button type="button" class="patient-appt-btn-ghost" (click)="closeAppointmentModal()">Cancelar</button>
-            <button type="submit" class="patient-appt-btn-submit" [disabled]="!appointmentForm.form.valid || savingAppointment">
+            <button type="button" class="ae-btn ae-btn--ghost" (click)="closeAppointmentModal()">Cancelar</button>
+            <button type="submit" class="ae-btn ae-btn--primary" [disabled]="!appointmentForm.form.valid || savingAppointment">
               <span *ngIf="!savingAppointment">Agendar</span>
               <span *ngIf="savingAppointment"><i class="fas fa-spinner fa-spin"></i></span>
             </button>
           </div>
         </form>
-        <div class="alert-error" *ngIf="appointmentErrorMessage">
+        <div class="alert-error ae-alert ae-alert--danger" *ngIf="appointmentErrorMessage">
           {{ appointmentErrorMessage }}
         </div>
       </div>

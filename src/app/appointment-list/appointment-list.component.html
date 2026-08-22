@@ -10,12 +10,12 @@
                 </div>
             </div>
 
-            <div class="header-main-row">
+            <div class="header-main-row ae-page-header">
                 <div class="title-section">
-                    <h1>Gerenciamento de Atendimentos</h1>
-                    <p class="subtitle">Acompanhe e gerencie todos os atendimentos marcados.</p>
+                    <h1 class="ae-title-page">Gerenciamento de Atendimentos</h1>
+                    <p class="subtitle ae-page-header__subtitle">Acompanhe e gerencie todos os atendimentos marcados.</p>
                 </div>
-                <button class="btn-primary" (click)="createAppointment()">
+                <button class="ae-btn ae-btn--primary" (click)="createAppointment()">
                     <i class="fas fa-plus"></i> Novo Atendimento
                 </button>
             </div>
@@ -25,9 +25,9 @@
         <div class="filters-container">
             <div class="search-wrapper">
                 <i class="fas fa-search"></i>
-                <input type="text" placeholder="Buscar por paciente..." [(ngModel)]="searchTerm"
+                <input type="text" class="ae-field" placeholder="Buscar por paciente..." [(ngModel)]="searchTerm"
                     (input)="onSearch($any($event.target).value)">
-                <span class="count-badge" *ngIf="paginationMeta?.total > 0">{{ paginationMeta.total }} registros
+                <span class="count-badge ae-chip ae-chip--neutral" *ngIf="paginationMeta?.total > 0"><span class="mono">{{ paginationMeta.total }}</span> registros
                     encontrados</span>
             </div>
 
@@ -36,7 +36,7 @@
                     <!-- Objective Filter (Select) -->
                     <div class="select-wrapper">
                         <i class="fas fa-bullseye input-icon"></i>
-                        <select [(ngModel)]="objectiveFilter" (change)="onFilterChange()"
+                        <select class="ae-field" [(ngModel)]="objectiveFilter" (change)="onFilterChange()"
                             [class.active-select]="objectiveFilter">
                             <option value="" disabled selected>Objetivo</option>
                             <option value="">Todos</option>
@@ -55,25 +55,25 @@
 
                 </div>
 
-                <button class="btn-clear" (click)="clearFilters()" *ngIf="hasActiveFilters()">
+                <button class="ae-btn ae-btn--ghost" (click)="clearFilters()" *ngIf="hasActiveFilters()">
                     <i class="fas fa-times"></i> Limpar Filtros
                 </button>
             </div>
         </div>
 
         <!-- Mensagem de erro -->
-        <div class="alert alert-error" *ngIf="errorMessage">
+        <div class="ae-alert ae-alert--danger" *ngIf="errorMessage">
             <i class="fas fa-exclamation-circle"></i>
             {{ errorMessage }}
         </div>
 
         <!-- Content Table -->
-        <div class="table-card">
+        <div class="table-card ae-card ae-card--flush">
             <div class="loading-state" *ngIf="loading">
                 <div class="spinner"></div>
             </div>
 
-            <table class="custom-table" *ngIf="!loading">
+            <table class="custom-table ae-table" *ngIf="!loading">
                 <thead>
                     <tr>
                         <th (click)="onSort('id')">ID <i class="fas fa-sort" *ngIf="sortColumn !== 'id'"></i><i
@@ -105,7 +105,7 @@
                             </div>
                         </td>
                         <td>
-                            <div class="date-badge-compact">
+                            <div class="date-badge-compact mono">
                                 <div class="day">{{ getDay(item.date) }}</div>
                                 <div class="month-year">
                                     <span class="month">{{ getShortMonth(item.date) }}</span>
@@ -129,7 +129,7 @@
                 </tbody>
             </table>
 
-            <div class="empty-state" *ngIf="!loading && appointments.length === 0">
+            <div class="ae-empty" *ngIf="!loading && appointments.length === 0">
                 <i class="fas fa-calendar-times"></i>
                 <p>Nenhum atendimento encontrado com os filtros selecionados.</p>
             </div>
@@ -153,7 +153,7 @@
     </div>
 
     <app-appointment-details-modal [visible]="showDetailsModal" [appointment]="selectedAppointment"
-        (close)="closeDetailsModal()" (edit)="onEditAppointment($any($event))">
+        [showEditAction]="true" (close)="closeDetailsModal()" (edit)="onEditAppointment($any($event))">
     </app-appointment-details-modal>
 
     <!-- ================================================== -->
@@ -233,7 +233,7 @@
 
                         <!-- Atendido -->
                         <div class="appt-field-group">
-                            <label class="appt-field-label">
+                            <label class="ae-field-label">
                                 Atendido <span class="appt-required">*</span>
                             </label>
                             <div class="appt-patient-selector" (click)="openPatientSearch()" [class.appt-selector-filled]="selectedPatient">
@@ -258,7 +258,7 @@
 
                         <!-- Data -->
                         <div class="appt-field-group">
-                            <label class="appt-field-label">
+                            <label class="ae-field-label">
                                 Data do Atendimento <span class="appt-required">*</span>
                             </label>
                             <div class="appt-input-wrapper custom-date-picker-wrapper">
@@ -275,7 +275,7 @@
 
                         <!-- Objetivo - Cards -->
                         <div class="appt-field-group">
-                            <label class="appt-field-label">
+                            <label class="ae-field-label">
                                 Objetivo <span class="appt-required">*</span>
                             </label>
                             <div class="appt-objective-grid">
@@ -340,10 +340,10 @@
 
                         <!-- Observações -->
                         <div class="appt-field-group" *ngIf="canEditObservations()">
-                            <label class="appt-field-label">
+                            <label class="ae-field-label">
                                 Observações <span class="appt-optional">(opcional)</span>
                             </label>
-                            <textarea name="observations" class="appt-input appt-textarea"
+                            <textarea name="observations" class="ae-field"
                                 [(ngModel)]="observations"
                                 placeholder="Descreva informações relevantes sobre este atendimento..."
                                 rows="3" [disabled]="submitting"></textarea>
@@ -351,10 +351,10 @@
 
                         <!-- Actions -->
                         <div class="appt-actions">
-                            <button type="button" class="appt-btn-ghost" (click)="resetForm()" [disabled]="submitting">
+                            <button type="button" class="ae-btn ae-btn--ghost" (click)="resetForm()" [disabled]="submitting">
                                 <i class="fas fa-undo"></i> Limpar
                             </button>
-                            <button type="submit" class="appt-btn-submit"
+                            <button type="submit" class="ae-btn ae-btn--primary"
                                 [disabled]="!selectedPatient || !appointmentDate || !appointmentObjective || submitting">
                                 <i class="fas" [ngClass]="submitting ? 'fa-spinner fa-spin' : 'fa-check'"></i>
                                 {{ submitting ? (isEditMode() ? 'Atualizando...' : 'Registrando...') : (isEditMode() ? 'Salvar Alterações' : 'Criar Atendimento') }}
@@ -397,7 +397,7 @@
                             (input)="onSearchCpfChange()"
                             (keyup.enter)="searchPatientByCpf()"
                             autocomplete="off">
-                        <button type="button" class="appt-cpf-search-btn" (click)="searchPatientByCpf()"
+                        <button type="button" class="ae-btn ae-btn--primary appt-cpf-search-btn" (click)="searchPatientByCpf()"
                             [disabled]="searching || !searchCpf">
                             <i class="fas" [ngClass]="searching ? 'fa-spinner fa-spin' : 'fa-search'"></i>
                             {{ searching ? 'Buscando...' : 'Buscar' }}

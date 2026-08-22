@@ -1,62 +1,44 @@
-<!-- Mobile Toggle Button -->
-<button class="mobile-toggle" (click)="toggleSidebar()">
+<button class="mobile-toggle" (click)="toggleSidebar()" aria-label="Abrir menu">
   <i class="fa-solid fa-bars"></i>
 </button>
 
-<!-- Overlay for Mobile -->
 <div class="sidebar-overlay" [class.open]="isSidebarOpen" (click)="closeSidebar()"></div>
 
 <div class="sidebar" [class.open]="isSidebarOpen">
-  <!-- Header -->
-  <div class="sidebar-header">
-    <div class="logo-area">
-      <div class="logo-icon">
-        <img src="assets/images/logo.png" alt="AEPAPA Logo" class="brand-logo" style="width: 50px;">
-      </div>
-      <div class="logo-text">
-        <span class="brand-name">AEPAPA</span>
-      </div>
-    </div>
+  <div class="sidebar-brand">
+    <img src="assets/images/logo.png" alt="AEPAPA" class="brand-logo">
+    <span class="brand-name">AEPAPA</span>
   </div>
 
-  <!-- Nav -->
   <nav class="sidebar-nav">
     <ul class="nav-list">
       <ng-container *ngFor="let item of menuItems">
 
-        <!-- SECTION HEADER -->
-        <li class="nav-section-header" *ngIf="item.type === 'header' && (!item.adminOnly || isAdmin)">
-          {{ item.text }}
+        <li class="nav-separator" *ngIf="item.type === 'header' && (!item.adminOnly || isAdmin)">
+          <span class="nav-separator-text">{{ item.text }}</span>
         </li>
 
-        <!-- LINK ITEM (No Children) -->
         <li class="nav-item" *ngIf="item.type === 'link' && !item.children && (!item.adminOnly || isAdmin)">
           <a [routerLink]="[item.link]" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
-            class="nav-link" (click)="closeSidebar()">
-            <div class="nav-icon" *ngIf="item.icon">
-              <i [class]="item.icon"></i>
-            </div>
-            <span class="nav-text">{{ item.text }}</span>
+            class="nav-link" [title]="item.text" (click)="closeSidebar()">
+            <span class="nav-icon" *ngIf="item.icon"><i [class]="item.icon"></i></span>
+            <span class="nav-label">{{ item.text }}</span>
           </a>
         </li>
 
-        <!-- GROUP ITEM (With Children) -->
         <li class="nav-item has-children" *ngIf="item.type === 'link' && item.children && (!item.adminOnly || isAdmin)"
           [class.expanded]="item.expanded">
-          <a class="nav-link parent-link" (click)="toggleGroup(item)">
-            <div class="nav-icon" *ngIf="item.icon">
-              <i [class]="item.icon"></i>
-            </div>
-            <span class="nav-text">{{ item.text }}</span>
+          <a class="nav-link parent-link" [title]="item.text" (click)="toggleGroup(item)">
+            <span class="nav-icon" *ngIf="item.icon"><i [class]="item.icon"></i></span>
+            <span class="nav-label">{{ item.text }}</span>
             <i class="fa-solid fa-chevron-right arrow-icon"></i>
           </a>
 
           <ul class="submenu" [style.max-height]="item.expanded ? '500px' : '0'">
             <li class="nav-item" *ngFor="let subItem of item.children">
               <a [routerLink]="[subItem.link]" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
-                class="nav-link sub-link" (click)="closeSidebar()">
-                <div class="bullet-point"></div>
-                <span class="nav-text">{{ subItem.text }}</span>
+                class="nav-link sub-link" [title]="subItem.text" (click)="closeSidebar()">
+                <span class="nav-label">{{ subItem.text }}</span>
               </a>
             </li>
           </ul>
@@ -66,13 +48,10 @@
     </ul>
   </nav>
 
-  <!-- Footer -->
   <div class="sidebar-footer">
-    <button class="logout-button" (click)="logout()">
-      <div class="nav-icon">
-        <i class="fa-solid fa-arrow-right-from-bracket"></i>
-      </div>
-      <span class="nav-text">Sair do Sistema</span>
+    <button class="logout-button" (click)="logout()" title="Sair do Sistema">
+      <span class="nav-icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></span>
+      <span class="nav-label">Sair do Sistema</span>
     </button>
   </div>
 </div>

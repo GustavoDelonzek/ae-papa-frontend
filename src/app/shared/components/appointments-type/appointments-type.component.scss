@@ -1,9 +1,8 @@
 .appointments-type-container {
-  background: #ffffff;
-  border-radius: 16px;
+  background: var(--surface);
+  border-radius: var(--r-card);
   padding: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(15, 23, 42, 0.04);
+  border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -13,12 +12,12 @@
     h3 {
       font-size: 1.25rem;
       font-weight: 700;
-      color: #111827;
+      color: var(--text);
       margin: 0 0 8px 0;
     }
     p {
       font-size: 0.85rem;
-      color: #6b7280;
+      color: var(--text-muted);
       margin: 0;
       line-height: 1.4;
     }
@@ -42,19 +41,19 @@
         .type-name {
           font-size: 0.9rem;
           font-weight: 600;
-          color: #1f2937;
+          color: var(--text);
         }
 
         .type-percent {
           font-size: 0.9rem;
           font-weight: 700;
-          color: #111827;
+          color: var(--text);
         }
       }
 
       .type-progress-track {
         height: 6px;
-        background: rgba(0, 0, 0, 0.05);
+        background: var(--hairline);
         border-radius: 999px;
         overflow: hidden;
 
@@ -63,7 +62,7 @@
           border-radius: 999px;
           transition: width 0.5s ease-out;
 
-          &.primary { background: #6a307d; }
+          &.primary { background: var(--accent); }
           &.secondary { background: #7c3aed; }
           &.tertiary { background: #a78bfa; }
           &.quaternary { background: #e9d5ff; }
@@ -75,7 +74,7 @@
   .empty-state {
     padding: 24px 0;
     text-align: center;
-    color: #9ca3af;
+    color: var(--text-faint);
     font-size: 0.9rem;
   }
 
@@ -90,8 +89,8 @@
       width: 48px;
       height: 48px;
       border-radius: 50%;
-      background: rgba(16, 185, 129, 0.15);
-      color: #059669;
+      background: var(--ok-bg);
+      color: var(--ok);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -108,13 +107,13 @@
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: #4b5563;
+        color: var(--text-muted);
       }
 
       .score-value {
         font-size: 1.5rem;
         font-weight: 800;
-        color: #111827;
+        color: var(--text);
       }
     }
   }

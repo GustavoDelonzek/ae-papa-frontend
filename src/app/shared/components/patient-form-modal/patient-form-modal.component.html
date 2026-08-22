@@ -61,14 +61,14 @@
                         <!-- STEP 1: Identification -->
                         <div class="step-content-container" *ngIf="currentStep === 1">
                             <div class="form-group">
-                                <label>Nome Completo <span class="required">*</span></label>
-                                <input type="text" name="full_name" class="form-control"
+                                <label class="ae-field-label">Nome Completo <span class="required">*</span></label>
+                                <input type="text" name="full_name" class="ae-field"
                                     [(ngModel)]="currentPatient.full_name" required placeholder="Nome do atendido">
                             </div>
 
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label>Data de Nascimento <span class="required">*</span></label>
+                                    <label class="ae-field-label">Data de Nascimento <span class="required">*</span></label>
                                     <mat-form-field class="custom-mat-form-field">
                                         <input matInput [matDatepicker]="pickerBirth" name="birth_date"
                                             [(ngModel)]="currentPatient.birth_date" [max]="maxBirthDate" required placeholder="DD/MM/AAAA" appDateMask (click)="pickerBirth.open()">
@@ -78,8 +78,8 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Gênero <span class="required">*</span></label>
-                                    <select name="gender" class="form-control" [(ngModel)]="currentPatient.gender"
+                                    <label class="ae-field-label">Gênero <span class="required">*</span></label>
+                                    <select name="gender" class="ae-field" [(ngModel)]="currentPatient.gender"
                                         required>
                                         <option value="" disabled>Selecione...</option>
                                         <option value="M">Masculino</option>
@@ -90,21 +90,21 @@
 
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label>CPF <span class="required">*</span></label>
-                                    <input type="text" name="cpf" class="form-control" [(ngModel)]="currentPatient.cpf"
+                                    <label class="ae-field-label">CPF <span class="required">*</span></label>
+                                    <input type="text" name="cpf" class="ae-field" [(ngModel)]="currentPatient.cpf"
                                         required (input)="formatCPF($event)" maxlength="14" placeholder="000.000.000-00">
                                 </div>
 
                                 <div class="form-group">
-                                    <label>RG</label>
-                                    <input type="text" name="rg" class="form-control" [(ngModel)]="currentPatient.rg"
+                                    <label class="ae-field-label">RG</label>
+                                    <input type="text" name="rg" class="ae-field" [(ngModel)]="currentPatient.rg"
                                         placeholder="Opcional">
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label>Estado Civil <span class="required">*</span></label>
-                                <select name="marital_status" class="form-control"
+                                <label class="ae-field-label">Estado Civil <span class="required">*</span></label>
+                                <select name="marital_status" class="ae-field"
                                     [(ngModel)]="currentPatient.marital_status" required>
                                     <option value="" disabled>Selecione...</option>
                                     <option value="single">Solteiro(a)</option>
@@ -119,8 +119,8 @@
                         <div class="step-content-container" *ngIf="currentStep === 2">
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label>Tipo <span class="required">*</span></label>
-                                    <select class="form-control" [(ngModel)]="newContact.type" name="contactType"
+                                    <label class="ae-field-label">Tipo <span class="required">*</span></label>
+                                    <select class="ae-field" [(ngModel)]="newContact.type" name="contactType"
                                         required>
                                         <option value="phone">Telefone</option>
                                         <option value="email">E-mail</option>
@@ -128,8 +128,8 @@
                                     </select>
                                 </div>
                                 <div class="form-group" style="flex: 2;">
-                                    <label>Contato</label>
-                                    <input type="text" class="form-control" [(ngModel)]="newContact.value"
+                                    <label class="ae-field-label">Contato</label>
+                                    <input type="text" class="ae-field" [(ngModel)]="newContact.value"
                                         name="contactValue" placeholder="Ex: (00) 00000-0000">
                                 </div>
                             </div>
@@ -147,42 +147,42 @@
                                 <h4>Adicionar Endereço</h4>
                                 <div class="form-row">
                                     <div class="form-group" style="flex: 0 0 120px;">
-                                        <label>CEP</label>
-                                        <input type="text" class="form-control" [(ngModel)]="newAddress.cep"
+                                        <label class="ae-field-label">CEP</label>
+                                        <input type="text" class="ae-field" [(ngModel)]="newAddress.cep"
                                             name="addrCep" mask="00000-000">
                                     </div>
                                     <div class="form-group">
-                                        <label>Cidade</label>
-                                        <input type="text" class="form-control" [(ngModel)]="newAddress.city"
+                                        <label class="ae-field-label">Cidade</label>
+                                        <input type="text" class="ae-field" [(ngModel)]="newAddress.city"
                                             name="addrCity">
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group" style="flex: 2;">
-                                        <label>Logradouro</label>
-                                        <input type="text" class="form-control" [(ngModel)]="newAddress.street"
+                                        <label class="ae-field-label">Logradouro</label>
+                                        <input type="text" class="ae-field" [(ngModel)]="newAddress.street"
                                             name="addrStreet">
                                     </div>
                                     <div class="form-group" style="flex: 0 0 80px;">
-                                        <label>Número</label>
-                                        <input type="text" class="form-control" [(ngModel)]="newAddress.number"
+                                        <label class="ae-field-label">Número</label>
+                                        <input type="text" class="ae-field" [(ngModel)]="newAddress.number"
                                             name="addrNumber">
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label>Bairro</label>
-                                        <input type="text" class="form-control" [(ngModel)]="newAddress.neighborhood"
+                                        <label class="ae-field-label">Bairro</label>
+                                        <input type="text" class="ae-field" [(ngModel)]="newAddress.neighborhood"
                                             name="addrNeighborhood">
                                     </div>
                                     <div class="form-group">
-                                        <label>Comp./Ref.</label>
-                                        <input type="text" class="form-control" [(ngModel)]="newAddress.reference_point"
+                                        <label class="ae-field-label">Comp./Ref.</label>
+                                        <input type="text" class="ae-field" [(ngModel)]="newAddress.reference_point"
                                             name="addrRef">
                                     </div>
                                 </div>
                                 <div style="display: flex; justify-content: flex-end;">
-                                    <button type="button" class="btn-add" (click)="addAddress()"
+                                    <button type="button" class="ae-btn ae-btn--ghost" (click)="addAddress()"
                                         [disabled]="!newAddress.street">
                                         Adicionar Endereço
                                     </button>
@@ -214,19 +214,19 @@
                 </div>
 
                 <div class="main-footer">
-                    <button type="button" class="btn-secondary" (click)="onClose()">Cancelar</button>
+                    <button type="button" class="ae-btn ae-btn--ghost" (click)="onClose()">Cancelar</button>
 
-                    <button type="button" class="btn-secondary" *ngIf="currentStep > 1" (click)="prevStep()">
+                    <button type="button" class="ae-btn ae-btn--ghost" *ngIf="currentStep > 1" (click)="prevStep()">
                         <i class="fas fa-arrow-left"></i> Anterior
                     </button>
 
-                    <button type="button" class="btn-submit" *ngIf="currentStep < 3" (click)="nextStep()">
+                    <button type="button" class="ae-btn ae-btn--primary" *ngIf="currentStep < 3" (click)="nextStep()">
                         Próximo <i class="fas fa-arrow-right"></i>
                     </button>
 
-                    <button type="button" class="btn-submit" 
-                        *ngIf="isEditing || currentStep === 3" 
-                        (click)="save()" 
+                    <button type="button" class="ae-btn ae-btn--primary"
+                        *ngIf="isEditing || currentStep === 3"
+                        (click)="save()"
                         [disabled]="isSaving">
                         <span *ngIf="!isSaving">{{ isEditing ? 'Atualizar' : 'Salvar' }}</span>
                         <span *ngIf="isSaving"><i class="fas fa-spinner fa-spin"></i></span>
